@@ -2,8 +2,14 @@
   "$schema": "https://biomejs.dev/schemas/2.2.2/schema.json",
   "root": true,
   "assist": {
+    "enabled": true,
     "actions": {
-      "source": { "organizeImports": "on" }
+      "recommended": true,
+      "source": {
+        "organizeImports": "on",
+        "recommended": true,
+        "useSortedAttributes": "on"
+      }
     }
   },
   "linter": {
@@ -30,7 +36,12 @@
         "noPrototypeBuiltins": "warn",
         "noConstEnum": "off",
         "noUnknownAtRules": "off",
-        "noConsole": { "level": "warn", "options": { "allow": ["log"] } }
+        "noConsole": {
+          "level": "warn",
+          "options": {
+            "allow": ["log"]
+          }
+        }
       },
       "style": {
         "noNonNullAssertion": "warn",
@@ -51,7 +62,9 @@
         "noUselessElse": "error",
         "useConsistentArrayType": {
           "level": "warn",
-          "options": { "syntax": "shorthand" }
+          "options": {
+            "syntax": "shorthand"
+          }
         }
       },
       "complexity": {
@@ -106,6 +119,9 @@
     ]
   },
   "javascript": {
+    "assist": {
+      "enabled": true
+    },
     "formatter": {
       "quoteStyle": "double",
       "semicolons": "always",
@@ -115,8 +131,14 @@
     }
   },
   "json": {
+    "assist": {
+      "enabled": true
+    },
+    "linter": {
+      "enabled": true
+    },
     "parser": {
-      "allowComments": true
+      "allowComments": false
     },
     "formatter": {
       "enabled": true
@@ -126,5 +148,16 @@
     "enabled": true,
     "clientKind": "git",
     "useIgnoreFile": true
+  },
+  "css": {
+    "assist": {
+      "enabled": true
+    },
+    "formatter": {
+      "enabled": true
+    },
+    "linter": {
+      "enabled": true
+    }
   }
 }
