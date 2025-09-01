@@ -25,7 +25,8 @@
         "useExhaustiveDependencies": "warn",
         "noUnusedImports": "error",
         "noUnreachable": "warn",
-        "noSwitchDeclarations": "warn"
+        "noSwitchDeclarations": "warn",
+        "useUniqueElementIds": "off"
       },
       "suspicious": {
         "noExplicitAny": "warn",
