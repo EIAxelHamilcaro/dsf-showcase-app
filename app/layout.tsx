@@ -130,7 +130,7 @@ export default async function RootLayout({
       <body
         className={cn(
           `${geistSans.variable} ${geistMono.variable}`,
-          "antialiased size-full h-screen",
+          "antialiased size-full",
         )}
       >
         <Providers>{children}</Providers>
