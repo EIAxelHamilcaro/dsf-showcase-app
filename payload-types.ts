@@ -199,9 +199,10 @@ export interface Config1 {
   /**
    * Texte des deux boutons principaux visible dans la Hero
    */
-  main_button?: {
+  main_button: {
     main_button_1?: string | null;
     main_button_2?: string | null;
+    guide_pdf: number | Media;
   };
   /**
    * Titre de la section À propos du site
@@ -380,6 +381,7 @@ export interface ConfigSelect<T extends boolean = true> {
     | {
         main_button_1?: T;
         main_button_2?: T;
+        guide_pdf?: T;
       };
   about_title?: T;
   about_text?: T;

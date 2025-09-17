@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import type { Config1, Media } from "@/payload-types";
 import { RichTextBoldOnly } from "./richText";
+import Link from "next/link";
 
 export default function HeroSection({ config }: { config: Config1 }) {
   const heroImage = config.hero_image as Media;
@@ -39,12 +40,21 @@ export default function HeroSection({ config }: { config: Config1 }) {
               </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex flex-col sm:flex-row gap-4 flex-wrap">
               <Button asChild size="lg">
                 <a href="#contact">{config.main_button?.main_button_1}</a>
               </Button>
               <Button asChild size="lg" variant="outline">
                 <a href="#realisations">{config.main_button?.main_button_2}</a>
+              </Button>
+              <Button
+                variant="destructive"
+                size="lg"
+                asChild
+              >
+                <Link href={(config.main_button.guide_pdf as Media).url || ""} target="_blank">
+                  Télécharger votre guide gratuitement
+                </Link>
               </Button>
             </div>
           </div>

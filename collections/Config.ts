@@ -145,6 +145,14 @@ const Config: CollectionConfig = {
           label: "Bouton 2",
           type: "text",
         },
+        {
+          name: "guide_pdf",
+          type: "upload",
+          relationTo: "media",
+          hasMany: false,
+          required: true,
+          label: "PDF du guide",
+        }
       ],
     },
     // --- Section À Propos ---
