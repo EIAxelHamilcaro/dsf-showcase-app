@@ -11,7 +11,7 @@ const Config: CollectionConfig = {
   },
   admin: {
     livePreview: {
-      url: "http://localhost:3000",
+      url: process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000",
     },
     description:
       "Configuration globale du site – titres, images, contacts, section À propos etc.",
