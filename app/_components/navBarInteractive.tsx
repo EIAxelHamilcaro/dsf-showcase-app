@@ -9,17 +9,17 @@ import {
   NavigationMenuList,
 } from "@/components/ui/navigation-menu";
 import { Separator } from "@/components/ui/separator";
-import type { GlobalSelect } from "@/payload-types";
+import type { Config1 } from "@/payload-types";
 import Logo from "../../public/logo.png";
 
 interface NavBarInteractiveProps {
   items: { label: string; href: string }[];
-  global: GlobalSelect;
+  config: Config1;
 }
 
 export default function NavBarInteractive({
   items,
-  global,
+  config,
 }: NavBarInteractiveProps) {
   const [open, setOpen] = useState(false);
 
@@ -53,7 +53,7 @@ export default function NavBarInteractive({
             href="tel:+33254975323"
           >
             <Phone className="h-4 w-4 mr-2" />
-            <span className="font-medium">{global.phone}</span>
+            <span className="font-medium">{config.phone}</span>
           </a>
         </NavigationMenuItem>
         <NavigationMenuItem>

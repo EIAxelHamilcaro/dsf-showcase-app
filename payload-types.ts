@@ -68,6 +68,8 @@ export interface Config {
   blocks: {};
   collections: {
     users: User;
+    config: Config1;
+    media: Media;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
@@ -75,6 +77,8 @@ export interface Config {
   collectionsJoins: {};
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
+    config: ConfigSelect<false> | ConfigSelect<true>;
+    media: MediaSelect<false> | MediaSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
@@ -82,12 +86,8 @@ export interface Config {
   db: {
     defaultIDType: number;
   };
-  globals: {
-    parameters: Parameter;
-  };
-  globalsSelect: {
-    parameters: ParametersSelect<false> | ParametersSelect<true>;
-  };
+  globals: {};
+  globalsSelect: {};
   locale: null;
   user: User & {
     collection: 'users';
@@ -140,15 +140,154 @@ export interface User {
   password?: string | null;
 }
 /**
+ * Configuration globale du site – titres, images, contacts, section À propos etc.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "config".
+ */
+export interface Config1 {
+  id: number;
+  /**
+   * Numéro de téléphone affiché dans l’en-tête / footer
+   */
+  phone?: string | null;
+  /**
+   * Adresse email visible pour les utilisateurs
+   */
+  email: string;
+  /**
+   * Image de fond de la section héroïque
+   */
+  hero_image: number | Media;
+  /**
+   * Texte superposé sur l’image principale
+   */
+  hero_image_label?: {
+    hero_image_label_1?: string | null;
+    hero_image_label_2?: string | null;
+  };
+  /**
+   * Utiliser uniquement le gras pour mettre en valeur des mots
+   */
+  main_title: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  /**
+   * Petit texte affiché sous le titre principal
+   */
+  sub_main_title?: string | null;
+  /**
+   * Texte pour les 3 tags affichés sous le titre
+   */
+  main_tags?: {
+    main_tag_1?: string | null;
+    main_tag_2?: string | null;
+    main_tag_3?: string | null;
+  };
+  /**
+   * Texte des deux boutons principaux visible dans la Hero
+   */
+  main_button?: {
+    main_button_1?: string | null;
+    main_button_2?: string | null;
+  };
+  /**
+   * Titre de la section À propos du site
+   */
+  about_title?: string | null;
+  /**
+   * Paragraphe ou contenu riche (gras autorisé si nécessaire)
+   */
+  about_text?: string | null;
+  /**
+   * 4 services que vous offrez — titre + description pour chacun
+   */
+  about_features: {
+    about_feature_1: {
+      about_feature_title_1: string;
+      about_feature_text_1: string;
+    };
+    about_feature_2: {
+      about_feature_title_2: string;
+      about_feature_text_2: string;
+    };
+    about_feature_3: {
+      about_feature_title_3: string;
+      about_feature_text_3: string;
+    };
+    about_feature_4: {
+      about_feature_title_4: string;
+      about_feature_text_4: string;
+    };
+  };
+  /**
+   * Image illustratrice pour la section À Propos
+   */
+  about_image?: (number | null) | Media;
+  /**
+   * Titre + texte explicatif + image + avantages (liste)
+   */
+  about_section: {
+    about_heading: string;
+    about_paragraphs?: {
+      para_1?: string | null;
+      para_2?: string | null;
+      para_3?: string | null;
+    };
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "media".
+ */
+export interface Media {
+  id: number;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
+  sizes?: {};
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-locked-documents".
  */
 export interface PayloadLockedDocument {
   id: number;
-  document?: {
-    relationTo: 'users';
-    value: number | User;
-  } | null;
+  document?:
+    | ({
+        relationTo: 'users';
+        value: number | User;
+      } | null)
+    | ({
+        relationTo: 'config';
+        value: number | Config1;
+      } | null)
+    | ({
+        relationTo: 'media';
+        value: number | Media;
+      } | null);
   globalSlug?: string | null;
   user: {
     relationTo: 'users';
@@ -215,6 +354,99 @@ export interface UsersSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "config_select".
+ */
+export interface ConfigSelect<T extends boolean = true> {
+  phone?: T;
+  email?: T;
+  hero_image?: T;
+  hero_image_label?:
+    | T
+    | {
+        hero_image_label_1?: T;
+        hero_image_label_2?: T;
+      };
+  main_title?: T;
+  sub_main_title?: T;
+  main_tags?:
+    | T
+    | {
+        main_tag_1?: T;
+        main_tag_2?: T;
+        main_tag_3?: T;
+      };
+  main_button?:
+    | T
+    | {
+        main_button_1?: T;
+        main_button_2?: T;
+      };
+  about_title?: T;
+  about_text?: T;
+  about_features?:
+    | T
+    | {
+        about_feature_1?:
+          | T
+          | {
+              about_feature_title_1?: T;
+              about_feature_text_1?: T;
+            };
+        about_feature_2?:
+          | T
+          | {
+              about_feature_title_2?: T;
+              about_feature_text_2?: T;
+            };
+        about_feature_3?:
+          | T
+          | {
+              about_feature_title_3?: T;
+              about_feature_text_3?: T;
+            };
+        about_feature_4?:
+          | T
+          | {
+              about_feature_title_4?: T;
+              about_feature_text_4?: T;
+            };
+      };
+  about_image?: T;
+  about_section?:
+    | T
+    | {
+        about_heading?: T;
+        about_paragraphs?:
+          | T
+          | {
+              para_1?: T;
+              para_2?: T;
+              para_3?: T;
+            };
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "media_select".
+ */
+export interface MediaSelect<T extends boolean = true> {
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
+  sizes?: T | {};
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-locked-documents_select".
  */
 export interface PayloadLockedDocumentsSelect<T extends boolean = true> {
@@ -244,28 +476,6 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   batch?: T;
   updatedAt?: T;
   createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "parameters".
- */
-export interface Parameter {
-  id: number;
-  phone?: string | null;
-  email?: string | null;
-  updatedAt?: string | null;
-  createdAt?: string | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "parameters_select".
- */
-export interface ParametersSelect<T extends boolean = true> {
-  phone?: T;
-  email?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  globalType?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

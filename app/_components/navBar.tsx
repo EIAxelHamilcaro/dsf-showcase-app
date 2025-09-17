@@ -1,16 +1,10 @@
 import Image from "next/image";
-import { getPayload } from "payload";
 import { NavigationMenu } from "@/components/ui/navigation-menu";
-import payloadConfig from "@/payload.config";
+import type { Config1 } from "@/payload-types";
 import Logo from "../../public/logo.png";
 import NavBarInteractive from "./navBarInteractive";
 
-export default async function NavBar() {
-  const payload = await getPayload({ config: payloadConfig });
-  const global = await payload.findGlobal({
-    slug: "parameters",
-  });
-
+export default function NavBar({ config }: { config: Config1 }) {
   const items = [
     {
       label: "Accueil",
@@ -44,7 +38,7 @@ export default async function NavBar() {
           width={150}
         />
 
-        <NavBarInteractive global={global} items={items} />
+        <NavBarInteractive config={config} items={items} />
       </NavigationMenu>
     </header>
   );

@@ -2,8 +2,12 @@ import { Award, Heart, Shield } from "lucide-react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import type { Config1, Media } from "@/payload-types";
+import { RichTextBoldOnly } from "./richText";
 
-export default function HeroSection() {
+export default function HeroSection({ config }: { config: Config1 }) {
+  const heroImage = config.hero_image as Media;
+
   return (
     <section
       className="py-16 lg:py-28 bg-gradient-to-b from-background to-muted"
@@ -13,58 +17,59 @@ export default function HeroSection() {
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           <div className="space-y-8">
             <div className="space-y-4">
-              <h1 className="text-4xl lg:text-6xl font-bold tracking-tight">
-                Votre salle de bain{" "}
-                <span className="text-primary">sécurisée</span> et{" "}
-                <span className="text-primary">confortable</span>
-              </h1>
+              <RichTextBoldOnly content={config.main_title} />
+
               <p className="text-lg text-muted-foreground">
-                Pensée pour les seniors, réalisée par un artisan français avec
-                15 ans d’expérience
+                {config.sub_main_title}
               </p>
             </div>
 
             <div className="flex flex-wrap gap-4">
               <div className="flex items-center gap-2">
                 <Shield className="h-5 w-5 text-primary" />
-                <span>Sécurité garantie</span>
+                <span>{config.main_tags?.main_tag_1}</span>
               </div>
               <div className="flex items-center gap-2">
                 <Heart className="h-5 w-5 text-primary" />
-                <span>Confort adapté</span>
+                <span>{config.main_tags?.main_tag_2}</span>
               </div>
               <div className="flex items-center gap-2">
                 <Award className="h-5 w-5 text-primary" />
-                <span>Artisan français</span>
+                <span>{config.main_tags?.main_tag_3}</span>
               </div>
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4">
               <Button asChild size="lg">
-                <a href="#contact">Demander un devis gratuit</a>
+                <a href="#contact">{config.main_button?.main_button_1}</a>
               </Button>
               <Button asChild size="lg" variant="outline">
-                <a href="#realisations">Voir nos réalisations</a>
+                <a href="#realisations">{config.main_button?.main_button_2}</a>
               </Button>
             </div>
           </div>
 
           {/* Image */}
           <div className="relative">
-            <Card className="overflow-hidden">
-              <CardContent className="p-0">
+            <Card className="overflow-hidden p-0">
+              <CardContent className="p-0 relative w-full h-64">
                 <Image
                   alt="Salle de bain moderne adaptée aux seniors"
-                  className="object-cover w-full h-full"
-                  height={600}
-                  src="/placeholder-x8qmm.png"
-                  width={800}
+                  fill
+                  sizes="100vw"
+                  src={heroImage.url || ""}
+                  style={{ objectFit: "cover" }}
                 />
               </CardContent>
             </Card>
+
             <div className="absolute -bottom-6 -left-6 bg-primary text-primary-foreground px-4 py-3 rounded-lg shadow-lg">
-              <p className="font-semibold">+200 installations</p>
-              <p className="text-sm opacity-90">réalisées avec succès</p>
+              <p className="font-semibold">
+                {config.hero_image_label?.hero_image_label_1}
+              </p>
+              <p className="text-sm opacity-90">
+                {config.hero_image_label?.hero_image_label_2}
+              </p>
             </div>
           </div>
         </div>

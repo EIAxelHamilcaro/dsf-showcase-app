@@ -1,15 +1,15 @@
-// storage-adapter-import-placeholder
-
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { postgresAdapter } from "@payloadcms/db-postgres";
 import { payloadCloudPlugin } from "@payloadcms/payload-cloud";
 import { lexicalEditor } from "@payloadcms/richtext-lexical";
+import { vercelBlobStorage } from "@payloadcms/storage-vercel-blob";
 import { fr } from "@payloadcms/translations/languages/fr";
 import { buildConfig } from "payload";
 import sharp from "sharp";
+import Config from "./collections/Config";
+import { Media } from "./collections/Media";
 import { Users } from "./collections/Users";
-import { Parameters } from "./globals/Parameters";
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
@@ -21,8 +21,8 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Users],
-  globals: [Parameters],
+  collections: [Users, Config, Media],
+  globals: [],
   i18n: {
     fallbackLanguage: "fr",
     supportedLanguages: { fr },
@@ -40,6 +40,16 @@ export default buildConfig({
   sharp,
   plugins: [
     payloadCloudPlugin(),
-    // storage-adapter-placeholder
+    vercelBlobStorage({
+      enabled: true,
+      collections: {
+        media: true,
+      },
+      token: process.env.BLOB_READ_WRITE_TOKEN,
+      // options utiles :
+      addRandomSuffix: false, // par défaut false
+      cacheControlMaxAge: 365 * 24 * 60 * 60, // 1 an par défaut
+      clientUploads: true, // true si tu veux bypass les limites de 4.5MB côté serveur
+    }),
   ],
 });

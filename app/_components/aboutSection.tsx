@@ -1,28 +1,29 @@
 import { Clock, MapPin, Users, Wrench } from "lucide-react";
 import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
+import type { Config1, Media } from "@/payload-types";
 
-export function AboutSection() {
+export function AboutSection({ config }: { config: Config1 }) {
   const features = [
     {
       icon: MapPin,
-      title: "100% Local",
-      description: "Artisan français, intervention dans votre région",
+      title: config.about_features?.about_feature_1?.about_feature_title_1,
+      description: config.about_features?.about_feature_1?.about_feature_text_1,
     },
     {
       icon: Clock,
-      title: "15 ans d'expérience",
-      description: "Expertise reconnue dans l'adaptation de salles de bain",
+      title: config.about_features?.about_feature_2?.about_feature_title_2,
+      description: config.about_features?.about_feature_2?.about_feature_text_2,
     },
     {
       icon: Users,
-      title: "Spécialiste seniors",
-      description: "Comprend les besoins spécifiques des personnes âgées",
+      title: config.about_features?.about_feature_3?.about_feature_title_3,
+      description: config.about_features?.about_feature_3?.about_feature_text_3,
     },
     {
       icon: Wrench,
-      title: "Travail artisanal",
-      description: "Qualité française, finitions soignées",
+      title: config.about_features?.about_feature_4?.about_feature_title_4,
+      description: config.about_features?.about_feature_4?.about_feature_text_4,
     },
   ];
 
@@ -32,12 +33,10 @@ export function AboutSection() {
         {/* Intro */}
         <div className="text-center mb-12">
           <h2 className="text-3xl lg:text-4xl font-bold mb-4">
-            Un artisan de confiance à votre service
+            {config.about_title}
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Depuis 15 ans, je transforme les salles de bain pour les rendre plus
-            sûres et confortables. Mon engagement : une solution personnalisée
-            avec un savoir-faire 100% français.
+            {config.about_text}
           </p>
         </div>
 
@@ -58,28 +57,34 @@ export function AboutSection() {
         <div className="grid lg:grid-cols-2 gap-8 items-center bg-muted rounded-lg p-8 lg:p-12">
           <div className="space-y-4">
             <h3 className="text-2xl font-bold">
-              Pourquoi choisir un artisan français ?
+              {config.about_section.about_heading}
             </h3>
             <p className="text-muted-foreground">
-              <strong>Proximité :</strong> déplacement rapide dans votre région
-              pour évaluer vos besoins et réaliser les travaux.
+              <strong>
+                {config.about_section.about_paragraphs?.para_1?.split(":")[0]} :
+              </strong>
+              {config.about_section.about_paragraphs?.para_1?.split(":")[1]}
             </p>
             <p className="text-muted-foreground">
-              <strong>Qualité :</strong> matériaux français de premier choix,
-              respect des normes de sécurité.
+              <strong>
+                {config.about_section.about_paragraphs?.para_2?.split(":")[0]} :
+              </strong>
+              {config.about_section.about_paragraphs?.para_2?.split(":")[1]}
             </p>
             <p className="text-muted-foreground">
-              <strong>Accompagnement :</strong> aide dans les démarches
-              financières et crédits d’impôt disponibles.
+              <strong>
+                {config.about_section.about_paragraphs?.para_3?.split(":")[0]} :
+              </strong>
+              {config.about_section.about_paragraphs?.para_3?.split(":")[1]}
             </p>
           </div>
           <div className="aspect-[4/3] rounded-lg overflow-hidden">
             <Image
               alt="Artisan français au travail dans une salle de bain"
               className="object-cover w-full h-full"
-              height={600}
-              src="/french-craftsman-working-on-bathroom-installation.png"
-              width={800}
+              height={800}
+              src={(config.about_image as Media).url || ""}
+              width={600}
             />
           </div>
         </div>
