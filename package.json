@@ -15,14 +15,6 @@
     "type-check": "turbo type-check",
     "ui:add": "pnpm dlx shadcn@latest add"
   },
-  "pnpm": {
-    "supportedArchitectures": {
-      "libc": [
-        "glibc",
-        "musl"
-      ]
-    }
-  },
   "dependencies": {
     "@payloadcms/db-postgres": "^3.55.1",
     "@payloadcms/live-preview-react": "^3.56.0",
@@ -46,7 +38,6 @@
     "payload": "^3.55.1",
     "react": "19.1.0",
     "react-dom": "19.1.0",
-    "sharp": "^0.34.3",
     "tailwind-merge": "^3.3.1"
   },
   "devDependencies": {
@@ -58,5 +49,8 @@
     "tailwindcss": "^4.1.12",
     "tw-animate-css": "^1.3.7",
     "typescript": "^5.9.2"
+  },
+  "optionalDependencies": {
+    "sharp": "^0.34.3"
   }
 }
