@@ -248,6 +248,100 @@ export interface Config1 {
       para_3?: string | null;
     };
   };
+  caroussel_section?:
+    | {
+        /**
+         * Image illustratrice d'un chantier avant changements
+         */
+        before?: (number | null) | Media;
+        /**
+         * Image illustratrice d'un chantier apres changements
+         */
+        after?: (number | null) | Media;
+        title: string;
+        description: string;
+        id?: string | null;
+      }[]
+    | null;
+  testimonials_section?:
+    | {
+        title?: string | null;
+        age?: string | null;
+        text?: string | null;
+        location?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  services_section?: {
+    title?: string | null;
+    description?: string | null;
+    about_feature_1?: {
+      about_feature_title_1?: string | null;
+      about_feature_text_1?: string | null;
+    };
+    about_feature_2?: {
+      about_feature_title_2?: string | null;
+      about_feature_text_2?: string | null;
+    };
+    about_feature_3?: {
+      about_feature_title_3?: string | null;
+      about_feature_text_3?: string | null;
+    };
+    about_feature_4?: {
+      about_feature_title_4?: string | null;
+      about_feature_text_4?: string | null;
+    };
+    about_feature_5?: {
+      about_feature_title_5?: string | null;
+      about_feature_text_5?: string | null;
+    };
+    about_feature_6?: {
+      about_feature_title_6?: string | null;
+      about_feature_text_6?: string | null;
+    };
+  };
+  financial_section?: {
+    title?: string | null;
+    description?: string | null;
+    sub_descrition?: string | null;
+    financial_help_1?: {
+      icon_text?: string | null;
+      title?: string | null;
+      description?: string | null;
+    };
+    financial_help_2?: {
+      icon_text?: string | null;
+      title?: string | null;
+      description?: string | null;
+    };
+    financial_help_3?: {
+      icon_text?: string | null;
+      title?: string | null;
+      description?: string | null;
+    };
+    financial_help_4?: {
+      icon_text?: string | null;
+      title?: string | null;
+      description?: string | null;
+    };
+  };
+  form_section?: {
+    title?: string | null;
+    description?: string | null;
+    work_zone?: {
+      title?: string | null;
+      region?: string | null;
+      radius?: string | null;
+    };
+    time_section?: {
+      title?: string | null;
+      list?: {
+        devis?: string | null;
+        travaux?: string | null;
+        total?: string | null;
+      };
+    };
+  };
   updatedAt: string;
   createdAt: string;
 }
@@ -424,6 +518,126 @@ export interface ConfigSelect<T extends boolean = true> {
               para_1?: T;
               para_2?: T;
               para_3?: T;
+            };
+      };
+  caroussel_section?:
+    | T
+    | {
+        before?: T;
+        after?: T;
+        title?: T;
+        description?: T;
+        id?: T;
+      };
+  testimonials_section?:
+    | T
+    | {
+        title?: T;
+        age?: T;
+        text?: T;
+        location?: T;
+        id?: T;
+      };
+  services_section?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        about_feature_1?:
+          | T
+          | {
+              about_feature_title_1?: T;
+              about_feature_text_1?: T;
+            };
+        about_feature_2?:
+          | T
+          | {
+              about_feature_title_2?: T;
+              about_feature_text_2?: T;
+            };
+        about_feature_3?:
+          | T
+          | {
+              about_feature_title_3?: T;
+              about_feature_text_3?: T;
+            };
+        about_feature_4?:
+          | T
+          | {
+              about_feature_title_4?: T;
+              about_feature_text_4?: T;
+            };
+        about_feature_5?:
+          | T
+          | {
+              about_feature_title_5?: T;
+              about_feature_text_5?: T;
+            };
+        about_feature_6?:
+          | T
+          | {
+              about_feature_title_6?: T;
+              about_feature_text_6?: T;
+            };
+      };
+  financial_section?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        sub_descrition?: T;
+        financial_help_1?:
+          | T
+          | {
+              icon_text?: T;
+              title?: T;
+              description?: T;
+            };
+        financial_help_2?:
+          | T
+          | {
+              icon_text?: T;
+              title?: T;
+              description?: T;
+            };
+        financial_help_3?:
+          | T
+          | {
+              icon_text?: T;
+              title?: T;
+              description?: T;
+            };
+        financial_help_4?:
+          | T
+          | {
+              icon_text?: T;
+              title?: T;
+              description?: T;
+            };
+      };
+  form_section?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        work_zone?:
+          | T
+          | {
+              title?: T;
+              region?: T;
+              radius?: T;
+            };
+        time_section?:
+          | T
+          | {
+              title?: T;
+              list?:
+                | T
+                | {
+                    devis?: T;
+                    travaux?: T;
+                    total?: T;
+                  };
             };
       };
   updatedAt?: T;

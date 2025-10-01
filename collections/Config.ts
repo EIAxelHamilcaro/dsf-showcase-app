@@ -1,10 +1,11 @@
 import { lexicalEditor } from "@payloadcms/richtext-lexical";
 import type { CollectionConfig } from "payload";
+import { media } from "@/payload-generated-schema";
 
 const Config: CollectionConfig = {
   slug: "config",
   access: {
-    create: () => true,
+    create: () => false,
     delete: () => false,
     read: () => true,
     update: () => true,
@@ -152,7 +153,7 @@ const Config: CollectionConfig = {
           hasMany: false,
           required: true,
           label: "PDF du guide",
-        }
+        },
       ],
     },
     // --- Section À Propos ---
@@ -305,6 +306,385 @@ const Config: CollectionConfig = {
               name: "para_3",
               label: "Paragraphe 3",
               type: "text",
+            },
+          ],
+        },
+      ],
+    },
+    {
+      name: "caroussel_section",
+      label: "Caroussel Avant/Aprés",
+      type: "array",
+      admin: {
+        description: "",
+      },
+      fields: [
+        {
+          name: "before",
+          label: "Photo Avant",
+          type: "upload",
+          relationTo: "media",
+          hasMany: false,
+          required: false,
+          admin: {
+            description: "Image illustratrice d'un chantier avant changements",
+          },
+        },
+        {
+          name: "after",
+          label: "Photo Apres",
+          type: "upload",
+          relationTo: "media",
+          hasMany: false,
+          required: false,
+          admin: {
+            description: "Image illustratrice d'un chantier apres changements",
+          },
+        },
+        {
+          name: "title",
+          label: "Titre de l'image",
+          type: "text",
+          required: true,
+        },
+        {
+          name: "description",
+          label: "Description de l'image",
+          type: "text",
+          required: true,
+        },
+      ],
+    },
+    {
+      name: "testimonials_section",
+      label: "mettre un label",
+      type: "array",
+      admin: {
+        description: "",
+      },
+      fields: [
+        {
+          name: "title",
+          label: "Nom de la personnes",
+          type: "text",
+        },
+        {
+          name: "age",
+          label: "Age de la personnes",
+          type: "text",
+        },
+        {
+          name: "text",
+          label: "Avis",
+          type: "text",
+        },
+        {
+          name: "location",
+          label: "lieu",
+          type: "text",
+        },
+      ],
+    },
+    {
+      name: "services_section",
+      label: "Services",
+      type: "group",
+      admin: {
+        description: "",
+      },
+      fields: [
+        {
+          name: "title",
+          label: "Titre de la section",
+          type: "text",
+        },
+        {
+          name: "description",
+          label: "Description de la section",
+          type: "text",
+        },
+        {
+          name: "about_feature_1",
+          label: "Service n°1",
+          type: "group",
+          fields: [
+            {
+              name: "about_feature_title_1",
+              label: "Titre du service 1",
+              type: "text",
+            },
+            {
+              name: "about_feature_text_1",
+              label: "Description du service 1",
+              type: "text",
+            },
+          ],
+        },
+        {
+          name: "about_feature_2",
+          label: "Service n°2",
+          type: "group",
+          fields: [
+            {
+              name: "about_feature_title_2",
+              label: "Titre du service 2",
+              type: "text",
+            },
+            {
+              name: "about_feature_text_2",
+              label: "Description du service 2",
+              type: "text",
+            },
+          ],
+        },
+        {
+          name: "about_feature_3",
+          label: "Service n°3",
+          type: "group",
+          fields: [
+            {
+              name: "about_feature_title_3",
+              label: "Titre du service 3",
+              type: "text",
+            },
+            {
+              name: "about_feature_text_3",
+              label: "Description du service 3",
+              type: "text",
+            },
+          ],
+        },
+        {
+          name: "about_feature_4",
+          label: "Service n°4",
+          type: "group",
+          fields: [
+            {
+              name: "about_feature_title_4",
+              label: "Titre du service 4",
+              type: "text",
+            },
+            {
+              name: "about_feature_text_4",
+              label: "Description du service 4",
+              type: "text",
+            },
+          ],
+        },
+        {
+          name: "about_feature_5",
+          label: "Service n°5",
+          type: "group",
+          fields: [
+            {
+              name: "about_feature_title_5",
+              label: "Titre du service 5",
+              type: "text",
+            },
+            {
+              name: "about_feature_text_5",
+              label: "Description du service 5",
+              type: "text",
+            },
+          ],
+        },
+        {
+          name: "about_feature_6",
+          label: "Service n°6",
+          type: "group",
+          fields: [
+            {
+              name: "about_feature_title_6",
+              label: "Titre du service 6",
+              type: "text",
+            },
+            {
+              name: "about_feature_text_6",
+              label: "Description du service 6",
+              type: "text",
+            },
+          ],
+        },
+      ],
+    },
+    {
+      name: "financial_section",
+      label: "Information financement",
+      type: "group",
+      fields: [
+        {
+          name: "title",
+          label: "Titre",
+          type: "text",
+        },
+        {
+          name: "description",
+          label: "Description",
+          type: "text",
+        },
+        {
+          name: "sub_descrition",
+          label: "Sous Description",
+          type: "text",
+        },
+        {
+          name: "financial_help_1",
+          label: "Détail de l'aide 1",
+          type: "group",
+          fields: [
+            {
+              name: "icon_text",
+              label: "Text de la bulle",
+              type: "text",
+            },
+            {
+              name: "title",
+              label: "Titre",
+              type: "text",
+            },
+            {
+              name: "description",
+              label: "Description",
+              type: "text",
+            },
+          ],
+        },
+        {
+          name: "financial_help_2",
+          label: "Détail de l'aide 2",
+          type: "group",
+          fields: [
+            {
+              name: "icon_text",
+              label: "Text de la bulle",
+              type: "text",
+            },
+            {
+              name: "title",
+              label: "Titre",
+              type: "text",
+            },
+            {
+              name: "description",
+              label: "Description",
+              type: "text",
+            },
+          ],
+        },
+        {
+          name: "financial_help_3",
+          label: "Détail de l'aide 3",
+          type: "group",
+          fields: [
+            {
+              name: "icon_text",
+              label: "Text de la bulle",
+              type: "text",
+            },
+            {
+              name: "title",
+              label: "Titre",
+              type: "text",
+            },
+            {
+              name: "description",
+              label: "Description",
+              type: "text",
+            },
+          ],
+        },
+        {
+          name: "financial_help_4",
+          label: "Détail de l'aide 4",
+          type: "group",
+          fields: [
+            {
+              name: "icon_text",
+              label: "Text de la bulle",
+              type: "text",
+            },
+            {
+              name: "title",
+              label: "Titre",
+              type: "text",
+            },
+            {
+              name: "description",
+              label: "Description",
+              type: "text",
+            },
+          ],
+        },
+      ],
+    },
+    {
+      name: "form_section",
+      label: "Détails de la section formulaire",
+      type: "group",
+      fields: [
+        {
+          name: "title",
+          label: "Titre",
+          type: "text",
+        },
+        {
+          name: "description",
+          label: "Description",
+          type: "text",
+        },
+        {
+          name: "work_zone",
+          label: "Zone d'intervention",
+          type: "group",
+          fields: [
+            {
+              name: "title",
+              label: "Titre",
+              type: "text",
+            },
+            {
+              name: "region",
+              label: "Région",
+              type: "text",
+            },
+            {
+              name: "radius",
+              label: "Rayon d'intervention",
+              type: "text",
+            },
+          ],
+        },
+        {
+          name: "time_section",
+          label: "Durée d'intervention",
+          type: "group",
+          fields: [
+            {
+              name: "title",
+              label: "Titre",
+              type: "text",
+            },
+            {
+              name: "list",
+              label: "Les délaie de réponse",
+              type: "group",
+              fields: [
+                {
+                  name: "devis",
+                  label: "Durée du devis",
+                  type: "text",
+                },
+                {
+                  name: "travaux",
+                  label: "Durée des travaux",
+                  type: "text",
+                },
+                {
+                  name: "total",
+                  label: "Durée total",
+                  type: "text",
+                },
+              ],
             },
           ],
         },

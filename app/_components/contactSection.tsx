@@ -1,5 +1,4 @@
 "use client";
-
 import { Clock, Mail, MapPin, Phone } from "lucide-react";
 import type React from "react";
 import { useState } from "react";
@@ -8,8 +7,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import type { Config1 } from "@/payload-types";
 
-export function ContactSection() {
+export function ContactSection({ config }: { config: Config1 }) {
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
@@ -17,10 +17,23 @@ export function ContactSection() {
     message: "",
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission here
-    console.log("Form submitted:", formData);
+
+    const res = await fetch("/api/contact", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formData),
+    });
+
+    if (res.ok) {
+      alert("Message envoyé ✅");
+      setFormData({ name: "", phone: "", email: "", message: "" });
+    } else {
+      alert("Erreur lors de l'envoi ❌");
+    }
   };
 
   const handleChange = (
@@ -79,24 +92,26 @@ export function ContactSection() {
                 </div>
 
                 <div>
-                  <Label htmlFor="email">Email</Label>
+                  <Label htmlFor="email">Email *</Label>
                   <Input
                     id="email"
                     name="email"
                     onChange={handleChange}
                     placeholder="votre@email.fr"
+                    required
                     type="email"
                     value={formData.email}
                   />
                 </div>
 
                 <div>
-                  <Label htmlFor="message">Votre projet</Label>
+                  <Label htmlFor="message">Votre projet *</Label>
                   <Textarea
                     id="message"
                     name="message"
                     onChange={handleChange}
                     placeholder="Décrivez-nous votre projet d'adaptation de salle de bain..."
+                    required
                     rows={4}
                     value={formData.message}
                   />
@@ -124,7 +139,7 @@ export function ContactSection() {
                       Appelez-nous directement
                     </h3>
                     <p className="text-2xl font-bold text-primary mb-2">
-                      01 23 45 67 89
+                      {config.phone || ""}
                     </p>
                     <p className="text-sm text-muted-foreground">
                       Disponible du lundi au vendredi, 8h-18h
@@ -140,7 +155,7 @@ export function ContactSection() {
                   <Mail className="h-6 w-6 text-primary mt-1" />
                   <div>
                     <h3 className="font-semibold mb-1">Email</h3>
-                    <p className="text-primary">contact@sdb-seniors.fr</p>
+                    <p className="text-primary">{config.email}</p>
                     <p className="text-sm text-muted-foreground">
                       Réponse sous 24h maximum
                     </p>
@@ -154,11 +169,13 @@ export function ContactSection() {
                 <div className="flex items-start space-x-4">
                   <MapPin className="h-6 w-6 text-primary mt-1" />
                   <div>
-                    <h3 className="font-semibold mb-1">Zone d'intervention</h3>
+                    <h3 className="font-semibold mb-1">
+                      {config.form_section?.work_zone?.title}
+                    </h3>
                     <p className="text-muted-foreground">
-                      Région Centre
+                      {config.form_section?.work_zone?.region}
                       <br />
-                      Déplacements dans un rayon de 100km
+                      {config.form_section?.work_zone?.radius}
                     </p>
                   </div>
                 </div>
@@ -171,12 +188,14 @@ export function ContactSection() {
                   <Clock className="h-6 w-6 text-primary mt-1" />
                   <div>
                     <h3 className="font-semibold mb-1">
-                      Délais d'intervention
+                      {config.form_section?.time_section?.title}
                     </h3>
                     <p className="text-muted-foreground">
-                      • Devis gratuit : sous 48h
-                      <br />• Début des travaux : 1-2 semaines
-                      <br />• Durée moyenne : 2-3 jours
+                      {config.form_section?.time_section?.list?.devis}
+                      <br />
+                      {config.form_section?.time_section?.list?.travaux}
+                      <br />
+                      {config.form_section?.time_section?.list?.total}
                     </p>
                   </div>
                 </div>

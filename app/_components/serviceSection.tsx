@@ -7,43 +7,45 @@ import {
   Wrench,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import type { Config1 } from "@/payload-types";
 
-export function ServicesSection() {
+export function ServicesSection({ config }: { config: Config1 }) {
   const services = [
     {
       icon: Shower,
-      title: "Douches sécurisées",
+      title: config.services_section?.about_feature_1?.about_feature_title_1,
       description:
-        "Remplacement de baignoire par douche à l'italienne, receveur antidérapant, parois adaptées",
+        config.services_section?.about_feature_1?.about_feature_text_1,
     },
     {
       icon: Shield,
-      title: "Barres d'appui",
+      title: config.services_section?.about_feature_2?.about_feature_title_2,
       description:
-        "Installation de barres de maintien ergonomiques, fixation renforcée selon normes",
+        config.services_section?.about_feature_2?.about_feature_text_2,
     },
     {
       icon: Accessibility,
-      title: "Sièges de douche",
+      title: config.services_section?.about_feature_3?.about_feature_title_3,
       description:
-        "Sièges rabattables, fixes ou amovibles, adaptés à tous les besoins",
+        config.services_section?.about_feature_3?.about_feature_text_3,
     },
     {
       icon: Wrench,
-      title: "Rehausse WC",
+      title: config.services_section?.about_feature_4?.about_feature_title_4,
       description:
-        "Cuvettes surélevées, abattants avec accoudoirs pour faciliter l'usage",
+        config.services_section?.about_feature_4?.about_feature_text_4,
     },
     {
       icon: Lightbulb,
-      title: "Éclairage adapté",
+      title: config.services_section?.about_feature_5?.about_feature_title_5,
       description:
-        "Éclairage LED renforcé, détecteurs de mouvement, éclairage d'urgence",
+        config.services_section?.about_feature_5?.about_feature_text_5,
     },
     {
       icon: Thermometer,
-      title: "Robinetterie thermostatique",
-      description: "Mitigeurs à sécurité anti-brûlure, commandes ergonomiques",
+      title: config.services_section?.about_feature_6?.about_feature_title_6,
+      description:
+        config.services_section?.about_feature_6?.about_feature_text_6,
     },
   ];
 
@@ -83,49 +85,63 @@ export function ServicesSection() {
         <div className="bg-primary/5 rounded-lg p-8 lg:p-12">
           <div className="text-center mb-8">
             <h3 className="text-2xl lg:text-3xl font-bold mb-4">
-              Aides financières disponibles
+              {config.financial_section?.title}
             </h3>
             <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
-              Saviez-vous que vous pouvez bénéficier d'aides pour financer vos
-              travaux d'adaptation ?
+              {config.financial_section?.description}
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div className="text-center">
               <div className="bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-3 text-xl font-bold shadow-lg">
-                30%
+                {config.financial_section?.financial_help_1?.icon_text}
               </div>
-              <h4 className="font-semibold mb-2 text-lg">Crédit d'impôt</h4>
-              <p className="text-muted-foreground">Jusqu'à 30% des travaux</p>
+              <h4 className="font-semibold mb-2 text-lg">
+                {config.financial_section?.financial_help_1?.title}
+              </h4>
+              <p className="text-muted-foreground">
+                {config.financial_section?.financial_help_1?.description}
+              </p>
             </div>
             <div className="text-center">
               <div className="bg-gradient-to-br from-green-500 to-green-600 text-white rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-3 text-xl font-bold shadow-lg">
-                ANAH
+                {config.financial_section?.financial_help_2?.icon_text}
               </div>
-              <h4 className="font-semibold mb-2 text-lg">Aide ANAH</h4>
-              <p className="text-muted-foreground">Subventions selon revenus</p>
+              <h4 className="font-semibold mb-2 text-lg">
+                {config.financial_section?.financial_help_2?.title}
+              </h4>
+              <p className="text-muted-foreground">
+                {config.financial_section?.financial_help_2?.description}
+              </p>
             </div>
             <div className="text-center">
               <div className="bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-3 text-xl font-bold shadow-lg">
-                APA
+                {config.financial_section?.financial_help_3?.icon_text}
               </div>
-              <h4 className="font-semibold mb-2 text-lg">APA</h4>
-              <p className="text-muted-foreground">Allocation personnalisée</p>
+              <h4 className="font-semibold mb-2 text-lg">
+                {config.financial_section?.financial_help_3?.title}
+              </h4>
+              <p className="text-muted-foreground">
+                {config.financial_section?.financial_help_3?.description}
+              </p>
             </div>
             <div className="text-center">
               <div className="bg-gradient-to-br from-orange-500 to-orange-600 text-white rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-3 text-xl font-bold shadow-lg">
-                CAF
+                {config.financial_section?.financial_help_4?.icon_text}
               </div>
-              <h4 className="font-semibold mb-2 text-lg">Aide CAF</h4>
-              <p className="text-muted-foreground">Prêt à l'amélioration</p>
+              <h4 className="font-semibold mb-2 text-lg">
+                {config.financial_section?.financial_help_4?.title}
+              </h4>
+              <p className="text-muted-foreground">
+                {config.financial_section?.financial_help_4?.description}
+              </p>
             </div>
           </div>
 
           <div className="text-center mt-8">
             <p className="text-muted-foreground text-base">
-              <strong>Je vous accompagne</strong> dans toutes vos démarches
-              administratives pour maximiser vos aides.
+              {config.financial_section?.sub_descrition}
             </p>
           </div>
         </div>
