@@ -47,9 +47,9 @@ export const metadata: Metadata = {
       "Installation de douches sécurisées pour seniors en 1 journée. Fabrication 100% française, normes PMR et labellisation Handibat Silverbat. Demandez votre devis gratuit.",
     images: [
       {
-        url: "/hero-image.jpg",
-        width: 1200,
-        height: 630,
+        url: "/hero.png",
+        width: 1536,
+        height: 1024,
         alt: "Douche senior sécurisée et moderne - Fabrication française",
       },
     ],
@@ -60,7 +60,7 @@ export const metadata: Metadata = {
     title: "Douche Senior France - Installation de douches sécurisées",
     description:
       "Douche senior sur mesure, posée en 1 journée. Fabrication française, normes PMR et label Handibat Silverbat. Devis gratuit.",
-    images: ["/hero-image.jpg"],
+    images: ["/hero.png"],
   },
   alternates: {
     canonical: "https://www.douche-senior-france.com",
@@ -69,7 +69,7 @@ export const metadata: Metadata = {
     "theme-color": "#ffffff",
     "msapplication-TileColor": "#ffffff",
     keywords:
-      "douche senior, douche sécurisée, douche PMR, douche adaptée personnes âgées, installation douche handicapée, douche plain-pied, fabricant douche française, douche aide action logement, douche Handibat Silverbat",
+      "douche senior, douche sécurisée, douche PMR, douche adaptée personnes âgées, installation douche handicapée, douche plain-pied, fabricant douche française, douche aide action logement, douche Handibat Silverbat, douche, salle de bain, baignoire, senior",
   },
 };
 
@@ -80,7 +80,7 @@ const orgJsonLd = {
   name: "Douche Senior France",
   url: "https://www.douche-senior-france.com/",
   logo: "https://www.douche-senior-france.com/logo.png",
-  sameAs: [],
+  sameAs: ["https://www.facebook.com/douche.senior.france/"],
 };
 
 const serviceJsonLd = {
@@ -98,9 +98,35 @@ const serviceJsonLd = {
   },
   offers: {
     "@type": "Offer",
-    url: "http://localhost:3000/#contact",
+    url: "https://www.douche-senior-france.com/#contact",
     price: "Sur devis",
     priceCurrency: "EUR",
+  },
+};
+
+const localBusinessJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "LocalBusiness",
+  name: "Douche Senior France",
+  image: "https://www.douche-senior-france.com/logo.png",
+  "@id": "https://www.douche-senior-france.com",
+  url: "https://www.douche-senior-france.com",
+  telephone: "02 54 97 53 23",
+  address: {
+    "@type": "PostalAddress",
+    streetAddress: "147 rue de Romorantin",
+    addressLocality: "Selles sur Cher",
+    postalCode: "41130",
+    addressCountry: "FR",
+  },
+  geo: {
+    "@type": "GeoCoordinates",
+    latitude: 47.28256927999651,
+    longitude: 1.5726510253114867,
+  },
+  areaServed: {
+    "@type": "AdministrativeArea",
+    name: "Centre-Val de Loire",
   },
 };
 
@@ -121,6 +147,12 @@ export default async function RootLayout({
         />
         <script
           dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceJsonLd) }}
+          type="application/ld+json"
+        />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(localBusinessJsonLd),
+          }}
           type="application/ld+json"
         />
       </Head>
