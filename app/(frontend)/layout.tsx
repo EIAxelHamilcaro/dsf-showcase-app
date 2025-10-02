@@ -2,6 +2,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "../globals.css";
+import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import Head from "next/head";
 import { getLocale } from "next-intl/server";
@@ -158,6 +159,7 @@ export default async function RootLayout({
         />
       </Head>
       <SpeedInsights />
+      <Analytics />
       <body
         className={cn(
           `${geistSans.variable} ${geistMono.variable}`,
