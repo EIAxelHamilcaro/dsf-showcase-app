@@ -24,7 +24,7 @@ export default function NavBar({ config }: { config: Config1 }) {
     },
     {
       label: "Contact",
-      href: "#",
+      href: "#contact",
     },
   ];
 

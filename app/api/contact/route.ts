@@ -14,7 +14,7 @@ export async function POST(req: Request) {
     });
 
     await transporter.sendMail({
-      from: `"Site DSF contact" <${process.env.GMAIL_USER}>`,
+      from: `"Site DSF contact" <${process.env.GMAIL_CONTACT}>`,
       to: process.env.GMAIL_USER,
       subject: `Nouveau contact : ${name}`,
       text: `
