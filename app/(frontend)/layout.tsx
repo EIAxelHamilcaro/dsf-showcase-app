@@ -28,7 +28,7 @@ export const metadata: Metadata = {
     template: "%s | Douche Senior France",
   },
   description:
-    "Transformez votre salle de bain en toute sécurité avec une douche senior sur mesure, installée en 1 journée. Fabrication française, labellisée Handibat Silverbat. Devis gratuit et sans engagement.",
+    "Adaptez votre salle de bain avec notre douche sécurisée pour les seniors en 1 journée. Fabrication 100% française. Labellisée Handibat Silverbat.",
   robots: {
     index: true,
     follow: true,
@@ -44,9 +44,10 @@ export const metadata: Metadata = {
     type: "website",
     locale: "fr_FR",
     url: "https://www.douche-senior-france.com",
-    title: "Douche Senior France - Douche Sécurisée sur Mesure",
+    title:
+      "Douche Senior France - Douche Sécurisée sur Mesure, Installation Rapide & Fabrication Française",
     description:
-      "Installation de douches sécurisées pour seniors en 1 journée. Fabrication 100% française, normes PMR et labellisation Handibat Silverbat. Demandez votre devis gratuit.",
+      "Adaptez votre salle de bain avec notre douche sécurisée pour les seniors en 1 journée. Fabrication 100% française. Labellisée Handibat Silverbat.Installation de douches sécurisées pour seniors en 1 journée. Fabrication 100% française, normes PMR et labellisation Handibat Silverbat. Demandez votre devis gratuit.",
     images: [
       {
         url: "/hero.png",
@@ -71,7 +72,7 @@ export const metadata: Metadata = {
     "theme-color": "#ffffff",
     "msapplication-TileColor": "#ffffff",
     keywords:
-      "douche senior, douche sécurisée, douche PMR, douche adaptée personnes âgées, installation douche handicapée, douche plain-pied, fabricant douche française, douche aide action logement, douche Handibat Silverbat, douche, salle de bain, baignoire, senior",
+      "douche senior, douche sécurisée, douche PMR, douche adaptée personnes âgées, installation douche handicapée, douche plain-pied, fabricant douche française, douche aide action logement, douche Handibat Silverbat, douche, salle de bain, baignoire, senior, douche blois, douche romorantin, douche chateauroux, douche bourges, douche tours, douche région centre, salle de bain région centre, prime adapt",
   },
 };
 
