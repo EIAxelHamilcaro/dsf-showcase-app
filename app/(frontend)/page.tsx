@@ -2,6 +2,7 @@ import { getPayload } from "payload";
 import payloadConfig from "@/payload.config";
 import { AboutSection } from "../_components/aboutSection";
 import { ContactSection } from "../_components/contactSection";
+import { FAQSection } from "../_components/faqSection";
 import { Footer } from "../_components/footer";
 import { GallerySection } from "../_components/gallerySection";
 import HeroSection from "../_components/heroSection";
@@ -27,9 +28,10 @@ export default async function Home() {
         <GallerySection config={config} />
         <ServicesSection config={config} />
         <ContactSection config={config} />
+        <FAQSection config={config} />
       </main>
       <footer>
-        <Footer />
+        <Footer config={config} />
       </footer>
     </>
   );

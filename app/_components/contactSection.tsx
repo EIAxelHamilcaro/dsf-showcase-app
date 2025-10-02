@@ -142,7 +142,7 @@ export function ContactSection({ config }: { config: Config1 }) {
                       {config.phone || ""}
                     </p>
                     <p className="text-sm text-muted-foreground">
-                      Disponible du lundi au vendredi, 8h-18h
+                      {config.form_section?.disponibility}
                     </p>
                   </div>
                 </div>

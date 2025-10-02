@@ -1,10 +1,10 @@
 import { Award, Heart, Shield } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import type { Config1, Media } from "@/payload-types";
 import { RichTextBoldOnly } from "./richText";
-import Link from "next/link";
 
 export default function HeroSection({ config }: { config: Config1 }) {
   const heroImage = config.hero_image as Media;
@@ -47,12 +47,11 @@ export default function HeroSection({ config }: { config: Config1 }) {
               <Button asChild size="lg" variant="outline">
                 <a href="#realisations">{config.main_button?.main_button_2}</a>
               </Button>
-              <Button
-                variant="destructive"
-                size="lg"
-                asChild
-              >
-                <Link href={(config.main_button.guide_pdf as Media).url || ""} target="_blank">
+              <Button asChild size="lg" variant="destructive">
+                <Link
+                  href={(config.main_button.guide_pdf as Media).url || ""}
+                  target="_blank"
+                >
                   Télécharger votre guide gratuitement
                 </Link>
               </Button>
@@ -62,7 +61,7 @@ export default function HeroSection({ config }: { config: Config1 }) {
           {/* Image */}
           <div className="relative">
             <Card className="overflow-hidden p-0">
-              <CardContent className="p-0 relative w-full h-64">
+              <CardContent className="p-0 relative w-full h-96">
                 <Image
                   alt="Salle de bain moderne adaptée aux seniors"
                   fill

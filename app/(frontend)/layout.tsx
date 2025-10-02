@@ -19,7 +19,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://votredomaine.com/"),
+  metadataBase: new URL("https://www.douche-senior-france.com/"),
   title: {
     default:
       "Douche Senior France - Douche Sécurisée sur Mesure, Installation Rapide & Fabrication Française",
@@ -41,7 +41,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "fr_FR",
-    url: "https://votredomaine.com",
+    url: "https://www.douche-senior-france.com",
     title: "Douche Senior France - Douche Sécurisée sur Mesure",
     description:
       "Installation de douches sécurisées pour seniors en 1 journée. Fabrication 100% française, normes PMR et labellisation Handibat Silverbat. Demandez votre devis gratuit.",
@@ -63,7 +63,7 @@ export const metadata: Metadata = {
     images: ["/hero-image.jpg"],
   },
   alternates: {
-    canonical: "https://votredomaine.com",
+    canonical: "https://www.douche-senior-france.com",
   },
   other: {
     "theme-color": "#ffffff",
@@ -78,12 +78,9 @@ const orgJsonLd = {
   "@context": "https://schema.org",
   "@type": "Organization",
   name: "Douche Senior France",
-  url: "https://votredomaine.com",
-  logo: "https://votredomaine.com/logo.png",
-  sameAs: [
-    "https://www.facebook.com/toncompte",
-    "https://www.instagram.com/toncompte",
-  ],
+  url: "https://www.douche-senior-france.com/",
+  logo: "https://www.douche-senior-france.com/logo.png",
+  sameAs: [],
 };
 
 const serviceJsonLd = {
@@ -93,7 +90,7 @@ const serviceJsonLd = {
   provider: {
     "@type": "Organization",
     name: "Douche Senior France",
-    url: "https://votredomaine.com",
+    url: "https://www.douche-senior-france.com",
   },
   areaServed: {
     "@type": "Country",
@@ -101,7 +98,7 @@ const serviceJsonLd = {
   },
   offers: {
     "@type": "Offer",
-    url: "https://votredomaine.com/devis",
+    url: "http://localhost:3000/#contact",
     price: "Sur devis",
     priceCurrency: "EUR",
   },
@@ -115,7 +112,7 @@ export default async function RootLayout({
   const locale = await getLocale();
 
   return (
-    <html lang={locale} suppressHydrationWarning>
+    <html className="scroll-smooth" lang={locale} suppressHydrationWarning>
       <Head>
         <meta content="DSF" name="apple-mobile-web-app-title" />
         <script

@@ -134,6 +134,16 @@
   }
 }
 
+@keyframes scrollInf {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  } /* décale d’une largeur de liste */
+}
+
 .animate-scroll-inf {
-  animation: scroll 40s linear infinite;
+  animation: scrollInf 100s linear infinite;
+  width: max-content;
 }

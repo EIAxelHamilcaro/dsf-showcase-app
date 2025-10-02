@@ -148,7 +148,7 @@ export interface User {
 export interface Config1 {
   id: number;
   /**
-   * Numéro de téléphone affiché dans l’en-tête / footer
+   * Numéro de téléphone affiché dans l’en-tête / le footer
    */
   phone?: string | null;
   /**
@@ -163,11 +163,17 @@ export interface Config1 {
    * Texte superposé sur l’image principale
    */
   hero_image_label?: {
+    /**
+     * Texte principal affiché sur le badge de l’image Hero
+     */
     hero_image_label_1?: string | null;
+    /**
+     * Texte secondaire affiché sous le texte principal du badge
+     */
     hero_image_label_2?: string | null;
   };
   /**
-   * Utiliser uniquement le gras pour mettre en valeur des mots
+   * Utiliser uniquement le **gras** pour mettre en valeur des mots
    */
   main_title: {
     root: {
@@ -189,158 +195,436 @@ export interface Config1 {
    */
   sub_main_title?: string | null;
   /**
-   * Texte pour les 3 tags affichés sous le titre
+   * Texte des 3 tags affichés sous le titre principal
    */
   main_tags?: {
+    /**
+     * Première étiquette
+     */
     main_tag_1?: string | null;
+    /**
+     * Deuxième étiquette
+     */
     main_tag_2?: string | null;
+    /**
+     * Troisième étiquette
+     */
     main_tag_3?: string | null;
   };
   /**
-   * Texte des deux boutons principaux visible dans la Hero
+   * Texte et option du(s) bouton(s) dans la Hero
    */
   main_button: {
+    /**
+     * Libellé du premier bouton
+     */
     main_button_1?: string | null;
+    /**
+     * Libellé du second bouton
+     */
     main_button_2?: string | null;
+    /**
+     * Fichier PDF à télécharger via le bouton
+     */
     guide_pdf: number | Media;
   };
   /**
-   * Titre de la section À propos du site
+   * Titre de la section À propos
    */
   about_title?: string | null;
   /**
-   * Paragraphe ou contenu riche (gras autorisé si nécessaire)
+   * Texte ou paragraphe présentant le site ou l’entreprise
    */
   about_text?: string | null;
   /**
-   * 4 services que vous offrez — titre + description pour chacun
+   * Quatre services présentés avec titre + description
    */
   about_features: {
+    /**
+     * Premier service détaillé
+     */
     about_feature_1: {
+      /**
+       * Titre de ce service
+       */
       about_feature_title_1: string;
+      /**
+       * Description détaillée du service
+       */
       about_feature_text_1: string;
     };
+    /**
+     * Deuxième service détaillé
+     */
     about_feature_2: {
+      /**
+       * Titre de ce service
+       */
       about_feature_title_2: string;
+      /**
+       * Description détaillée du service
+       */
       about_feature_text_2: string;
     };
+    /**
+     * Troisième service détaillé
+     */
     about_feature_3: {
+      /**
+       * Titre de ce service
+       */
       about_feature_title_3: string;
+      /**
+       * Description détaillée du service
+       */
       about_feature_text_3: string;
     };
+    /**
+     * Quatrième service détaillé
+     */
     about_feature_4: {
+      /**
+       * Titre de ce service
+       */
       about_feature_title_4: string;
+      /**
+       * Description détaillée du service
+       */
       about_feature_text_4: string;
     };
   };
   /**
-   * Image illustratrice pour la section À Propos
+   * Image utilisée pour illustrer la section À Propos
    */
   about_image?: (number | null) | Media;
   /**
-   * Titre + texte explicatif + image + avantages (liste)
+   * Bloc complet : titre + paragraphes + image + avantages
    */
   about_section: {
+    /**
+     * Titre principal de cette section
+     */
     about_heading: string;
+    /**
+     * Textes explicatifs de la section
+     */
     about_paragraphs?: {
+      /**
+       * Premier paragraphe
+       */
       para_1?: string | null;
+      /**
+       * Deuxième paragraphe
+       */
       para_2?: string | null;
+      /**
+       * Troisième paragraphe
+       */
       para_3?: string | null;
     };
   };
+  /**
+   * Image(s) avant / après pour démontrer les transformations
+   */
   caroussel_section?:
     | {
         /**
-         * Image illustratrice d'un chantier avant changements
+         * Image illustrant un chantier avant modifications
          */
         before?: (number | null) | Media;
         /**
-         * Image illustratrice d'un chantier apres changements
+         * Image illustrant le chantier après modifications
          */
         after?: (number | null) | Media;
+        /**
+         * Titre pour ce couple avant/après
+         */
         title: string;
+        /**
+         * Texte explicatif de ce qu’on voit sur les images
+         */
         description: string;
         id?: string | null;
       }[]
     | null;
+  /**
+   * Liste des avis / témoignages des clients
+   */
   testimonials_section?:
     | {
+        /**
+         * Nom du client ou témoin
+         */
         title?: string | null;
+        /**
+         * Âge du client (optionnel)
+         */
         age?: string | null;
+        /**
+         * Contenu du témoignage
+         */
         text?: string | null;
+        /**
+         * Ville, région ou lieu du client
+         */
         location?: string | null;
         id?: string | null;
       }[]
     | null;
+  /**
+   * Présentation des services offerts
+   */
   services_section?: {
+    /**
+     * Titre pour la section des services
+     */
     title?: string | null;
+    /**
+     * Texte introductif des services
+     */
     description?: string | null;
+    /**
+     * Détail du 1ᵉʳ service
+     */
     about_feature_1?: {
+      /**
+       * Nom du service
+       */
       about_feature_title_1?: string | null;
+      /**
+       * Description du service
+       */
       about_feature_text_1?: string | null;
     };
+    /**
+     * Détail du 2ᵉ service
+     */
     about_feature_2?: {
+      /**
+       * Nom du service
+       */
       about_feature_title_2?: string | null;
+      /**
+       * Description du service
+       */
       about_feature_text_2?: string | null;
     };
+    /**
+     * Détail du 3ᵉ service
+     */
     about_feature_3?: {
+      /**
+       * Nom du service
+       */
       about_feature_title_3?: string | null;
+      /**
+       * Description du service
+       */
       about_feature_text_3?: string | null;
     };
+    /**
+     * Détail du 4ᵉ service
+     */
     about_feature_4?: {
+      /**
+       * Nom du service
+       */
       about_feature_title_4?: string | null;
+      /**
+       * Description du service
+       */
       about_feature_text_4?: string | null;
     };
+    /**
+     * Détail du 5ᵉ service
+     */
     about_feature_5?: {
+      /**
+       * Nom du service
+       */
       about_feature_title_5?: string | null;
+      /**
+       * Description du service
+       */
       about_feature_text_5?: string | null;
     };
+    /**
+     * Détail du 6ᵉ service
+     */
     about_feature_6?: {
+      /**
+       * Nom du service
+       */
       about_feature_title_6?: string | null;
+      /**
+       * Description du service
+       */
       about_feature_text_6?: string | null;
     };
   };
+  /**
+   * Infos sur les aides ou financement possibles
+   */
   financial_section?: {
+    /**
+     * Titre de la section financement
+     */
     title?: string | null;
+    /**
+     * Texte de description générale du financement
+     */
     description?: string | null;
-    sub_descrition?: string | null;
+    /**
+     * Texte secondaire ou complémentaire
+     */
+    sub_description?: string | null;
+    /**
+     * Premier détail d’aide financière
+     */
     financial_help_1?: {
+      /**
+       * Texte sur la bulle/icône
+       */
       icon_text?: string | null;
+      /**
+       * Titre de cette aide
+       */
       title?: string | null;
+      /**
+       * Détails de cette aide
+       */
       description?: string | null;
     };
+    /**
+     * Deuxième aide détaillée
+     */
     financial_help_2?: {
+      /**
+       * Texte sur l’icône
+       */
       icon_text?: string | null;
+      /**
+       * Titre de cette aide
+       */
       title?: string | null;
+      /**
+       * Détails de cette aide
+       */
       description?: string | null;
     };
+    /**
+     * Troisième aide détaillée
+     */
     financial_help_3?: {
+      /**
+       * Texte sur l’icône
+       */
       icon_text?: string | null;
+      /**
+       * Titre de cette aide
+       */
       title?: string | null;
+      /**
+       * Détails de cette aide
+       */
       description?: string | null;
     };
+    /**
+     * Quatrième aide détaillée
+     */
     financial_help_4?: {
+      /**
+       * Texte sur l’icône
+       */
       icon_text?: string | null;
+      /**
+       * Titre de cette aide
+       */
       title?: string | null;
+      /**
+       * Détails de cette aide
+       */
       description?: string | null;
     };
   };
+  /**
+   * Champs pour configurer le formulaire de contact
+   */
   form_section?: {
+    /**
+     * Titre du formulaire
+     */
     title?: string | null;
+    /**
+     * Texte explicatif du formulaire
+     */
     description?: string | null;
+    /**
+     * Texte indiquant la disponibilité (ex : horaires)
+     */
+    disponibility?: string | null;
+    /**
+     * Définition de la zone géographique d’intervention
+     */
     work_zone?: {
+      /**
+       * Titre du bloc zone
+       */
       title?: string | null;
+      /**
+       * Nom de la région d’intervention
+       */
       region?: string | null;
+      /**
+       * Rayon autour de la région (km par ex.)
+       */
       radius?: string | null;
     };
+    /**
+     * Délais estimés pour devis + travaux + total
+     */
     time_section?: {
+      /**
+       * Titre du bloc temporal
+       */
       title?: string | null;
+      /**
+       * Durées pour chaque étape
+       */
       list?: {
+        /**
+         * Temps estimé pour fournir le devis
+         */
         devis?: string | null;
+        /**
+         * Durée estimée des travaux
+         */
         travaux?: string | null;
+        /**
+         * Somme des délais devis + travaux
+         */
         total?: string | null;
       };
     };
+  };
+  /**
+   * Champs pour configurer la partie FAQ
+   */
+  faq_section?: {
+    title?: string | null;
+    description?: string | null;
+    faq?:
+      | {
+          question?: string | null;
+          answer?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  footer_section?: {
+    title?: string | null;
+    description?: string | null;
+    region?: string | null;
   };
   updatedAt: string;
   createdAt: string;
@@ -585,7 +869,7 @@ export interface ConfigSelect<T extends boolean = true> {
     | {
         title?: T;
         description?: T;
-        sub_descrition?: T;
+        sub_description?: T;
         financial_help_1?:
           | T
           | {
@@ -620,6 +904,7 @@ export interface ConfigSelect<T extends boolean = true> {
     | {
         title?: T;
         description?: T;
+        disponibility?: T;
         work_zone?:
           | T
           | {
@@ -639,6 +924,26 @@ export interface ConfigSelect<T extends boolean = true> {
                     total?: T;
                   };
             };
+      };
+  faq_section?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        faq?:
+          | T
+          | {
+              question?: T;
+              answer?: T;
+              id?: T;
+            };
+      };
+  footer_section?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        region?: T;
       };
   updatedAt?: T;
   createdAt?: T;
