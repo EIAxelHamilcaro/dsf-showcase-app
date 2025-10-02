@@ -141,7 +141,7 @@ export function ServicesSection({ config }: { config: Config1 }) {
 
           <div className="text-center mt-8">
             <p className="text-muted-foreground text-base">
-              {config.financial_section?.sub_descrition}
+              {config.financial_section?.sub_description}
             </p>
           </div>
         </div>
