@@ -2,6 +2,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "../globals.css";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import Head from "next/head";
 import { getLocale } from "next-intl/server";
 import type { ReactNode } from "react";
@@ -156,6 +157,7 @@ export default async function RootLayout({
           type="application/ld+json"
         />
       </Head>
+      <SpeedInsights />
       <body
         className={cn(
           `${geistSans.variable} ${geistMono.variable}`,
