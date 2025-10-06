@@ -127,7 +127,7 @@ export function ServicesSection({ config }: { config: Config1 }) {
               <h4 className="underline text-blue-500 font-semibold mb-2 text-lg group-hover:text-blue-600 transition-colors duration-200">
                 {config.financial_section?.financial_help_2?.title}
               </h4>
-              <p className="text-muted-foreground">
+              <p className="text-muted-foreground group-hover:text-blue-500 transition-colors duration-200">
                 {config.financial_section?.financial_help_2?.description}
               </p>
             </Link>
