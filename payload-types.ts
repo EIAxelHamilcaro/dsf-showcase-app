@@ -227,6 +227,10 @@ export interface Config1 {
      * Fichier PDF à télécharger via le bouton
      */
     guide_pdf: number | Media;
+    /**
+     * Fichier PDF à télécharger via le bouton
+     */
+    doc_pdf?: (number | null) | Media;
   };
   /**
    * Titre de la section À propos
@@ -494,6 +498,10 @@ export interface Config1 {
        * Détails de cette aide
        */
       description?: string | null;
+      /**
+       * Fichier PDF à télécharger via le bouton
+       */
+      impot_pdf?: (number | null) | Media;
     };
     /**
      * Deuxième aide détaillée
@@ -760,6 +768,7 @@ export interface ConfigSelect<T extends boolean = true> {
         main_button_1?: T;
         main_button_2?: T;
         guide_pdf?: T;
+        doc_pdf?: T;
       };
   about_title?: T;
   about_text?: T;
@@ -876,6 +885,7 @@ export interface ConfigSelect<T extends boolean = true> {
               icon_text?: T;
               title?: T;
               description?: T;
+              impot_pdf?: T;
             };
         financial_help_2?:
           | T

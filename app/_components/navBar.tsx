@@ -16,15 +16,19 @@ export default function NavBar({ config }: { config: Config1 }) {
     },
     {
       label: "Réalisation",
-      href: "#",
+      href: "#realisations",
     },
     {
       label: "Services",
-      href: "#",
+      href: "#services",
     },
     {
       label: "Contact",
       href: "#contact",
+    },
+    {
+      label: "Questions",
+      href: "#faq",
     },
   ];
 
@@ -35,7 +39,7 @@ export default function NavBar({ config }: { config: Config1 }) {
           alt="Logo de Douche Senior France"
           className="hidden lg:block"
           src={Logo}
-          width={150}
+          width={185}
         />
 
         <NavBarInteractive config={config} items={items} />

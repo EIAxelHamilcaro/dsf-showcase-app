@@ -14,7 +14,7 @@ export function RichTextBoldOnly({ content }: Props) {
   const nodes = content.root.children;
 
   return (
-    <h1 className="text-4xl lg:text-6xl font-bold tracking-tight">
+    <h1 className="text-5xl lg:text-6xl font-bold tracking-tight">
       {nodes.map((node, idx) => {
         if (!node.children || !Array.isArray(node.children)) {
           // cas rare : pas de children => juste texte ou vide

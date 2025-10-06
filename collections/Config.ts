@@ -179,6 +179,16 @@ const Config: CollectionConfig = {
             description: "Fichier PDF à télécharger via le bouton",
           },
         },
+        {
+          name: "doc_pdf",
+          type: "upload",
+          relationTo: "media",
+          hasMany: false,
+          label: "PDF de la documentation",
+          admin: {
+            description: "Fichier PDF à télécharger via le bouton",
+          },
+        },
       ],
     },
     // --- Section À Propos ---
@@ -722,6 +732,16 @@ const Config: CollectionConfig = {
               type: "text",
               admin: {
                 description: "Détails de cette aide",
+              },
+            },
+            {
+              name: "impot_pdf",
+              type: "upload",
+              relationTo: "media",
+              hasMany: false,
+              label: "PDF de du fichier crédit d'impots",
+              admin: {
+                description: "Fichier PDF à télécharger via le bouton",
               },
             },
           ],

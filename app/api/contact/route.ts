@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 
 export async function POST(req: Request) {
-  const { name, phone, email, message } = await req.json();
+  const { name, phone, email, message, adress } = await req.json();
 
   try {
     const transporter = nodemailer.createTransport({
@@ -21,6 +21,7 @@ export async function POST(req: Request) {
         Nom : ${name}
         Téléphone : ${phone}
         Email : ${email}
+        Adresse : ${adress}
         Message :
         ${message}
       `,

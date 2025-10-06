@@ -11,7 +11,7 @@
   --card-foreground: oklch(0.35 0.01 258); /* Dark Slate Gray */
   --popover: oklch(1 0 0); /* White */
   --popover-foreground: oklch(0.35 0.01 258); /* Dark Slate Gray */
-  --primary: oklch(0.78 0.08 220); /* Light Blue #A4C8E1 */
+  --primary: oklch(0.53 0.18 254);
   --primary-foreground: oklch(1 0 0); /* White */
   --secondary: oklch(0.55 0.005 258); /* Medium Gray #7D7D7D */
   --secondary-foreground: oklch(1 0 0); /* White */

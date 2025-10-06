@@ -37,7 +37,7 @@ export default function NavBarInteractive({
         </Button>
       </div>
 
-      <NavigationMenuList className="hidden lg:flex">
+      <NavigationMenuList className="hidden lg:flex pl-40">
         {items.map((item, i) => (
           <NavigationMenuItem key={`nav_item_${i.toString()}`}>
             <Button asChild type="button" variant={"link"}>
@@ -46,18 +46,22 @@ export default function NavBarInteractive({
           </NavigationMenuItem>
         ))}
       </NavigationMenuList>
-      <NavigationMenuList className="hidden lg:flex">
+      <NavigationMenuList className="hidden lg:flex gap-3">
         <NavigationMenuItem>
-          <a
-            className="flex items-center text-primary px-3 py-2"
-            href="tel:+33254975323"
-          >
-            <Phone className="h-4 w-4 mr-2" />
-            <span className="font-medium">{config.phone}</span>
-          </a>
+          <Button asChild variant="link">
+            <Link
+              className="flex items-center text-primary py-2"
+              href="tel:+33254975323"
+            >
+              <Phone className="h-4 w-4" />
+              <span className="font-medium text-xl">{config.phone}</span>
+            </Link>
+          </Button>
         </NavigationMenuItem>
         <NavigationMenuItem>
-          <Button>Devis gratuit</Button>
+          <Button asChild className="w-full">
+            <Link href="#contact">Devis gratuit</Link>
+          </Button>
         </NavigationMenuItem>
       </NavigationMenuList>
 
@@ -76,7 +80,7 @@ export default function NavBarInteractive({
             </NavigationMenuItem>
           ))}
           <Separator />
-          <NavigationMenuItem className="w-full px-5">
+          <NavigationMenuItem className="w-full">
             <a
               className="flex items-center text-primary"
               href="tel:+33254975323"
@@ -85,8 +89,10 @@ export default function NavBarInteractive({
               <span className="font-medium">02 54 97 53 23</span>
             </a>
           </NavigationMenuItem>
-          <NavigationMenuItem className="w-full pb-2 px-5">
-            <Button className="w-full">Devis gratuit</Button>
+          <NavigationMenuItem className="w-full pb-2">
+            <Button asChild className="w-full">
+              <Link href="#contact">Devis gratuit</Link>
+            </Button>
           </NavigationMenuItem>
           <Separator className="pb-0 mb-0" />
         </NavigationMenuList>
