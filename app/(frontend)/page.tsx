@@ -10,6 +10,9 @@ import NavBar from "../_components/navBar";
 import { RefreshRouteOnSave } from "../_components/refreshRouteOnSave";
 import { ServicesSection } from "../_components/serviceSection";
 
+export const dynamic = "force-static";
+export const revalidate = 43200;
+
 export default async function Home() {
   const payload = await getPayload({ config: payloadConfig });
   const config = await payload.findByID({
