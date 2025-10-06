@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 import type { Config1, Media } from "@/payload-types";
 
 export function ServicesSection({ config }: { config: Config1 }) {
@@ -93,8 +94,8 @@ export function ServicesSection({ config }: { config: Config1 }) {
           </p>
         </div>
 
-        <div className="flex justify-center gap-6">
-          <div className="text-center">
+        <div className="flex justify-center gap-6 flex-wrap">
+          <div className="text-center max-w-xs flex-1">
             <Link
               className="group block transition-transform duration-200 hover:-translate-y-1"
               href={
@@ -115,13 +116,13 @@ export function ServicesSection({ config }: { config: Config1 }) {
             </Link>
           </div>
 
-          <div className="text-center">
+          <div className="text-center max-w-xs flex-1">
             <Link
               className="group block transition-transform duration-200 hover:-translate-y-1"
-              href={"https://france-renov.gouv.fr/aides/maprimeadapt"}
+              href="https://france-renov.gouv.fr/aides/maprimeadapt"
               target="_blank"
             >
-              <div className="bg-gradient-to-br from-green-500 to-green-600 text-white rounded-full size-30 flex items-center justify-center mx-auto mb-3 text-xl font-bold shadow-lg">
+              <div className="bg-gradient-to-br from-green-500 to-green-600 text-white rounded-full size-30 flex items-center justify-center mx-auto mb-3 text-xl font-bold shadow-lg group-hover:shadow-xl group-hover:from-green-400 group-hover:to-green-500 transition-all duration-300">
                 {config.financial_section?.financial_help_2?.icon_text}
               </div>
               <h4 className="underline text-blue-500 font-semibold mb-2 text-lg group-hover:text-blue-600 transition-colors duration-200">
