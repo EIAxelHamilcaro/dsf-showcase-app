@@ -340,10 +340,10 @@ export function ModalMultiStepForm({ initialData, link }: ModalFormProps) {
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
-    const { name, value, type, checked } = e.target;
+    const { name, value } = e.target;
     setData((prev) => ({
       ...prev,
-      [name]: type === "checkbox" ? checked : value,
+      [name]: value,
     }));
   };
 
