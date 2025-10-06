@@ -3,7 +3,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import type { Config1, Media } from "@/payload-types";
+import { ModalMultiStepForm } from "./multiStepForm";
 import { RichTextBoldOnly } from "./richText";
 
 export default function HeroSection({ config }: { config: Config1 }) {
@@ -46,22 +48,31 @@ export default function HeroSection({ config }: { config: Config1 }) {
                 {config.main_button?.main_button_2}
               </Link>
             </Button>
-            <Button asChild size="lg" variant="outline">
-              <Link
-                href={(config.main_button.guide_pdf as Media).url || ""}
-                target="_blank"
-              >
-                Télécharger votre guide gratuitement
-              </Link>
-            </Button>
-            <Button asChild size="lg" variant="destructive">
-              <Link
-                href={(config.main_button.doc_pdf as Media).url || ""}
-                target="_blank"
-              >
-                Télécharger notre documentation gratuitement
-              </Link>
-            </Button>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button size="lg" variant="outline">
+                  Télécharger notre guide gratuitement
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <ModalMultiStepForm
+                  link={(config.main_button.guide_pdf as Media).url || ""}
+                />
+              </DialogContent>
+            </Dialog>
+
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button size="lg" variant="destructive">
+                  Télécharger notre documentation gratuitement
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <ModalMultiStepForm
+                  link={(config.main_button.doc_pdf as Media).url || ""}
+                />
+              </DialogContent>
+            </Dialog>
           </div>
         </div>
 

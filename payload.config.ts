@@ -8,6 +8,7 @@ import { fr } from "@payloadcms/translations/languages/fr";
 import { buildConfig } from "payload";
 import sharp from "sharp";
 import Config from "./collections/Config";
+import Leads from "./collections/Leads";
 import { Media } from "./collections/Media";
 import { Users } from "./collections/Users";
 
@@ -21,7 +22,7 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Users, Config, Media],
+  collections: [Leads, Config, Users, Media],
   globals: [],
   i18n: {
     fallbackLanguage: "fr",
