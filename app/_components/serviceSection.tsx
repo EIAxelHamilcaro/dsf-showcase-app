@@ -124,7 +124,7 @@ export function ServicesSection({ config }: { config: Config1 }) {
               <div className="bg-gradient-to-br from-green-500 to-green-600 text-white rounded-full size-30 flex items-center justify-center mx-auto mb-3 text-xl font-bold shadow-lg">
                 {config.financial_section?.financial_help_2?.icon_text}
               </div>
-              <h4 className="underline text-blue-500 font-semibold mb-2 text-lg">
+              <h4 className="underline text-blue-500 font-semibold mb-2 text-lg group-hover:text-blue-600 transition-colors duration-200">
                 {config.financial_section?.financial_help_2?.title}
               </h4>
               <p className="text-muted-foreground">
