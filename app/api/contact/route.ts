@@ -1,9 +1,21 @@
+/** biome-ignore-all lint/suspicious/noExplicitAny: ok */
 import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 import { getPayload } from "payload";
 import payloadConfig from "@/payload.config";
 
 export async function POST(req: Request) {
+  let body: any;
+
+  try {
+    body = await req.json();
+  } catch {
+    return NextResponse.json(
+      { success: false, error: "Requête invalide" },
+      { status: 400 },
+    );
+  }
+
   const {
     name,
     phone,
@@ -16,7 +28,20 @@ export async function POST(req: Request) {
     step4,
     consentMain,
     consentPartners,
-  } = await req.json();
+    website,
+  } = body ?? {};
+
+  if (website && website.trim().length > 0) {
+    console.log("[SPAM] Honeypot rempli, requête ignorée");
+    return NextResponse.json({ success: true });
+  }
+
+  if (!name || !email || !adress || !phone) {
+    return NextResponse.json(
+      { success: false, error: "Champs obligatoires manquants" },
+      { status: 400 },
+    );
+  }
 
   try {
     const transporter = nodemailer.createTransport({
@@ -41,7 +66,7 @@ export async function POST(req: Request) {
         Type Salle de bain: ${step3 || "--"}
         Age: ${step4 || "--"}
         Message :
-        ${message}
+        ${message || "--"}
       `,
     });
 
@@ -65,7 +90,6 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    // biome-ignore lint/suspicious/noConsole: ok
     console.error(error);
     return NextResponse.json({ success: false, error }, { status: 500 });
   }

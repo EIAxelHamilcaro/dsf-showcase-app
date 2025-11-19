@@ -1,14 +1,18 @@
+/** biome-ignore-all lint/suspicious/noExplicitAny: ok */
+/** biome-ignore-all lint/a11y/useKeyWithClickEvents: ok */
+/** biome-ignore-all lint/a11y/noStaticElementInteractions: ok */
 "use client";
 
+import { load } from "@fingerprintjs/botd";
 import { Bath, Check, Home, HomeIcon, ShowerHead, User } from "lucide-react";
 import Link from "next/link";
-import { type ChangeEvent, type FormEvent, useEffect, useState } from "react";
+import { type ChangeEvent, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { RadioGroup } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
 
 // ------------------------------------
@@ -232,7 +236,7 @@ export const Step5 = ({ data, onChange }: any) => (
         className="h-14 text-xl px-4"
         name="name"
         onChange={onChange}
-        placeholder="Votre nom"
+        placeholder="Votre nom*"
         required
         type="text"
         value={data.name}
@@ -241,7 +245,7 @@ export const Step5 = ({ data, onChange }: any) => (
         className="h-14 text-xl px-4"
         name="phone"
         onChange={onChange}
-        placeholder="Téléphone"
+        placeholder="Téléphone*"
         required
         type="tel"
         value={data.phone}
@@ -250,7 +254,7 @@ export const Step5 = ({ data, onChange }: any) => (
         className="h-14 text-xl px-4"
         name="email"
         onChange={onChange}
-        placeholder="Email"
+        placeholder="Email*"
         required
         type="email"
         value={data.email}
@@ -259,7 +263,7 @@ export const Step5 = ({ data, onChange }: any) => (
         className="h-14 text-xl px-4"
         name="adress"
         onChange={onChange}
-        placeholder="Adresse complète"
+        placeholder="Adresse complète*"
         required
         type="text"
         value={data.adress}
@@ -334,6 +338,15 @@ export function ModalMultiStepForm({ initialData, link }: ModalFormProps) {
     ...initialData,
   });
 
+  const [isBot, setIsBot] = useState(false);
+  useEffect(() => {
+    (async () => {
+      const botd = await load();
+      const resBotd = botd.detect();
+      setIsBot(resBotd.bot);
+    })();
+  }, []);
+
   const goNext = () => setStep((s) => Math.min(6, s + 1));
   const goBack = () => setStep((s) => Math.max(1, s - 1));
 
@@ -358,6 +371,8 @@ export function ModalMultiStepForm({ initialData, link }: ModalFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (isBot) return;
 
     const res = await fetch("/api/contact", {
       method: "POST",
@@ -409,13 +424,6 @@ export function ModalMultiStepForm({ initialData, link }: ModalFormProps) {
             </Link>
           </Button>
         )}
-        <Button
-          className="text-xl px-10 py-6"
-          onClick={() => setIsSubmitted(false)}
-          variant={"secondary"}
-        >
-          Retour
-        </Button>
       </div>
     );
 
@@ -439,6 +447,13 @@ export function ModalMultiStepForm({ initialData, link }: ModalFormProps) {
           {step < 6 && (
             <Button
               className="text-xl px-8 py-5"
+              disabled={
+                step === 5 &&
+                (data.name.length === 0 ||
+                  data.email.length === 0 ||
+                  data.phone.length === 0 ||
+                  data.adress.length === 0)
+              }
               onClick={goNext}
               type="button"
             >

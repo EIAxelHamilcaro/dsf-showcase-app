@@ -1,8 +1,10 @@
+/** biome-ignore-all lint/suspicious/noConsole: ok*/
 "use client";
+import { load } from "@fingerprintjs/botd";
 import { Clock, Mail, MapPin, Phone } from "lucide-react";
 import Link from "next/link";
 import type React from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -17,24 +19,62 @@ export function ContactSection({ config }: { config: Config1 }) {
     email: "",
     message: "",
     adress: "",
+    website: "",
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const [isBot, setIsBot] = useState(false);
+  useEffect(() => {
+    (async () => {
+      const botd = await load();
+      const resBotd = botd.detect();
+      setIsBot(resBotd.bot);
+    })();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const res = await fetch("/api/contact", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(formData),
-    });
+    if (formData.website?.trim().length > 0) return;
+    try {
+      if (isBot) {
+        alert("Message envoyé ✅");
+        return;
+      }
+    } catch (err) {
+      console.error(
+        "[BotD] Erreur de détection, on laisse passer la requête",
+        err,
+      );
+    }
 
-    if (res.ok) {
-      alert("Message envoyé ✅");
-      setFormData({ name: "", phone: "", email: "", message: "", adress: "" });
-    } else {
+    setIsSubmitting(true);
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (res.ok) {
+        alert("Message envoyé ✅");
+        setFormData({
+          name: "",
+          phone: "",
+          email: "",
+          message: "",
+          adress: "",
+          website: "",
+        });
+      } else {
+        alert("Erreur lors de l'envoi ❌");
+      }
+    } catch (_e) {
       alert("Erreur lors de l'envoi ❌");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -70,6 +110,18 @@ export function ContactSection({ config }: { config: Config1 }) {
           </CardHeader>
           <CardContent>
             <form className="space-y-4" onSubmit={handleSubmit}>
+              <div className="hidden">
+                <Label htmlFor="website">website</Label>
+                <Input
+                  autoComplete="off"
+                  id="website"
+                  name="website"
+                  onChange={handleChange}
+                  tabIndex={-1}
+                  value={formData.website}
+                />
+              </div>
+
               <div>
                 <Label className="text-lg" htmlFor="name">
                   Nom complet *
@@ -122,7 +174,7 @@ export function ContactSection({ config }: { config: Config1 }) {
                   id="adress"
                   name="adress"
                   onChange={handleChange}
-                  placeholder="rue - ville - département"
+                  placeholder="ville - département"
                   required
                   type="text"
                   value={formData.adress}
@@ -131,21 +183,31 @@ export function ContactSection({ config }: { config: Config1 }) {
 
               <div>
                 <Label className="text-lg" htmlFor="message">
-                  Votre projet *
+                  Votre projet
                 </Label>
                 <Textarea
                   id="message"
                   name="message"
                   onChange={handleChange}
                   placeholder="Décrivez-nous votre projet d'adaptation de salle de bain..."
-                  required
                   rows={4}
                   value={formData.message}
                 />
               </div>
 
-              <Button className="w-full" size="lg" type="submit">
-                Envoyer ma demande
+              <Button
+                className="w-full"
+                disabled={
+                  isSubmitting ||
+                  !formData.name ||
+                  !formData.email ||
+                  !formData.adress ||
+                  !formData.phone
+                }
+                size="lg"
+                type="submit"
+              >
+                {isSubmitting ? "Envoi en cours..." : "Envoyer ma demande"}
               </Button>
 
               <p className="text-lg text-muted-foreground text-center">
