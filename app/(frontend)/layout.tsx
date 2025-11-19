@@ -24,11 +24,11 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://www.douche-senior-france.com/"),
   title: {
     default:
-      "Douche Senior France - Douche Sécurisée sur Mesure, Installation Rapide & Fabrication Française",
+      "Remplacez votre baignoire par une douche sécurisée en 1 jour | Douche Senior France",
     template: "%s | Douche Senior France",
   },
   description:
-    "Adaptez votre salle de bain avec notre douche sécurisée pour les seniors en 1 journée. Fabrication 100% française. Labellisée Handibat Silverbat.",
+    "Artisan spécialisé dans le remplacement de baignoire par une douche sécurisée pour seniors en Centre-Val de Loire. Pose en 1 journée, fabrication 100% française, normes PMR, label Handibat Silverbat. Demandez votre devis gratuit dès maintenant.",
   robots: {
     index: true,
     follow: true,
@@ -45,9 +45,9 @@ export const metadata: Metadata = {
     locale: "fr_FR",
     url: "https://www.douche-senior-france.com",
     title:
-      "Douche Senior France - Douche Sécurisée sur Mesure, Installation Rapide & Fabrication Française",
+      "Remplacement de baignoire par douche sécurisée en 1 jour | Douche Senior France",
     description:
-      "Adaptez votre salle de bain avec notre douche sécurisée pour les seniors en 1 journée. Fabrication 100% française. Labellisée Handibat Silverbat.Installation de douches sécurisées pour seniors en 1 journée. Fabrication 100% française, normes PMR et labellisation Handibat Silverbat. Demandez votre devis gratuit.",
+      "Installation de douches sécurisées pour seniors et personnes à mobilité réduite en 1 journée. Fabrication 100% française, normes PMR, label Handibat Silverbat. Artisan basé en Centre-Val de Loire. Demandez votre devis gratuit.",
     images: [
       {
         url: "/hero.png",
@@ -60,9 +60,10 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Douche Senior France - Installation de douches sécurisées",
+    title:
+      "Remplacement de baignoire par douche sécurisée en 1 jour | Douche Senior France",
     description:
-      "Douche senior sur mesure, posée en 1 journée. Fabrication française, normes PMR et label Handibat Silverbat. Devis gratuit.",
+      "Douche senior sur mesure, posée en 1 journée. Fabrication française, normes PMR, label Handibat Silverbat. Artisan en Centre-Val de Loire. Devis gratuit.",
     images: ["/hero.png"],
   },
   alternates: {
@@ -72,7 +73,7 @@ export const metadata: Metadata = {
     "theme-color": "#ffffff",
     "msapplication-TileColor": "#ffffff",
     keywords:
-      "douche senior, douche sécurisée, douche PMR, douche adaptée personnes âgées, installation douche handicapée, douche plain-pied, fabricant douche française, douche aide action logement, douche Handibat Silverbat, douche, salle de bain, baignoire, senior, douche blois, douche romorantin, douche chateauroux, douche bourges, douche tours, douche région centre, salle de bain région centre, prime adapt",
+      "remplacement baignoire douche, douche senior, douche sécurisée, douche PMR, douche adaptée personnes âgées, installation douche handicapée, douche plain-pied, fabricant douche française, douche aide action logement, douche Handibat Silverbat, douche sécurisée Centre-Val de Loire, douche Blois, douche Romorantin, douche Châteauroux, douche Bourges, douche Tours, prime adapt salle de bain",
   },
 };
 
