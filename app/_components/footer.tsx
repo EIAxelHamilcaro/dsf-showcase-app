@@ -17,7 +17,9 @@ export function Footer({ config }: { config: Config1 }) {
         </div>
 
         <div>
-          <h4 className="font-semibold mb-3 sm:mb-4 text-base sm:text-lg">Contact</h4>
+          <h4 className="font-semibold mb-3 sm:mb-4 text-base sm:text-lg">
+            Contact
+          </h4>
           <div className="space-y-2 text-sm sm:text-base">
             <div className="flex items-center gap-2">
               <Phone className="h-4 w-4 shrink-0" />
@@ -45,11 +47,11 @@ export function Footer({ config }: { config: Config1 }) {
           Site conçu par{" "}
           <Link
             className="hover:text-primary font-medium transition-colors"
-            href="https://www.linkedin.com/in/axelhamilcaro"
+            href="https://axelhamilcaro.com/"
             rel="noopener noreferrer"
             target="_blank"
           >
-            Axel Hamilcaro
+            Axel Hamilcaro - Developpeur Web
           </Link>
         </p>
       </div>
