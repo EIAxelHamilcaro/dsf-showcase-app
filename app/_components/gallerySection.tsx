@@ -21,7 +21,7 @@ export function GallerySection({ config }: { config: Config1 }) {
     clearAutoplay();
     autoplayRef.current = setInterval(() => {
       nextProject(false);
-    }, 5000);
+    }, 8000);
   };
 
   const nextProject = (manual = true) => {
@@ -69,7 +69,7 @@ export function GallerySection({ config }: { config: Config1 }) {
                   alt="Avant transformation"
                   className="object-cover rounded-xl shadow-lg"
                   fill
-                  loading={"eager"}
+                  loading={index === 0 ? "eager" : "lazy"}
                   sizes="(max-width: 768px) 100vw, 50vw"
                   src={(project.before as Media)?.url || "/placeholder.svg"}
                 />
