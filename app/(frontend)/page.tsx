@@ -33,9 +33,7 @@ export default async function Home() {
         <ContactSection config={config} />
         <FAQSection config={config} />
       </main>
-      <footer>
-        <Footer config={config} />
-      </footer>
+      <Footer config={config} />
     </>
   );
 }

@@ -33,8 +33,8 @@ export default function NavBar({ config }: { config: Config1 }) {
   ];
 
   return (
-    <header className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 w-full px-5 py-3">
-      <NavigationMenu className="max-w-full flex justify-between flex-col lg:flex-row">
+    <header className="bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 sticky top-0 z-50 w-full px-4 sm:px-6 py-3">
+      <NavigationMenu className="max-w-full w-full flex justify-between flex-col lg:flex-row">
         <Image
           alt="Logo de Douche Senior France"
           className="hidden lg:block"

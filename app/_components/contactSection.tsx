@@ -89,24 +89,24 @@ export function ContactSection({ config }: { config: Config1 }) {
 
   return (
     <section
-      className="py-16 lg:py-24 bg-muted mx-auto px-10 lg:px-32"
+      className="py-12 md:py-16 lg:py-24 bg-muted mx-auto px-4 sm:px-10 md:px-16 lg:px-32 overflow-hidden"
       id="contact"
     >
       <div className="text-center mb-16">
-        <h1 className="text-5xl font-bold text-foreground mb-4 text-balance">
+        <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4 text-balance">
           Demandez votre devis gratuit
-        </h1>
-        <p className="text-xl text-muted-foreground text-pretty">
+        </h2>
+        <p className="text-lg md:text-xl text-muted-foreground text-pretty">
           Intervention rapide dans votre région. Étude personnalisée de vos
           besoins.
         </p>
       </div>
 
-      <div className="grid lg:grid-cols-2 gap-12 text-lg">
+      <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
         {/* Contact Form */}
-        <Card className="text-lg">
-          <CardHeader>
-            <CardTitle>Formulaire de contact</CardTitle>
+        <Card>
+          <CardHeader className="pb-4">
+            <CardTitle className="text-xl sm:text-2xl">Formulaire de contact</CardTitle>
           </CardHeader>
           <CardContent>
             <form className="space-y-4" onSubmit={handleSubmit}>
@@ -123,10 +123,11 @@ export function ContactSection({ config }: { config: Config1 }) {
               </div>
 
               <div>
-                <Label className="text-lg" htmlFor="name">
+                <Label className="text-base sm:text-lg" htmlFor="name">
                   Nom complet *
                 </Label>
                 <Input
+                  className="mt-1"
                   id="name"
                   name="name"
                   onChange={handleChange}
@@ -137,10 +138,11 @@ export function ContactSection({ config }: { config: Config1 }) {
               </div>
 
               <div>
-                <Label className="text-lg" htmlFor="phone">
+                <Label className="text-base sm:text-lg" htmlFor="phone">
                   Téléphone *
                 </Label>
                 <Input
+                  className="mt-1"
                   id="phone"
                   name="phone"
                   onChange={handleChange}
@@ -152,10 +154,11 @@ export function ContactSection({ config }: { config: Config1 }) {
               </div>
 
               <div>
-                <Label className="text-lg" htmlFor="email">
+                <Label className="text-base sm:text-lg" htmlFor="email">
                   Email *
                 </Label>
                 <Input
+                  className="mt-1"
                   id="email"
                   name="email"
                   onChange={handleChange}
@@ -167,10 +170,11 @@ export function ContactSection({ config }: { config: Config1 }) {
               </div>
 
               <div>
-                <Label className="text-lg" htmlFor="adress">
+                <Label className="text-base sm:text-lg" htmlFor="adress">
                   Adresse *
                 </Label>
                 <Input
+                  className="mt-1"
                   id="adress"
                   name="adress"
                   onChange={handleChange}
@@ -182,10 +186,11 @@ export function ContactSection({ config }: { config: Config1 }) {
               </div>
 
               <div>
-                <Label className="text-lg" htmlFor="message">
+                <Label className="text-base sm:text-lg" htmlFor="message">
                   Votre projet
                 </Label>
                 <Textarea
+                  className="mt-1"
                   id="message"
                   name="message"
                   onChange={handleChange}
@@ -210,7 +215,7 @@ export function ContactSection({ config }: { config: Config1 }) {
                 {isSubmitting ? "Envoi en cours..." : "Envoyer ma demande"}
               </Button>
 
-              <p className="text-lg text-muted-foreground text-center">
+              <p className="text-sm sm:text-base text-muted-foreground text-center">
                 * Champs obligatoires. Réponse sous 24h maximum.
               </p>
             </form>
@@ -218,64 +223,58 @@ export function ContactSection({ config }: { config: Config1 }) {
         </Card>
 
         {/* Contact Information */}
-        <div className="space-y-6 text-lg">
+        <div className="space-y-4 sm:space-y-6">
           <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-start space-x-4">
-                <Phone className="text-primary" size={40} />
-                <div>
-                  <h3 className="font-semibold mb-1">
+            <CardContent className="pt-4 sm:pt-6">
+              <div className="flex items-start gap-3 sm:gap-4">
+                <Phone className="text-primary shrink-0" size={28} />
+                <div className="min-w-0">
+                  <h3 className="font-semibold mb-1 text-sm sm:text-base">
                     Appelez-nous directement
                   </h3>
-                  <Button asChild variant="link">
-                    <Link
-                      className="flex items-center text-primary py-2"
-                      href={`tel:+33${config?.phone?.replace(/\s|^0/g, "")}`}
-                    >
-                      <Phone size={16} />
-                      <span className="font-medium text-xl">
-                        {config.phone}
-                      </span>
-                    </Link>
-                  </Button>
-                  <p className="">{config.form_section?.disponibility}</p>
+                  <a
+                    className="flex items-center gap-2 text-primary py-1"
+                    href={`tel:+33${config?.phone?.replace(/\s|^0/g, "")}`}
+                  >
+                    <span className="font-medium text-base sm:text-lg break-all">
+                      {config.phone}
+                    </span>
+                  </a>
+                  <p className="text-sm sm:text-base text-muted-foreground">{config.form_section?.disponibility}</p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
           <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-start space-x-4">
-                <Mail className="text-primary" size={40} />
-                <div>
-                  <h3 className="font-semibold mb-1">Email</h3>
-                  <Button asChild variant="link">
-                    <Link
-                      className="flex items-center text-primary py-2"
-                      href={`mailto:${config.email}`}
-                    >
-                      <Mail size={16} />
-                      <span className="font-medium text-xl">
-                        {config.email}
-                      </span>
-                    </Link>
-                  </Button>
-                  <p className="">Réponse sous 24h maximum</p>
+            <CardContent className="pt-4 sm:pt-6">
+              <div className="flex items-start gap-3 sm:gap-4">
+                <Mail className="text-primary shrink-0" size={28} />
+                <div className="min-w-0">
+                  <h3 className="font-semibold mb-1 text-sm sm:text-base">Email</h3>
+                  <a
+                    className="flex items-center gap-2 text-primary py-1"
+                    href={`mailto:${config.email}`}
+                  >
+                    <span className="font-medium text-base sm:text-lg break-all">
+                      {config.email}
+                    </span>
+                  </a>
+                  <p className="text-sm sm:text-base text-muted-foreground">Réponse sous 24h maximum</p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
           <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-start space-x-4">
-                <MapPin className="text-primary" size={40} />
-                <div>
-                  <h3 className="font-semibold mb-1">
+            <CardContent className="pt-4 sm:pt-6">
+              <div className="flex items-start gap-3 sm:gap-4">
+                <MapPin className="text-primary shrink-0" size={28} />
+                <div className="min-w-0">
+                  <h3 className="font-semibold mb-1 text-sm sm:text-base">
                     {config.form_section?.work_zone?.title}
                   </h3>
-                  <p className="text-muted-foreground">
+                  <p className="text-sm sm:text-base text-muted-foreground">
                     {config.form_section?.work_zone?.region}
                     <br />
                     {config.form_section?.work_zone?.radius}
@@ -286,14 +285,14 @@ export function ContactSection({ config }: { config: Config1 }) {
           </Card>
 
           <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-start space-x-4">
-                <Clock className="text-primary" size={40} />
-                <div>
-                  <h3 className="font-semibold mb-1">
+            <CardContent className="pt-4 sm:pt-6">
+              <div className="flex items-start gap-3 sm:gap-4">
+                <Clock className="text-primary shrink-0" size={28} />
+                <div className="min-w-0">
+                  <h3 className="font-semibold mb-1 text-sm sm:text-base">
                     {config.form_section?.time_section?.title}
                   </h3>
-                  <p className="text-muted-foreground">
+                  <p className="text-sm sm:text-base text-muted-foreground">
                     {config.form_section?.time_section?.list?.devis}
                     <br />
                     {config.form_section?.time_section?.list?.travaux}

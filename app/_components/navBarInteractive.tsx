@@ -24,20 +24,25 @@ export default function NavBarInteractive({
   const [open, setOpen] = useState(false);
 
   return (
-    <>
+    <div className="w-full">
       <div className="lg:hidden flex justify-between w-full items-center">
-        <Image alt="Logo de Douche Senior France" src={Logo} width={150} />
+        <Image
+          alt="Logo de Douche Senior France"
+          src={Logo}
+          width={120}
+          className="w-28 sm:w-36"
+        />
         <Button
-          className="lg:hidden"
+          className="lg:hidden p-2"
           onClick={() => setOpen((prev) => !prev)}
-          size="sm"
+          size="icon"
           variant="outline"
         >
           {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
         </Button>
       </div>
 
-      <NavigationMenuList className="hidden lg:flex pl-40">
+      <NavigationMenuList className="hidden lg:flex pl-8 xl:pl-20 2xl:pl-40">
         {items.map((item, i) => (
           <NavigationMenuItem key={`nav_item_${i.toString()}`}>
             <Button asChild type="button" variant={"link"}>
@@ -65,38 +70,39 @@ export default function NavBarInteractive({
         </NavigationMenuItem>
       </NavigationMenuList>
 
+      {/* Mobile menu */}
       {open && (
-        <NavigationMenuList className="w-screen flex-col lg:hidden items-start p-2 pb-0 bg-card">
-          {items.map((item, i) => (
-            <NavigationMenuItem key={`nav_item_${i.toString()}`}>
-              <Button
-                asChild
-                className="text-base"
-                type="button"
-                variant={"link"}
-              >
-                <Link href={item.href}>{item.label}</Link>
-              </Button>
-            </NavigationMenuItem>
-          ))}
-          <Separator />
-          <NavigationMenuItem className="w-full">
+        <nav className="lg:hidden w-full mt-4 pb-4 border-t border-border">
+          <ul className="flex flex-col w-full pt-4 space-y-1">
+            {items.map((item, i) => (
+              <li key={`nav_mobile_${i.toString()}`} className="w-full">
+                <Link
+                  href={item.href}
+                  onClick={() => setOpen(false)}
+                  className="block w-full py-3 px-2 text-base font-medium hover:bg-muted rounded-md transition-colors"
+                >
+                  {item.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+          <Separator className="my-4" />
+          <div className="space-y-3 px-2">
             <a
-              className="flex items-center text-primary"
+              className="flex items-center text-primary py-2"
               href="tel:+33254975323"
             >
-              <Phone className="h-4 w-4 mr-2" />
-              <span className="font-medium">02 54 97 53 23</span>
+              <Phone className="h-5 w-5 mr-3" />
+              <span className="font-medium text-lg">{config.phone}</span>
             </a>
-          </NavigationMenuItem>
-          <NavigationMenuItem className="w-full pb-2">
-            <Button asChild className="w-full">
-              <Link href="#contact">Devis gratuit</Link>
+            <Button asChild className="w-full" size="lg">
+              <Link href="#contact" onClick={() => setOpen(false)}>
+                Devis gratuit
+              </Link>
             </Button>
-          </NavigationMenuItem>
-          <Separator className="pb-0 mb-0" />
-        </NavigationMenuList>
+          </div>
+        </nav>
       )}
-    </>
+    </div>
   );
 }

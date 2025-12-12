@@ -42,20 +42,18 @@ export function GallerySection({ config }: { config: Config1 }) {
 
   return (
     <section
-      className="py-16 lg:py-24 bg-muted max-w-full mx-auto px-10 lg:px-32"
+      className="py-12 md:py-16 lg:py-24 bg-muted w-full mx-auto px-4 sm:px-10 md:px-16 lg:px-32 overflow-hidden"
       id="realisations"
     >
-      {/* Titre */}
       <div className="text-center mb-16">
-        <h1 className="text-5xl font-bold mb-4">
+        <h2 className="text-4xl md:text-5xl font-bold mb-4">
           Nos réalisations avant / après
-        </h1>
-        <p className="text-xl">
+        </h2>
+        <p className="text-lg md:text-xl">
           Découvrez comment nous transformons les salles de bain
         </p>
       </div>
 
-      {/* Carrousel */}
       <div className="relative overflow-hidden mb-16 max-w-full">
         <div
           className="flex transition-transform duration-1000 ease-in-out"
@@ -66,29 +64,30 @@ export function GallerySection({ config }: { config: Config1 }) {
               className="flex-shrink-0 w-full grid grid-cols-1 md:grid-cols-2 gap-6"
               key={`project_${index.toString()}`}
             >
-              {/* Avant */}
-              <div className="relative w-full h-[35rem] md:h-[45rem]">
+              <div className="relative w-full h-[20rem] sm:h-[28rem] md:h-[35rem] lg:h-[45rem]">
                 <Image
                   alt="Avant transformation"
                   className="object-cover rounded-xl shadow-lg"
                   fill
+                  loading={index === 0 ? "eager" : "lazy"}
+                  sizes="(max-width: 768px) 100vw, 50vw"
                   src={(project.before as Media)?.url || "/placeholder.svg"}
                 />
-                <span className="absolute top-3 left-3 bg-destructive text-white px-3 py-1 rounded-full text-lg font-semibold">
+                <span className="absolute top-3 left-3 bg-destructive text-white px-2 py-1 sm:px-3 rounded-full text-sm sm:text-lg font-semibold">
                   Avant
                 </span>
               </div>
 
-              {/* Après */}
-              <div className="relative h-[35rem] md:h-[45rem]">
+              <div className="relative w-full h-[20rem] sm:h-[28rem] md:h-[35rem] lg:h-[45rem]">
                 <Image
                   alt="Après transformation"
                   className="object-cover rounded-xl shadow-lg"
                   fill
-                  sizes="100vw"
+                  loading={index === 0 ? "eager" : "lazy"}
+                  sizes="(max-width: 768px) 100vw, 50vw"
                   src={(project.after as Media)?.url || "/placeholder.svg"}
                 />
-                <span className="absolute top-3 left-3 bg-primary text-white px-3 py-1 rounded-full text-lg font-semibold">
+                <span className="absolute top-3 left-3 bg-primary text-white px-2 py-1 sm:px-3 rounded-full text-sm sm:text-lg font-semibold">
                   Après
                 </span>
               </div>
@@ -96,7 +95,6 @@ export function GallerySection({ config }: { config: Config1 }) {
           ))}
         </div>
 
-        {/* Boutons nav */}
         <div className="absolute inset-y-0 left-3 flex items-center">
           <Button
             className="bg-background/80 backdrop-blur-sm rounded-full"
@@ -119,56 +117,56 @@ export function GallerySection({ config }: { config: Config1 }) {
         </div>
       </div>
 
-      {/* Dots */}
-      <div className="flex justify-center mt-4 mb-16 space-x-2">
+      <div className="flex justify-center mt-4 mb-16 gap-2 flex-wrap px-4" role="tablist" aria-label="Navigation des projets">
         {projects.map((_, index) => (
-          <Button
-            className={`w-3 h-3 rounded-full transition-colors ${
-              index === currentProject ? "bg-primary" : "bg-muted-foreground/30"
+          <button
+            aria-label={`Voir projet ${index + 1}`}
+            className={`w-3 h-3 min-w-3 min-h-3 p-0 rounded-full transition-colors cursor-pointer ${
+              index === currentProject ? "bg-primary" : "bg-muted-foreground/30 hover:bg-muted-foreground/50"
             }`}
             key={`dot_${index.toString()}`}
             onClick={() => {
               setCurrentProject(index);
               startAutoplay();
             }}
+            type="button"
           />
         ))}
       </div>
 
-      {/* Témoignages */}
-      <div className="px-6 flex flex-col items-center justify-center">
-        <h3 className="text-4xl font-bold text-center mb-8">
+      <div className="px-4 md:px-6 flex flex-col items-center justify-center">
+        <h3 className="text-3xl md:text-4xl font-bold text-center mb-8">
           Témoignages clients
         </h3>
-        <div className="relative w-11/12 overflow-hidden">
-          <div className="flex gap-6 animate-scroll-inf">
+        <div className="relative w-full md:w-11/12 overflow-hidden">
+          <div className="flex gap-4 md:gap-6 animate-scroll-inf">
             {[...Array(2)].map((_) => (
               <div
-                className="flex gap-6"
+                className="flex gap-4 md:gap-6"
                 key={`clone_testimonial_${Math.random() * 1000}`}
               >
                 {testimonials.map((testimonial, index) => (
                   <Card
-                    className="p-6 w-96 mb-1 border rounded-2xl shadow-sm hover:shadow-md transition-shadow flex-shrink-0"
+                    className="p-4 md:p-6 w-72 sm:w-80 md:w-96 mb-1 border rounded-2xl shadow-sm hover:shadow-md transition-shadow flex-shrink-0"
                     key={`testmonial_$${Math.random() * 1000}-${index.toString}`}
                   >
                     <CardHeader className="p-0 mb-0 gap-0">
                       <div className="flex items-center gap-3">
-                        <div className="w-15 h-15 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold">
+                        <div className="w-12 h-12 md:w-15 md:h-15 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold">
                           {testimonial?.title?.charAt(0)}
                         </div>
                         <div>
-                          <CardTitle className="text-xl">
+                          <CardTitle className="text-lg md:text-xl">
                             {testimonial.title}
                           </CardTitle>
-                          <p>
+                          <p className="text-sm md:text-base">
                             {testimonial.age} • {testimonial.location}
                           </p>
                         </div>
                       </div>
                     </CardHeader>
                     <CardContent className="p-0 mt-0">
-                      <p className="text-lg italic">“{testimonial.text}”</p>
+                      <p className="text-base md:text-lg italic">"{testimonial.text}"</p>
                     </CardContent>
                   </Card>
                 ))}

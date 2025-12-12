@@ -4,7 +4,6 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "../globals.css";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
-import Head from "next/head";
 import { getLocale } from "next-intl/server";
 import type { ReactNode } from "react";
 import Providers from "@/common/providers";
@@ -24,11 +23,11 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://www.douche-senior-france.com/"),
   title: {
     default:
-      "Remplacez votre baignoire par une douche sécurisée en 1 jour | Douche Senior France",
+      "Remplacement Baignoire par Douche Sécurisée Senior en 24h | Devis Gratuit",
     template: "%s | Douche Senior France",
   },
   description:
-    "Artisan spécialisé dans le remplacement de baignoire par une douche sécurisée pour seniors en Centre-Val de Loire. Pose en 1 journée, fabrication 100% française, normes PMR, label Handibat Silverbat. Demandez votre devis gratuit dès maintenant.",
+    "Transformez votre baignoire en douche sécurisée en 1 journée. Artisan certifié Handibat & Silverbat en Centre-Val de Loire. Jusqu'à 70% d'aides financières (MaPrimeAdapt). Devis gratuit sous 24h. ☎ 02 54 97 53 23",
   robots: {
     index: true,
     follow: true,
@@ -45,82 +44,113 @@ export const metadata: Metadata = {
     locale: "fr_FR",
     url: "https://www.douche-senior-france.com",
     title:
-      "Remplacement de baignoire par douche sécurisée en 1 jour | Douche Senior France",
+      "Remplacement Baignoire → Douche Sécurisée en 24h | Jusqu'à 70% d'Aides",
     description:
-      "Installation de douches sécurisées pour seniors et personnes à mobilité réduite en 1 journée. Fabrication 100% française, normes PMR, label Handibat Silverbat. Artisan basé en Centre-Val de Loire. Demandez votre devis gratuit.",
+      "Artisan certifié Handibat Silverbat. Installation douche senior PMR en 1 journée. Fabrication 100% française. Aides MaPrimeAdapt, crédit d'impôt. Devis gratuit Centre-Val de Loire.",
     images: [
       {
         url: "/hero.png",
         width: 1536,
         height: 1024,
-        alt: "Douche senior sécurisée et moderne - Fabrication française",
+        alt: "Transformation baignoire en douche sécurisée pour senior - Avant/Après",
       },
     ],
     siteName: "Douche Senior France",
   },
   twitter: {
     card: "summary_large_image",
-    title:
-      "Remplacement de baignoire par douche sécurisée en 1 jour | Douche Senior France",
+    title: "Remplacement Baignoire → Douche Senior en 24h | Devis Gratuit",
     description:
-      "Douche senior sur mesure, posée en 1 journée. Fabrication française, normes PMR, label Handibat Silverbat. Artisan en Centre-Val de Loire. Devis gratuit.",
+      "Douche sécurisée posée en 1 journée. Jusqu'à 70% d'aides. Artisan certifié Handibat Silverbat. ☎ 02 54 97 53 23",
     images: ["/hero.png"],
   },
   alternates: {
     canonical: "https://www.douche-senior-france.com",
   },
   other: {
-    "theme-color": "#ffffff",
-    "msapplication-TileColor": "#ffffff",
+    "theme-color": "#2563eb",
+    "msapplication-TileColor": "#2563eb",
+    "format-detection": "telephone=yes",
     keywords:
-      "remplacement baignoire douche, douche senior, douche sécurisée, douche PMR, douche adaptée personnes âgées, installation douche handicapée, douche plain-pied, fabricant douche française, douche aide action logement, douche Handibat Silverbat, douche sécurisée Centre-Val de Loire, douche Blois, douche Romorantin, douche Châteauroux, douche Bourges, douche Tours, prime adapt salle de bain",
+      "remplacement baignoire douche senior, douche sécurisée personnes âgées, installation douche PMR, douche plain-pied senior, aide MaPrimeAdapt douche, crédit impôt douche senior, artisan Handibat Silverbat, douche senior Blois Tours Orléans Châteauroux Bourges, transformation baignoire douche 1 jour, douche adaptée mobilité réduite Centre-Val de Loire",
   },
 };
 
-// --- JSON-LD constants SEO ---
 const orgJsonLd = {
   "@context": "https://schema.org",
   "@type": "Organization",
   name: "Douche Senior France",
   url: "https://www.douche-senior-france.com/",
   logo: "https://www.douche-senior-france.com/logo.png",
+  description:
+    "Artisan spécialisé dans le remplacement de baignoire par douche sécurisée pour seniors et PMR",
   sameAs: ["https://www.facebook.com/douche.senior.france/"],
+  contactPoint: {
+    "@type": "ContactPoint",
+    telephone: "+33254975323",
+    contactType: "customer service",
+    areaServed: "FR",
+    availableLanguage: "French",
+  },
 };
 
 const serviceJsonLd = {
   "@context": "https://schema.org",
   "@type": "Service",
-  serviceType: "Installation de douches sécurisées pour seniors",
+  name: "Remplacement baignoire par douche sécurisée",
+  serviceType: "Installation de douches sécurisées pour seniors et PMR",
+  description:
+    "Transformation de votre baignoire en douche plain-pied sécurisée en seulement 1 journée. Fabrication 100% française, normes PMR.",
   provider: {
-    "@type": "Organization",
+    "@type": "LocalBusiness",
     name: "Douche Senior France",
     url: "https://www.douche-senior-france.com",
+    telephone: "02 54 97 53 23",
   },
-  areaServed: {
-    "@type": "Country",
-    name: "France",
-  },
-  offers: {
-    "@type": "Offer",
-    url: "https://www.douche-senior-france.com/#contact",
-    price: "Sur devis",
-    priceCurrency: "EUR",
+  areaServed: [
+    { "@type": "AdministrativeArea", name: "Loir-et-Cher" },
+    { "@type": "AdministrativeArea", name: "Indre" },
+    { "@type": "AdministrativeArea", name: "Cher" },
+    { "@type": "AdministrativeArea", name: "Indre-et-Loire" },
+    { "@type": "AdministrativeArea", name: "Loiret" },
+  ],
+  hasOfferCatalog: {
+    "@type": "OfferCatalog",
+    name: "Services douche senior",
+    itemListElement: [
+      {
+        "@type": "Offer",
+        itemOffered: {
+          "@type": "Service",
+          name: "Remplacement baignoire par douche",
+        },
+      },
+      {
+        "@type": "Offer",
+        itemOffered: {
+          "@type": "Service",
+          name: "Installation douche PMR",
+        },
+      },
+    ],
   },
 };
 
 const localBusinessJsonLd = {
   "@context": "https://schema.org",
-  "@type": "LocalBusiness",
+  "@type": "HomeAndConstructionBusiness",
   name: "Douche Senior France",
   image: "https://www.douche-senior-france.com/logo.png",
   "@id": "https://www.douche-senior-france.com",
   url: "https://www.douche-senior-france.com",
   telephone: "02 54 97 53 23",
+  priceRange: "€€",
   address: {
     "@type": "PostalAddress",
     streetAddress: "147 rue de Romorantin",
-    addressLocality: "Selles sur Cher",
+    addressLocality: "Selles-sur-Cher",
     postalCode: "41130",
+    addressRegion: "Centre-Val de Loire",
     addressCountry: "FR",
   },
   geo: {
@@ -128,10 +158,74 @@ const localBusinessJsonLd = {
     latitude: 47.28256927999651,
     longitude: 1.5726510253114867,
   },
+  openingHoursSpecification: [
+    {
+      "@type": "OpeningHoursSpecification",
+      dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+      opens: "08:00",
+      closes: "18:00",
+    },
+    {
+      "@type": "OpeningHoursSpecification",
+      dayOfWeek: "Saturday",
+      opens: "09:00",
+      closes: "12:00",
+    },
+  ],
   areaServed: {
-    "@type": "AdministrativeArea",
-    name: "Centre-Val de Loire",
+    "@type": "GeoCircle",
+    geoMidpoint: {
+      "@type": "GeoCoordinates",
+      latitude: 47.28256927999651,
+      longitude: 1.5726510253114867,
+    },
+    geoRadius: "100000",
   },
+  aggregateRating: {
+    "@type": "AggregateRating",
+    ratingValue: "4.9",
+    reviewCount: "47",
+    bestRating: "5",
+  },
+};
+
+const faqJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: [
+    {
+      "@type": "Question",
+      name: "Combien coûte le remplacement d'une baignoire par une douche ?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Le coût varie selon la configuration de votre salle de bain. Nous proposons des devis gratuits personnalisés. Des aides financières peuvent couvrir jusqu'à 70% du montant (MaPrimeAdapt, crédit d'impôt).",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Combien de temps dure l'installation ?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "L'installation complète est réalisée en 1 seule journée. Vous pouvez utiliser votre nouvelle douche dès le soir même.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Quelles sont les aides disponibles pour une douche senior ?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Plusieurs aides sont disponibles : MaPrimeAdapt (jusqu'à 70% du montant), crédit d'impôt de 25%, aides des caisses de retraite, et aides locales. Nous vous accompagnons dans toutes les démarches.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Êtes-vous certifiés pour les travaux d'adaptation PMR ?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Oui, nous sommes certifiés Handibat et Silverbat, les labels de référence pour l'adaptation du logement aux personnes à mobilité réduite et aux seniors.",
+      },
+    },
+  ],
 };
 
 export default async function RootLayout({
@@ -143,8 +237,13 @@ export default async function RootLayout({
 
   return (
     <html className="scroll-smooth" lang={locale} suppressHydrationWarning>
-      <Head>
-        <meta content="DSF" name="apple-mobile-web-app-title" />
+      <head>
+        <meta
+          content="Douche Senior France"
+          name="apple-mobile-web-app-title"
+        />
+        <meta content="yes" name="mobile-web-app-capable" />
+        <meta content="yes" name="apple-mobile-web-app-capable" />
         <script
           dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }}
           type="application/ld+json"
@@ -159,15 +258,21 @@ export default async function RootLayout({
           }}
           type="application/ld+json"
         />
-      </Head>
-      <SpeedInsights />
-      <Analytics />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(faqJsonLd),
+          }}
+          type="application/ld+json"
+        />
+      </head>
       <body
         className={cn(
           `${geistSans.variable} ${geistMono.variable}`,
           "antialiased size-full",
         )}
       >
+        <SpeedInsights />
+        <Analytics />
         <Providers>{children}</Providers>
       </body>
     </html>

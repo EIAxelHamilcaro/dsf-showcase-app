@@ -64,7 +64,7 @@ const RadioOption = ({
   isSelected?: boolean;
 }) => (
   <div
-    className={`flex flex-col justify-center items-center gap-4 p-8 border-4 rounded-3xl cursor-pointer transition-all duration-200 hover:shadow-xl ${
+    className={`flex flex-col justify-center items-center gap-2 sm:gap-4 p-4 sm:p-6 md:p-8 border-4 rounded-2xl sm:rounded-3xl cursor-pointer transition-all duration-200 hover:shadow-xl ${
       isSelected
         ? "border-blue-600 bg-blue-50"
         : "border-gray-300 hover:border-blue-400"
@@ -75,11 +75,11 @@ const RadioOption = ({
       <Icon
         className={`${
           isSelected ? "text-blue-600" : "text-gray-600"
-        } w-16 h-16`}
+        } w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16`}
       />
     )}
     <Label
-      className={`cursor-pointer text-2xl font-semibold ${
+      className={`cursor-pointer text-base sm:text-lg md:text-2xl font-semibold text-center ${
         isSelected ? "text-blue-700" : "text-gray-800"
       }`}
       htmlFor={id}
@@ -94,11 +94,11 @@ const RadioOption = ({
 // ------------------------------------
 export const Step1 = ({ data, onSelect }: any) => (
   <StepWrapper>
-    <Label className="text-3xl font-bold text-center block">
+    <Label className="text-xl sm:text-2xl md:text-3xl font-bold text-center block">
       Êtes-vous propriétaire ou locataire ?
     </Label>
     <RadioGroup
-      className="grid grid-cols-2 gap-8 mt-6"
+      className="grid grid-cols-2 gap-4 sm:gap-6 md:gap-8 mt-6"
       onValueChange={(val) => onSelect("step1", val, true)}
       value={data.step1}
     >
@@ -128,11 +128,11 @@ export const Step1 = ({ data, onSelect }: any) => (
 
 export const Step2 = ({ data, onSelect }: any) => (
   <StepWrapper>
-    <Label className="text-3xl font-bold text-center block">
+    <Label className="text-xl sm:text-2xl md:text-3xl font-bold text-center block">
       Maison ou appartement ?
     </Label>
     <RadioGroup
-      className="grid grid-cols-2 gap-8 mt-6"
+      className="grid grid-cols-2 gap-4 sm:gap-6 md:gap-8 mt-6"
       onValueChange={(val) => onSelect("step2", val, true)}
       value={data.step2}
     >
@@ -162,11 +162,11 @@ export const Step2 = ({ data, onSelect }: any) => (
 
 export const Step3 = ({ data, onSelect }: any) => (
   <StepWrapper>
-    <Label className="text-3xl font-bold text-center block">
+    <Label className="text-xl sm:text-2xl md:text-3xl font-bold text-center block">
       Actuellement :
     </Label>
     <RadioGroup
-      className="grid grid-cols-2 gap-8 mt-6"
+      className="grid grid-cols-2 gap-4 sm:gap-6 md:gap-8 mt-6"
       onValueChange={(val) => onSelect("step3", val, true)}
       value={data.step3}
     >
@@ -196,11 +196,11 @@ export const Step3 = ({ data, onSelect }: any) => (
 
 export const Step4 = ({ data, onSelect }: any) => (
   <StepWrapper>
-    <Label className="text-3xl font-bold text-center block">
+    <Label className="text-xl sm:text-2xl md:text-3xl font-bold text-center block">
       Âge du bénéficiaire :
     </Label>
     <RadioGroup
-      className="grid grid-cols-2 gap-8 mt-6"
+      className="grid grid-cols-2 gap-4 sm:gap-6 md:gap-8 mt-6"
       onValueChange={(val) => onSelect("step4", val, true)}
       value={data.step4}
     >
@@ -228,12 +228,12 @@ export const Step4 = ({ data, onSelect }: any) => (
 
 export const Step5 = ({ data, onChange }: any) => (
   <StepWrapper>
-    <Label className="text-3xl font-bold text-center block mb-6">
+    <Label className="text-xl sm:text-2xl md:text-3xl font-bold text-center block mb-6">
       Vos coordonnées
     </Label>
-    <div className="grid gap-6 text-xl">
+    <div className="grid gap-4 sm:gap-6 text-base sm:text-lg md:text-xl">
       <Input
-        className="h-14 text-xl px-4"
+        className="h-12 sm:h-14 text-base sm:text-lg md:text-xl px-3 sm:px-4"
         name="name"
         onChange={onChange}
         placeholder="Votre nom*"
@@ -242,7 +242,7 @@ export const Step5 = ({ data, onChange }: any) => (
         value={data.name}
       />
       <Input
-        className="h-14 text-xl px-4"
+        className="h-12 sm:h-14 text-base sm:text-lg md:text-xl px-3 sm:px-4"
         name="phone"
         onChange={onChange}
         placeholder="Téléphone*"
@@ -251,7 +251,7 @@ export const Step5 = ({ data, onChange }: any) => (
         value={data.phone}
       />
       <Input
-        className="h-14 text-xl px-4"
+        className="h-12 sm:h-14 text-base sm:text-lg md:text-xl px-3 sm:px-4"
         name="email"
         onChange={onChange}
         placeholder="Email*"
@@ -260,7 +260,7 @@ export const Step5 = ({ data, onChange }: any) => (
         value={data.email}
       />
       <Input
-        className="h-14 text-xl px-4"
+        className="h-12 sm:h-14 text-base sm:text-lg md:text-xl px-3 sm:px-4"
         name="adress"
         onChange={onChange}
         placeholder="Adresse complète*"
@@ -269,7 +269,7 @@ export const Step5 = ({ data, onChange }: any) => (
         value={data.adress}
       />
       <Textarea
-        className="text-xl p-4"
+        className="text-base sm:text-lg md:text-xl p-3 sm:p-4"
         name="message"
         onChange={onChange}
         placeholder="Message (optionnel)"
@@ -281,7 +281,7 @@ export const Step5 = ({ data, onChange }: any) => (
 
 export const Step6 = ({ data, setData }: any) => (
   <StepWrapper>
-    <Label className="text-3xl font-bold text-center block mb-8">
+    <Label className="text-xl sm:text-2xl md:text-3xl font-bold text-center block mb-6 sm:mb-8">
       Consentements nécessaires
     </Label>
     <div className="flex flex-col gap-6">

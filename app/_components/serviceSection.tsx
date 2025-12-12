@@ -53,49 +53,49 @@ export function ServicesSection({ config }: { config: Config1 }) {
 
   return (
     <section
-      className="py-16 lg:py-24 bg-background px-10 lg:px-32 mx-auto"
+      className="py-12 md:py-16 lg:py-24 bg-background px-4 sm:px-10 md:px-16 lg:px-32 mx-auto overflow-hidden"
       id="services"
     >
-      <div className="text-center mb-16">
-        <h2 className="text-5xl font-bold text-foreground mb-4 text-balance">
+      <div className="text-center mb-8 sm:mb-12 md:mb-16">
+        <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-4 text-balance">
           Nos services d'adaptation
         </h2>
-        <p className="text-xl text-muted-foreground max-w-3xl mx-auto text-pretty">
+        <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto text-pretty">
           Chaque installation est personnalisée selon vos besoins spécifiques.
           Nous utilisons uniquement des équipements certifiés et de qualité
           française.
         </p>
       </div>
 
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-8 sm:mb-12 md:mb-16">
         {services.map((service, index) => (
           <Card
             className="hover:shadow-lg transition-shadow"
             key={`service_${index.toString()}`}
           >
-            <CardHeader className="flex items-center gap-6">
-              <service.icon className="text-primary" size={40} />
-              <CardTitle className="text-xl">{service.title}</CardTitle>
+            <CardHeader className="flex items-center gap-4 sm:gap-6 pb-2 sm:pb-4">
+              <service.icon className="text-primary shrink-0" size={32} />
+              <CardTitle className="text-base sm:text-lg md:text-xl">{service.title}</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-lg">{service.description}</p>
+              <p className="text-sm sm:text-base md:text-lg">{service.description}</p>
             </CardContent>
           </Card>
         ))}
       </div>
 
-      <div className="bg-primary/5 rounded-lg p-8 lg:p-12">
-        <div className="text-center mb-8">
-          <h3 className="text-3xl lg:text-3xl font-bold mb-4">
+      <div className="bg-primary/5 rounded-lg p-4 sm:p-6 md:p-8 lg:p-12">
+        <div className="text-center mb-6 sm:mb-8">
+          <h3 className="text-xl sm:text-2xl md:text-3xl font-bold mb-3 sm:mb-4">
             {config.financial_section?.title}
           </h3>
-          <p className="max-w-2xl mx-auto text-lg">
+          <p className="max-w-2xl mx-auto text-sm sm:text-base md:text-lg">
             {config.financial_section?.description}
           </p>
         </div>
 
-        <div className="flex justify-center gap-6 flex-wrap">
-          <div className="text-center max-w-xs flex-1">
+        <div className="flex justify-center gap-4 sm:gap-6 flex-wrap">
+          <div className="text-center max-w-xs flex-1 min-w-[140px]">
             <Link
               className="group block transition-transform duration-200 hover:-translate-y-1"
               href={
@@ -104,39 +104,39 @@ export function ServicesSection({ config }: { config: Config1 }) {
               }
               target="_blank"
             >
-              <div className="bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-full size-30 flex items-center justify-center mx-auto mb-3 text-xl font-bold shadow-lg group-hover:shadow-xl group-hover:from-blue-400 group-hover:to-blue-500 transition-all duration-300">
+              <div className="bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-full w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 flex items-center justify-center mx-auto mb-3 text-base sm:text-lg md:text-xl font-bold shadow-lg group-hover:shadow-xl group-hover:from-blue-400 group-hover:to-blue-500 transition-all duration-300">
                 {config.financial_section?.financial_help_1?.icon_text}
               </div>
-              <h4 className="underline text-blue-500 font-semibold mb-2 text-lg group-hover:text-blue-600 transition-colors duration-200">
+              <h4 className="underline text-blue-500 font-semibold mb-2 text-sm sm:text-base md:text-lg group-hover:text-blue-600 transition-colors duration-200">
                 {config.financial_section?.financial_help_1?.title}
               </h4>
-              <p className="text-muted-foreground group-hover:text-blue-500 transition-colors duration-200">
+              <p className="text-muted-foreground text-xs sm:text-sm md:text-base group-hover:text-blue-500 transition-colors duration-200">
                 {config.financial_section?.financial_help_1?.description}
               </p>
             </Link>
           </div>
 
-          <div className="text-center max-w-xs flex-1">
+          <div className="text-center max-w-xs flex-1 min-w-[140px]">
             <Link
               className="group block transition-transform duration-200 hover:-translate-y-1"
               href="https://france-renov.gouv.fr/aides/maprimeadapt"
               target="_blank"
             >
-              <div className="bg-gradient-to-br from-green-500 to-green-600 text-white rounded-full size-30 flex items-center justify-center mx-auto mb-3 text-xl font-bold shadow-lg group-hover:shadow-xl group-hover:from-green-400 group-hover:to-green-500 transition-all duration-300">
+              <div className="bg-gradient-to-br from-green-500 to-green-600 text-white rounded-full w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 flex items-center justify-center mx-auto mb-3 text-base sm:text-lg md:text-xl font-bold shadow-lg group-hover:shadow-xl group-hover:from-green-400 group-hover:to-green-500 transition-all duration-300">
                 {config.financial_section?.financial_help_2?.icon_text}
               </div>
-              <h4 className="underline text-blue-500 font-semibold mb-2 text-lg group-hover:text-blue-600 transition-colors duration-200">
+              <h4 className="underline text-blue-500 font-semibold mb-2 text-sm sm:text-base md:text-lg group-hover:text-blue-600 transition-colors duration-200">
                 {config.financial_section?.financial_help_2?.title}
               </h4>
-              <p className="text-muted-foreground group-hover:text-blue-500 transition-colors duration-200">
+              <p className="text-muted-foreground text-xs sm:text-sm md:text-base group-hover:text-blue-500 transition-colors duration-200">
                 {config.financial_section?.financial_help_2?.description}
               </p>
             </Link>
           </div>
         </div>
 
-        <div className="text-center mt-8">
-          <p className="text-xl">{config.financial_section?.sub_description}</p>
+        <div className="text-center mt-6 sm:mt-8">
+          <p className="text-base sm:text-lg md:text-xl">{config.financial_section?.sub_description}</p>
         </div>
       </div>
     </section>
