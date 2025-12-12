@@ -97,7 +97,8 @@ export default function HeroSection({ config }: { config: Config1 }) {
                     Recevez votre documentation
                   </DialogTitle>
                   <p className="text-sm text-muted-foreground">
-                    Répondez à quelques questions pour accéder à la documentation complète
+                    Répondez à quelques questions pour accéder à la
+                    documentation complète
                   </p>
                 </div>
                 <ModalMultiStepForm
@@ -115,6 +116,7 @@ export default function HeroSection({ config }: { config: Config1 }) {
                 alt="Salle de bain moderne adaptée aux seniors"
                 fill
                 priority
+                loading="eager"
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 600px"
                 src={heroImage.url || ""}
                 style={{ objectFit: "cover" }}
