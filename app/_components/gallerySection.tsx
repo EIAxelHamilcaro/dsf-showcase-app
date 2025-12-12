@@ -69,7 +69,7 @@ export function GallerySection({ config }: { config: Config1 }) {
                   alt="Avant transformation"
                   className="object-cover rounded-xl shadow-lg"
                   fill
-                  loading={index === 0 ? "eager" : "lazy"}
+                  loading={"eager"}
                   sizes="(max-width: 768px) 100vw, 50vw"
                   src={(project.before as Media)?.url || "/placeholder.svg"}
                 />
@@ -117,12 +117,18 @@ export function GallerySection({ config }: { config: Config1 }) {
         </div>
       </div>
 
-      <div className="flex justify-center mt-4 mb-16 gap-2 flex-wrap px-4" role="tablist" aria-label="Navigation des projets">
+      <div
+        className="flex justify-center mt-4 mb-16 gap-2 flex-wrap px-4"
+        role="tablist"
+        aria-label="Navigation des projets"
+      >
         {projects.map((_, index) => (
           <button
             aria-label={`Voir projet ${index + 1}`}
             className={`w-3 h-3 min-w-3 min-h-3 p-0 rounded-full transition-colors cursor-pointer ${
-              index === currentProject ? "bg-primary" : "bg-muted-foreground/30 hover:bg-muted-foreground/50"
+              index === currentProject
+                ? "bg-primary"
+                : "bg-muted-foreground/30 hover:bg-muted-foreground/50"
             }`}
             key={`dot_${index.toString()}`}
             onClick={() => {
@@ -166,7 +172,9 @@ export function GallerySection({ config }: { config: Config1 }) {
                       </div>
                     </CardHeader>
                     <CardContent className="p-0 mt-0">
-                      <p className="text-base md:text-lg italic">"{testimonial.text}"</p>
+                      <p className="text-base md:text-lg italic">
+                        "{testimonial.text}"
+                      </p>
                     </CardContent>
                   </Card>
                 ))}
