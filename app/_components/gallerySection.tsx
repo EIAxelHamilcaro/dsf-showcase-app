@@ -61,10 +61,10 @@ export function GallerySection({ config }: { config: Config1 }) {
         >
           {projects.map((project, index) => (
             <div
-              className="flex-shrink-0 w-full grid grid-cols-1 md:grid-cols-2 gap-6"
+              className="shrink-0 w-full grid grid-cols-1 md:grid-cols-2 gap-6"
               key={`project_${index.toString()}`}
             >
-              <div className="relative w-full h-[20rem] sm:h-[28rem] md:h-[35rem] lg:h-[45rem]">
+              <div className="relative w-full h-80 sm:h-112 md:h-140 lg:h-180">
                 <Image
                   alt="Avant transformation"
                   className="object-cover rounded-xl shadow-lg"
@@ -78,7 +78,7 @@ export function GallerySection({ config }: { config: Config1 }) {
                 </span>
               </div>
 
-              <div className="relative w-full h-[20rem] sm:h-[28rem] md:h-[35rem] lg:h-[45rem]">
+              <div className="relative w-full h-80 sm:h-112 md:h-140 lg:h-180">
                 <Image
                   alt="Après transformation"
                   className="object-cover rounded-xl shadow-lg"
@@ -117,6 +117,7 @@ export function GallerySection({ config }: { config: Config1 }) {
         </div>
       </div>
 
+      {/** biome-ignore assist/source/useSortedAttributes: ok */}
       <div
         className="flex justify-center mt-4 mb-16 gap-2 flex-wrap px-4"
         role="tablist"
@@ -153,7 +154,7 @@ export function GallerySection({ config }: { config: Config1 }) {
               >
                 {testimonials.map((testimonial, index) => (
                   <Card
-                    className="p-4 md:p-6 w-72 sm:w-80 md:w-96 mb-1 border rounded-2xl shadow-sm hover:shadow-md transition-shadow flex-shrink-0"
+                    className="p-4 md:p-6 w-72 sm:w-80 md:w-96 mb-1 border rounded-2xl shadow-sm hover:shadow-md transition-shadow shrink-0"
                     key={`testmonial_$${Math.random() * 1000}-${index.toString}`}
                   >
                     <CardHeader className="p-0 mb-0 gap-0">

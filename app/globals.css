@@ -6,17 +6,17 @@
 :root {
   /* Updated color tokens to match French craftsman design brief with light blue, white, and gray palette */
   --background: oklch(1 0 0); /* White */
-  --foreground: oklch(0.35 0.01 258); /* Dark Slate Gray #4B5563 */
+  --foreground: oklch(0.25 0.01 258); /* Texte plus foncé pour meilleur contraste seniors */
   --card: oklch(0.97 0.005 258); /* Light Gray #F1F5F9 */
-  --card-foreground: oklch(0.35 0.01 258); /* Dark Slate Gray */
+  --card-foreground: oklch(0.25 0.01 258); /* Texte carte plus foncé */
   --popover: oklch(1 0 0); /* White */
-  --popover-foreground: oklch(0.35 0.01 258); /* Dark Slate Gray */
-  --primary: oklch(0.53 0.18 254);
+  --popover-foreground: oklch(0.25 0.01 258); /* Texte popover plus foncé */
+  --primary: oklch(0.45 0.20 254); /* Bleu plus foncé et saturé pour meilleure visibilité */
   --primary-foreground: oklch(1 0 0); /* White */
   --secondary: oklch(0.55 0.005 258); /* Medium Gray #7D7D7D */
   --secondary-foreground: oklch(1 0 0); /* White */
   --muted: oklch(0.97 0.005 258); /* Light Gray #F1F5F9 */
-  --muted-foreground: oklch(0.35 0.01 258); /* Dark Slate Gray */
+  --muted-foreground: oklch(0.30 0.01 258); /* Texte secondaire plus lisible pour seniors */
   --accent: oklch(0.35 0.01 258); /* Dark Slate Gray */
   --accent-foreground: oklch(1 0 0); /* White */
   --destructive: oklch(0.577 0.245 27.325);
@@ -120,8 +120,27 @@
   * {
     @apply border-border outline-ring/50;
   }
+  html {
+    /* Taille de base plus grande pour seniors - 18px au lieu de 16px */
+    font-size: 112.5%;
+  }
   body {
     @apply bg-background text-foreground;
+    /* Meilleur interlignage pour la lisibilité */
+    line-height: 1.6;
+  }
+  /* Liens plus visibles */
+  a {
+    text-decoration-thickness: 2px;
+    text-underline-offset: 3px;
+  }
+  /* Focus visible plus marqué pour navigation clavier */
+  :focus-visible {
+    @apply outline-2 outline-offset-4 outline-primary;
+  }
+  /* Boutons plus grands par défaut */
+  button, [role="button"] {
+    min-height: 44px; /* Taille minimale recommandée WCAG */
   }
 }
 

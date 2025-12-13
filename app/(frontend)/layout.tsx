@@ -23,11 +23,11 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://www.douche-senior-france.com/"),
   title: {
     default:
-      "Remplacement Baignoire par Douche Sécurisée Senior en 24h | Devis Gratuit",
+      "Douche Senior Sécurisée | Installation en 24h | Différentes aides disponibles",
     template: "%s | Douche Senior France",
   },
   description:
-    "Transformez votre baignoire en douche sécurisée en 1 journée. Artisan certifié Handibat & Silverbat en Centre-Val de Loire. Jusqu'à 70% d'aides financières (MaPrimeAdapt). Devis gratuit sous 24h. ☎ 02 54 97 53 23",
+    "Artisan certifié Handibat & Silverbat: installation douche senior sécurisée en 1 journée. Remplacement baignoire, douche PMR, salle de bain adaptée personnes âgées. Différentes aides disponibles (MaPrimeAdapt). Devis gratuit ☎ 02 54 97 53 23",
   robots: {
     index: true,
     follow: true,
@@ -43,10 +43,9 @@ export const metadata: Metadata = {
     type: "website",
     locale: "fr_FR",
     url: "https://www.douche-senior-france.com",
-    title:
-      "Remplacement Baignoire → Douche Sécurisée en 24h | Jusqu'à 70% d'Aides",
+    title: "Douche Senior Sécurisée | Artisan Certifié | Installation 24h",
     description:
-      "Artisan certifié Handibat Silverbat. Installation douche senior PMR en 1 journée. Fabrication 100% française. Aides MaPrimeAdapt, crédit d'impôt. Devis gratuit Centre-Val de Loire.",
+      "Installation douche senior et PMR en 1 journée. Artisan certifié Handibat Silverbat. Remplacement baignoire, douche sécurisée personnes âgées. Différentes aides disponibles (MaPrimeAdapt). Devis gratuit.",
     images: [
       {
         url: "/hero.png",
@@ -59,9 +58,10 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Remplacement Baignoire → Douche Senior en 24h | Devis Gratuit",
+    title:
+      "Douche Senior Sécurisée | Installation 24h | Différentes aides disponibles",
     description:
-      "Douche sécurisée posée en 1 journée. Jusqu'à 70% d'aides. Artisan certifié Handibat Silverbat. ☎ 02 54 97 53 23",
+      "Douche sécurisée pour seniors et PMR installée en 1 journée. Artisan certifié Handibat Silverbat. Devis gratuit ☎ 02 54 97 53 23",
     images: ["/hero.png"],
   },
   alternates: {
@@ -72,7 +72,7 @@ export const metadata: Metadata = {
     "msapplication-TileColor": "#2563eb",
     "format-detection": "telephone=yes",
     keywords:
-      "remplacement baignoire douche senior, douche sécurisée personnes âgées, installation douche PMR, douche plain-pied senior, aide MaPrimeAdapt douche, crédit impôt douche senior, artisan Handibat Silverbat, douche senior Blois Tours Orléans Châteauroux Bourges, transformation baignoire douche 1 jour, douche adaptée mobilité réduite Centre-Val de Loire",
+      "douche senior, douche sécurisée, installateur douche senior, artisan douche senior, douche seniors, douche sécurisée senior, douche PMR, douche personnes âgées, douche italienne senior, installation douche sécurisée, salle de bain senior, remplacement baignoire douche, douche adaptée senior, douche sans marche, aide MaPrimeAdapt, artisan Handibat Silverbat, Centre-Val de Loire",
   },
 };
 
@@ -198,7 +198,7 @@ const faqJsonLd = {
       name: "Combien coûte le remplacement d'une baignoire par une douche ?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Le coût varie selon la configuration de votre salle de bain. Nous proposons des devis gratuits personnalisés. Des aides financières peuvent couvrir jusqu'à 70% du montant (MaPrimeAdapt, crédit d'impôt).",
+        text: "Le coût varie selon la configuration de votre salle de bain. Nous proposons des devis gratuits personnalisés. Des aides financières peuvent couvrir le montant (MaPrimeAdapt, crédit d'impôt).",
       },
     },
     {
@@ -214,7 +214,7 @@ const faqJsonLd = {
       name: "Quelles sont les aides disponibles pour une douche senior ?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Plusieurs aides sont disponibles : MaPrimeAdapt (jusqu'à 70% du montant), crédit d'impôt de 25%, aides des caisses de retraite, et aides locales. Nous vous accompagnons dans toutes les démarches.",
+        text: "Plusieurs aides sont disponibles : MaPrimeAdapt, crédit d'impôt, aides des caisses de retraite, et aides locales. Nous vous accompagnons dans toutes les démarches.",
       },
     },
     {
