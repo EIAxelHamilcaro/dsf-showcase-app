@@ -39,7 +39,7 @@ export default function NavBar({ config }: { config: Config1 }) {
         {
           label: "Aides Financières",
           href: "/aides-financieres",
-          description: "MaPrimeAdapt, crédit d'impôt et autres aides",
+          description: "MaPrimeAdapt et crédit d'impôt",
         },
       ],
     },

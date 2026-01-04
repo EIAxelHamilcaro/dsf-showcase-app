@@ -217,7 +217,7 @@ const faqJsonLd = {
       name: "Quelles sont les aides disponibles pour une douche senior ?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Plusieurs aides sont disponibles : MaPrimeAdapt, crédit d'impôt, aides des caisses de retraite, et aides locales. Nous vous accompagnons dans toutes les démarches.",
+        text: "Plusieurs aides sont disponibles : MaPrimeAdapt et crédit d'impôt. Nous vous accompagnons dans toutes les démarches.",
       },
     },
     {
