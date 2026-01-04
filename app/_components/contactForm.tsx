@@ -1,6 +1,7 @@
 /** biome-ignore-all lint/suspicious/noConsole: ok*/
 "use client";
 import { load } from "@fingerprintjs/botd";
+import { Loader2 } from "lucide-react";
 import type React from "react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -18,6 +19,8 @@ export function ContactForm({ onSuccess }: { onSuccess?: () => void }) {
     website: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [submitError, setSubmitError] = useState<string>("");
 
   const [isBot, setIsBot] = useState(false);
   useEffect(() => {
@@ -28,13 +31,46 @@ export function ContactForm({ onSuccess }: { onSuccess?: () => void }) {
     })();
   }, []);
 
+  const validateForm = () => {
+    const newErrors: Record<string, string> = {};
+
+    if (!formData.name.trim()) {
+      newErrors.name = "Le nom est requis";
+    }
+
+    if (!formData.phone.trim()) {
+      newErrors.phone = "Le téléphone est requis";
+    } else if (!/^[\d\s+()-]{10,}$/.test(formData.phone)) {
+      newErrors.phone = "Le format du téléphone est invalide";
+    }
+
+    if (!formData.email.trim()) {
+      newErrors.email = "L'email est requis";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = "Le format de l'email est invalide";
+    }
+
+    if (!formData.adress.trim()) {
+      newErrors.adress = "L'adresse est requise";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSubmitError("");
 
     if (formData.website?.trim().length > 0) return;
+
+    if (!validateForm()) {
+      return;
+    }
+
     try {
       if (isBot) {
-        alert("Message envoyé ✅");
+        setSubmitError("");
         return;
       }
     } catch (err) {
@@ -57,7 +93,6 @@ export function ContactForm({ onSuccess }: { onSuccess?: () => void }) {
 
       if (!res.ok) throw new Error("Erreur lors de l'envoi");
 
-      alert("Message envoyé ! Nous vous recontacterons rapidement. ✅");
       setFormData({
         name: "",
         phone: "",
@@ -68,7 +103,7 @@ export function ContactForm({ onSuccess }: { onSuccess?: () => void }) {
       });
       if (onSuccess) onSuccess();
     } catch (error) {
-      alert("Une erreur est survenue. Veuillez réessayer.");
+      setSubmitError("Une erreur est survenue. Veuillez réessayer.");
       console.error(error);
     } finally {
       setIsSubmitting(false);
@@ -103,6 +138,8 @@ export function ContactForm({ onSuccess }: { onSuccess?: () => void }) {
           Nom complet *
         </Label>
         <Input
+          aria-describedby={errors.name ? "name-error" : undefined}
+          aria-invalid={!!errors.name}
           className="mt-1"
           id="name"
           name="name"
@@ -111,6 +148,11 @@ export function ContactForm({ onSuccess }: { onSuccess?: () => void }) {
           required
           value={formData.name}
         />
+        {errors.name && (
+          <p className="text-sm text-destructive mt-1" id="name-error" role="alert">
+            {errors.name}
+          </p>
+        )}
       </div>
 
       <div>
@@ -118,6 +160,8 @@ export function ContactForm({ onSuccess }: { onSuccess?: () => void }) {
           Téléphone *
         </Label>
         <Input
+          aria-describedby={errors.phone ? "phone-error" : undefined}
+          aria-invalid={!!errors.phone}
           className="mt-1"
           id="phone"
           name="phone"
@@ -127,6 +171,11 @@ export function ContactForm({ onSuccess }: { onSuccess?: () => void }) {
           type="tel"
           value={formData.phone}
         />
+        {errors.phone && (
+          <p className="text-sm text-destructive mt-1" id="phone-error" role="alert">
+            {errors.phone}
+          </p>
+        )}
       </div>
 
       <div>
@@ -134,6 +183,8 @@ export function ContactForm({ onSuccess }: { onSuccess?: () => void }) {
           Email *
         </Label>
         <Input
+          aria-describedby={errors.email ? "email-error" : undefined}
+          aria-invalid={!!errors.email}
           className="mt-1"
           id="email"
           name="email"
@@ -143,6 +194,11 @@ export function ContactForm({ onSuccess }: { onSuccess?: () => void }) {
           type="email"
           value={formData.email}
         />
+        {errors.email && (
+          <p className="text-sm text-destructive mt-1" id="email-error" role="alert">
+            {errors.email}
+          </p>
+        )}
       </div>
 
       <div>
@@ -150,6 +206,8 @@ export function ContactForm({ onSuccess }: { onSuccess?: () => void }) {
           Adresse *
         </Label>
         <Input
+          aria-describedby={errors.adress ? "adress-error" : undefined}
+          aria-invalid={!!errors.adress}
           className="mt-1"
           id="adress"
           name="adress"
@@ -158,6 +216,11 @@ export function ContactForm({ onSuccess }: { onSuccess?: () => void }) {
           required
           value={formData.adress}
         />
+        {errors.adress && (
+          <p className="text-sm text-destructive mt-1" id="adress-error" role="alert">
+            {errors.adress}
+          </p>
+        )}
       </div>
 
       <div>
@@ -174,13 +237,27 @@ export function ContactForm({ onSuccess }: { onSuccess?: () => void }) {
         />
       </div>
 
+      {submitError && (
+        <div className="p-3 bg-destructive/10 border border-destructive text-destructive rounded-md" role="alert">
+          {submitError}
+        </div>
+      )}
+
       <Button
+        aria-busy={isSubmitting}
         className="w-full text-lg py-6"
         disabled={isSubmitting}
         size="lg"
         type="submit"
       >
-        {isSubmitting ? "Envoi en cours..." : "Envoyer ma demande"}
+        {isSubmitting ? (
+          <>
+            <Loader2 className="h-5 w-5 animate-spin mr-2" />
+            Envoi en cours...
+          </>
+        ) : (
+          "Envoyer ma demande"
+        )}
       </Button>
     </form>
   );
