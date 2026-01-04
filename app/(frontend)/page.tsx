@@ -6,6 +6,7 @@ import { FAQSection } from "../_components/faqSection";
 import { GallerySection } from "../_components/gallerySection";
 import HeroSection from "../_components/heroSection";
 import { RefreshRouteOnSave } from "../_components/refreshRouteOnSave";
+import { RegionalNavSection } from "../_components/regionalNav";
 import { ServicesSection } from "../_components/serviceSection";
 
 export const dynamic = "force-static";
@@ -22,14 +23,13 @@ export default async function Home() {
   return (
     <>
       <RefreshRouteOnSave />
-      <main>
-        <HeroSection config={config} />
-        <AboutSection config={config} />
-        <GallerySection config={config} />
-        <ServicesSection config={config} />
-        <ContactSection config={config} />
-        <FAQSection config={config} />
-      </main>
+      <HeroSection config={config} />
+      <AboutSection config={config} />
+      <GallerySection config={config} />
+      <ServicesSection config={config} />
+      <RegionalNavSection />
+      <ContactSection config={config} />
+      <FAQSection config={config} />
     </>
   );
 }
