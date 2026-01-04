@@ -113,54 +113,6 @@ export default async function AidesFinancieresPage() {
                 </div>
               </CardContent>
             </Card>
-
-            <Card>
-              <CardContent className="pt-6">
-                <Users className="h-12 w-12 text-primary mb-4" />
-                <h3 className="text-2xl font-bold mb-3">Caisses de retraite</h3>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Aides des caisses de retraite pour l'amélioration de
-                  l'habitat.
-                </p>
-                <div className="space-y-2 mb-4">
-                  <p className="text-sm">
-                    <strong>Carsat :</strong> Aide à l'adaptation du logement
-                  </p>
-                  <p className="text-sm">
-                    <strong>MSA :</strong> Plan d'action personnalisé
-                  </p>
-                  <p className="text-sm">
-                    <strong>Agirc-Arrco :</strong> Aide au maintien à domicile
-                  </p>
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Montants variables selon votre caisse et votre situation
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="pt-6">
-                <CheckCircle2 className="h-12 w-12 text-primary mb-4" />
-                <h3 className="text-2xl font-bold mb-3">Aides locales</h3>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Compléments possibles selon votre localisation.
-                </p>
-                <div className="space-y-2">
-                  <p className="text-sm">
-                    <strong>Conseils départementaux :</strong> APA, PCH
-                  </p>
-                  <p className="text-sm">
-                    <strong>Communes/intercommunalités :</strong> Aides
-                    spécifiques
-                  </p>
-                  <p className="text-sm">
-                    <strong>Action Logement :</strong> Pour les salariés du
-                    privé
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
           </div>
         </div>
       </section>
@@ -243,44 +195,6 @@ export default async function AidesFinancieresPage() {
                 </CardContent>
               </Card>
             </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="py-16 lg:py-24">
-        <div className="container mx-auto px-4 text-center">
-          <div className="max-w-2xl mx-auto bg-primary/5 border-2 border-primary rounded-lg p-8">
-            <h2 className="text-2xl md:text-3xl font-bold mb-4">
-              Exemple concret de financement
-            </h2>
-            <div className="text-left space-y-3 mb-6">
-              <p className="text-lg">
-                <strong>Coût total travaux :</strong> 8 000 €
-              </p>
-              <div className="border-t pt-3 space-y-2">
-                <p>
-                  • MaPrimeAdapt (selon revenus) :{" "}
-                  <strong className="text-primary">-4 000 €</strong>
-                </p>
-                <p>
-                  • Crédit d'impôt 25% :{" "}
-                  <strong className="text-primary">-2 000 €</strong>
-                </p>
-                <p>
-                  • Caisse retraite :{" "}
-                  <strong className="text-primary">-1 000 €</strong>
-                </p>
-              </div>
-              <div className="border-t pt-3">
-                <p className="text-xl font-bold">
-                  Reste à charge : <span className="text-primary">1 000 €</span>
-                </p>
-              </div>
-            </div>
-            <p className="text-sm text-muted-foreground">
-              * Exemple à titre indicatif. Le montant des aides dépend de votre
-              situation.
-            </p>
           </div>
         </div>
       </section>
