@@ -66,7 +66,7 @@ export function GallerySection({ config }: { config: Config1 }) {
             >
               <div className="relative w-full h-80 sm:h-112 md:h-140 lg:h-180">
                 <Image
-                  alt="Avant transformation"
+                  alt={`Baignoire ancienne avant remplacement par douche sécurisée senior - ${project.description || `Réalisation ${index + 1}`}`}
                   className="object-cover rounded-xl shadow-lg"
                   fill
                   loading={index === 0 ? "eager" : "lazy"}
@@ -80,7 +80,7 @@ export function GallerySection({ config }: { config: Config1 }) {
 
               <div className="relative w-full h-80 sm:h-112 md:h-140 lg:h-180">
                 <Image
-                  alt="Après transformation"
+                  alt={`Douche sécurisée plain-pied pour senior après installation - ${project.description || `Réalisation ${index + 1}`}`}
                   className="object-cover rounded-xl shadow-lg"
                   fill
                   loading={index === 0 ? "eager" : "lazy"}
@@ -97,6 +97,7 @@ export function GallerySection({ config }: { config: Config1 }) {
 
         <div className="absolute inset-y-0 left-3 flex items-center">
           <Button
+            aria-label="Projet précédent"
             className="bg-background/80 backdrop-blur-sm rounded-full"
             onClick={() => prevProject(true)}
             size="icon"
@@ -107,6 +108,7 @@ export function GallerySection({ config }: { config: Config1 }) {
         </div>
         <div className="absolute inset-y-0 right-3 flex items-center">
           <Button
+            aria-label="Projet suivant"
             className="bg-background/80 backdrop-blur-sm rounded-full"
             onClick={() => nextProject(true)}
             size="icon"
@@ -125,6 +127,7 @@ export function GallerySection({ config }: { config: Config1 }) {
       >
         {projects.map((_, index) => (
           <button
+            aria-current={index === currentProject ? "true" : "false"}
             aria-label={`Voir projet ${index + 1}`}
             className={`w-3 h-3 min-w-3 min-h-3 p-0 rounded-full transition-colors cursor-pointer ${
               index === currentProject
