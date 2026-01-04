@@ -24,6 +24,7 @@ export function RichTextBoldOnly({ content }: Props) {
 
         return (
           <React.Fragment key={idx}>
+            {/* biome-ignore lint/suspicious/noExplicitAny: Dynamic content from Payload CMS */}
             {node.children.map((child: any, cIdx: number) => {
               const childText = (child.text ?? "").replace(/\u00A0/g, " ");
               if (child.format === 1) {
