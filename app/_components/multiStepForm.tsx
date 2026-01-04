@@ -94,9 +94,9 @@ const RadioOption = ({
 // ------------------------------------
 export const Step1 = ({ data, onSelect }: any) => (
   <StepWrapper>
-    <Label className="text-xl sm:text-2xl md:text-3xl font-bold text-center block">
+    <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-center">
       Êtes-vous propriétaire ou locataire ?
-    </Label>
+    </h2>
     <RadioGroup
       className="grid grid-cols-2 gap-4 sm:gap-6 md:gap-8 mt-6"
       onValueChange={(val) => onSelect("step1", val, true)}
@@ -128,9 +128,9 @@ export const Step1 = ({ data, onSelect }: any) => (
 
 export const Step2 = ({ data, onSelect }: any) => (
   <StepWrapper>
-    <Label className="text-xl sm:text-2xl md:text-3xl font-bold text-center block">
+    <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-center">
       Maison ou appartement ?
-    </Label>
+    </h2>
     <RadioGroup
       className="grid grid-cols-2 gap-4 sm:gap-6 md:gap-8 mt-6"
       onValueChange={(val) => onSelect("step2", val, true)}
@@ -162,9 +162,9 @@ export const Step2 = ({ data, onSelect }: any) => (
 
 export const Step3 = ({ data, onSelect }: any) => (
   <StepWrapper>
-    <Label className="text-xl sm:text-2xl md:text-3xl font-bold text-center block">
+    <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-center">
       Actuellement :
-    </Label>
+    </h2>
     <RadioGroup
       className="grid grid-cols-2 gap-4 sm:gap-6 md:gap-8 mt-6"
       onValueChange={(val) => onSelect("step3", val, true)}
@@ -196,9 +196,9 @@ export const Step3 = ({ data, onSelect }: any) => (
 
 export const Step4 = ({ data, onSelect }: any) => (
   <StepWrapper>
-    <Label className="text-xl sm:text-2xl md:text-3xl font-bold text-center block">
+    <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-center">
       Âge du bénéficiaire :
-    </Label>
+    </h2>
     <RadioGroup
       className="grid grid-cols-2 gap-4 sm:gap-6 md:gap-8 mt-6"
       onValueChange={(val) => onSelect("step4", val, true)}
@@ -228,9 +228,9 @@ export const Step4 = ({ data, onSelect }: any) => (
 
 export const Step5 = ({ data, onChange }: any) => (
   <StepWrapper>
-    <Label className="text-xl sm:text-2xl md:text-3xl font-bold text-center block mb-6">
+    <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-center mb-6">
       Vos coordonnées
-    </Label>
+    </h2>
     <div className="grid gap-4 sm:gap-6 text-base sm:text-lg md:text-xl">
       <Input
         className="h-12 sm:h-14 text-base sm:text-lg md:text-xl px-3 sm:px-4"
@@ -281,9 +281,9 @@ export const Step5 = ({ data, onChange }: any) => (
 
 export const Step6 = ({ data, setData }: any) => (
   <StepWrapper>
-    <Label className="text-xl sm:text-2xl md:text-3xl font-bold text-center block mb-6 sm:mb-8">
+    <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-center mb-6 sm:mb-8">
       Consentements nécessaires
-    </Label>
+    </h2>
     <div className="flex flex-col gap-6">
       <div className="flex items-start gap-4">
         <Checkbox
