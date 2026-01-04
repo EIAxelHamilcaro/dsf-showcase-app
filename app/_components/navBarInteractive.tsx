@@ -30,6 +30,7 @@ export default function NavBarInteractive({
 }: NavBarInteractiveProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileServicesOpen, setMobileServicesOpen] = useState(false);
+  const [desktopDropdownOpen, setDesktopDropdownOpen] = useState(false);
   const pathname = usePathname();
   const isHomePage = pathname === "/";
 
@@ -75,25 +76,57 @@ export default function NavBarInteractive({
           {items.map((item, i) => (
             <li className="relative group" key={`nav_item_${i.toString()}`}>
               {item.children ? (
-                <div className="relative">
-                  <Link
+                <div
+                  className="relative"
+                  onMouseEnter={() => setDesktopDropdownOpen(true)}
+                  onMouseLeave={() => setDesktopDropdownOpen(false)}
+                >
+                  <button
+                    type="button"
                     className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-foreground hover:text-primary transition-colors"
-                    href={item.href}
-                    onClick={handleServiceClick}
+                    onClick={(e) => {
+                      if (isHomePage) {
+                        handleServiceClick(e as any);
+                      }
+                      setDesktopDropdownOpen(!desktopDropdownOpen);
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        setDesktopDropdownOpen(!desktopDropdownOpen);
+                      }
+                      if (e.key === "Escape") {
+                        setDesktopDropdownOpen(false);
+                      }
+                    }}
+                    aria-expanded={desktopDropdownOpen}
+                    aria-haspopup="menu"
                   >
                     {item.label}
-                    <ChevronDown className="h-4 w-4 transition-transform group-hover:rotate-180" />
-                  </Link>
+                    <ChevronDown
+                      className={`h-4 w-4 transition-transform ${desktopDropdownOpen ? "rotate-180" : ""}`}
+                    />
+                  </button>
 
                   {/* Dropdown */}
-                  <div className="absolute left-0 top-full pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                  <div
+                    className={`absolute left-0 top-full pt-2 transition-all duration-200 z-50 ${
+                      desktopDropdownOpen
+                        ? "opacity-100 visible"
+                        : "opacity-0 invisible"
+                    }`}
+                    role="menu"
+                    aria-hidden={!desktopDropdownOpen}
+                  >
                     <div className="bg-background border border-border rounded-lg shadow-xl overflow-hidden w-[450px]">
                       <ul className="p-2 gap-1 flex flex-col">
                         {item.children.map((child, j) => (
-                          <li key={`nav_child_${i.toString()}_${j.toString()}`}>
+                          <li key={`nav_child_${i.toString()}_${j.toString()}`} role="none">
                             <Link
                               className="block p-3 rounded-md transition-all duration-150 hover:bg-primary/10 hover:border-primary/20 border border-transparent group/item"
                               href={child.href}
+                              role="menuitem"
+                              onClick={() => setDesktopDropdownOpen(false)}
                             >
                               <div className="text-sm font-semibold leading-none mb-1.5 text-foreground group-hover/item:text-primary transition-colors">
                                 {child.label}
