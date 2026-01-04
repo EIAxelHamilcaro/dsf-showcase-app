@@ -1,33 +1,35 @@
 /** biome-ignore-all lint/security/noDangerouslySetInnerHtml: SEO */
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Nunito } from "next/font/google";
 import "../globals.css";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { getLocale } from "next-intl/server";
+import { getPayload } from "payload";
 import type { ReactNode } from "react";
+import { ContactModal } from "@/app/_components/contactModal";
+import { Footer } from "@/app/_components/footer";
+import NavBar from "@/app/_components/navBar";
 import Providers from "@/common/providers";
 import { cn } from "@/lib/utils";
+import payloadConfig from "@/payload.config";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const nunito = Nunito({
+  variable: "--font-nunito",
   subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  weight: ["400", "600", "700", "800"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.douche-senior-france.com/"),
   title: {
     default:
-      "Douche Senior Sécurisée | Installation en 24h | Différentes aides disponibles",
+      "Douche Sans Risque de Chute | Installation 1 Jour | Aide Financière",
     template: "%s | Douche Senior France",
   },
   description:
-    "Artisan certifié Handibat & Silverbat: installation douche senior sécurisée en 1 journée. Remplacement baignoire, douche PMR, salle de bain adaptée personnes âgées. Différentes aides disponibles (MaPrimeAdapt). Devis gratuit ☎ 02 54 97 53 23",
+    "Fini la peur de tomber dans votre baignoire. Douche de plain-pied installée en 1 journée, sans gros travaux. Devis gratuit ☎ 02 54 97 53 23",
   robots: {
     index: true,
     follow: true,
@@ -43,9 +45,10 @@ export const metadata: Metadata = {
     type: "website",
     locale: "fr_FR",
     url: "https://www.douche-senior-france.com",
-    title: "Douche Senior Sécurisée | Artisan Certifié | Installation 24h",
+    title:
+      "Douche Sans Risque de Chute | Installation 1 Jour | Aide Financière",
     description:
-      "Installation douche senior et PMR en 1 journée. Artisan certifié Handibat Silverbat. Remplacement baignoire, douche sécurisée personnes âgées. Différentes aides disponibles (MaPrimeAdapt). Devis gratuit.",
+      "Fini la peur de tomber dans votre baignoire. Douche de plain-pied installée en 1 journée, sans gros travaux. Devis gratuit ☎ 02 54 97 53 23",
     images: [
       {
         url: "/hero.png",
@@ -59,9 +62,9 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title:
-      "Douche Senior Sécurisée | Installation 24h | Différentes aides disponibles",
+      "Douche Sans Risque de Chute | Installation 1 Jour | Aide Financière",
     description:
-      "Douche sécurisée pour seniors et PMR installée en 1 journée. Artisan certifié Handibat Silverbat. Devis gratuit ☎ 02 54 97 53 23",
+      "Fini la peur de tomber dans votre baignoire. Douche de plain-pied installée en 1 journée, sans gros travaux. Devis gratuit ☎ 02 54 97 53 23",
     images: ["/hero.png"],
   },
   alternates: {
@@ -234,6 +237,12 @@ export default async function RootLayout({
   children: ReactNode;
 }>) {
   const locale = await getLocale();
+  const payload = await getPayload({ config: payloadConfig });
+  const config = await payload.findByID({
+    collection: "config",
+    id: 1,
+    depth: 1,
+  });
 
   return (
     <html className="scroll-smooth" lang={locale} suppressHydrationWarning>
@@ -265,15 +274,15 @@ export default async function RootLayout({
           type="application/ld+json"
         />
       </head>
-      <body
-        className={cn(
-          `${geistSans.variable} ${geistMono.variable}`,
-          "antialiased size-full",
-        )}
-      >
+      <body className={cn(nunito.variable, "antialiased size-full font-sans")}>
         <SpeedInsights />
         <Analytics />
-        <Providers>{children}</Providers>
+        <Providers>
+          <NavBar config={config} />
+          {children}
+          <Footer config={config} />
+          <ContactModal />
+        </Providers>
       </body>
     </html>
   );
