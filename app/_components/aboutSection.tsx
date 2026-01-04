@@ -36,23 +36,27 @@ export function AboutSection({ config }: { config: Config1 }) {
       <div className="text-center mb-8 sm:mb-12 md:mb-16">
         <div className="flex flex-col items-center gap-4 sm:gap-6">
           <div className="flex items-center justify-center gap-3 sm:gap-6 flex-wrap">
-            <Image
-              alt="Label Handibat"
-              className="object-contain opacity-90 hover:opacity-100 transition-opacity duration-200 w-20 sm:w-28 md:w-32"
-              height={80}
-              src="/logo-handibat.webp"
-              width={120}
-            />
+            <div className="relative w-20 sm:w-28 md:w-32 h-16 sm:h-20 md:h-24">
+              <Image
+                alt="Certification Handibat pour l'accessibilité PMR et adaptation du logement aux personnes âgées"
+                className="object-contain opacity-90 hover:opacity-100 transition-opacity duration-200"
+                fill
+                sizes="(max-width: 640px) 80px, (max-width: 768px) 112px, 128px"
+                src="/logo-handibat.webp"
+              />
+            </div>
             <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tight">
               {config.about_title}
             </h2>
-            <Image
-              alt="Label Silverbat"
-              className="object-contain opacity-90 hover:opacity-100 transition-opacity duration-200 w-24 sm:w-32 md:w-40"
-              height={1000}
-              src="/logo-silverbat.webp"
-              width={160}
-            />
+            <div className="relative w-24 sm:w-32 md:w-40 h-16 sm:h-20 md:h-24">
+              <Image
+                alt="Label Silverbat spécialiste de l'adaptation des salles de bain pour seniors et personnes âgées"
+                className="object-contain opacity-90 hover:opacity-100 transition-opacity duration-200"
+                fill
+                sizes="(max-width: 640px) 96px, (max-width: 768px) 128px, 160px"
+                src="/logo-silverbat.webp"
+              />
+            </div>
           </div>
 
           <p className="max-w-2xl mx-auto text-base sm:text-lg md:text-xl text-muted-foreground leading-relaxed">
@@ -70,7 +74,9 @@ export function AboutSection({ config }: { config: Config1 }) {
               <h3 className="font-semibold text-sm sm:text-base">{title}</h3>
             </CardHeader>
             <CardContent className="pt-0">
-              <p className="text-muted-foreground text-xs sm:text-sm md:text-base">{description}</p>
+              <p className="text-muted-foreground text-xs sm:text-sm md:text-base">
+                {description}
+              </p>
             </CardContent>
           </Card>
         ))}
