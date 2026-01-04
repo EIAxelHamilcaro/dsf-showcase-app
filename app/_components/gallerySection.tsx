@@ -36,7 +36,14 @@ export function GallerySection({ config }: { config: Config1 }) {
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: ok
   useEffect(() => {
-    startAutoplay();
+    // Respect user's motion preferences
+    const prefersReducedMotion =
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    if (!prefersReducedMotion) {
+      startAutoplay();
+    }
+
     return clearAutoplay;
   }, []);
 
@@ -129,10 +136,8 @@ export function GallerySection({ config }: { config: Config1 }) {
           <button
             aria-current={index === currentProject ? "true" : "false"}
             aria-label={`Voir projet ${index + 1}`}
-            className={`w-3 h-3 min-w-3 min-h-3 p-0 rounded-full transition-colors cursor-pointer ${
-              index === currentProject
-                ? "bg-primary"
-                : "bg-muted-foreground/30 hover:bg-muted-foreground/50"
+            className={`relative w-11 h-11 min-w-11 min-h-11 p-0 rounded-full transition-colors cursor-pointer flex items-center justify-center ${
+              index === currentProject ? "" : "hover:bg-muted-foreground/10"
             }`}
             key={`dot_${index.toString()}`}
             onClick={() => {
@@ -140,7 +145,15 @@ export function GallerySection({ config }: { config: Config1 }) {
               startAutoplay();
             }}
             type="button"
-          />
+          >
+            <span
+              className={`w-3 h-3 rounded-full transition-colors ${
+                index === currentProject
+                  ? "bg-primary"
+                  : "bg-muted-foreground/30"
+              }`}
+            />
+          </button>
         ))}
       </div>
 
