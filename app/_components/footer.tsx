@@ -1,6 +1,5 @@
 import { Mail, MapPin, Phone } from "lucide-react";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
 import type { Config1 } from "@/payload-types";
 
 export function Footer({ config }: { config: Config1 }) {

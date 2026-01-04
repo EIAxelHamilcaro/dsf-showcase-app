@@ -1,6 +1,5 @@
 import { lexicalEditor } from "@payloadcms/richtext-lexical";
 import type { CollectionConfig } from "payload";
-import { media } from "@/payload-generated-schema";
 
 const Config: CollectionConfig = {
   slug: "config",

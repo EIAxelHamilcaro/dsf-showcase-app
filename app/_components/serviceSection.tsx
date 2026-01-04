@@ -8,7 +8,6 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
 import type { Config1, Media } from "@/payload-types";
 
 export function ServicesSection({ config }: { config: Config1 }) {
@@ -75,10 +74,14 @@ export function ServicesSection({ config }: { config: Config1 }) {
           >
             <CardHeader className="flex items-center gap-4 sm:gap-6 pb-2 sm:pb-4">
               <service.icon className="text-primary shrink-0" size={32} />
-              <CardTitle className="text-base sm:text-lg md:text-xl">{service.title}</CardTitle>
+              <CardTitle className="text-base sm:text-lg md:text-xl">
+                {service.title}
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm sm:text-base md:text-lg">{service.description}</p>
+              <p className="text-sm sm:text-base md:text-lg">
+                {service.description}
+              </p>
             </CardContent>
           </Card>
         ))}
@@ -136,7 +139,9 @@ export function ServicesSection({ config }: { config: Config1 }) {
         </div>
 
         <div className="text-center mt-6 sm:mt-8">
-          <p className="text-base sm:text-lg md:text-xl">{config.financial_section?.sub_description}</p>
+          <p className="text-base sm:text-lg md:text-xl">
+            {config.financial_section?.sub_description}
+          </p>
         </div>
       </div>
     </section>

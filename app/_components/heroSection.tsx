@@ -1,3 +1,4 @@
+import { DialogTitle } from "@radix-ui/react-dialog";
 import { Award, Heart, Shield } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -7,7 +8,6 @@ import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import type { Config1, Media } from "@/payload-types";
 import { ModalMultiStepForm } from "./multiStepForm";
 import { RichTextBoldOnly } from "./richText";
-import { DialogTitle } from "@radix-ui/react-dialog";
 
 export default function HeroSection({ config }: { config: Config1 }) {
   const heroImage = config.hero_image as Media;
@@ -43,14 +43,14 @@ export default function HeroSection({ config }: { config: Config1 }) {
           </div>
 
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 flex-wrap">
-            <Button asChild size="lg" className="w-full sm:w-auto">
+            <Button asChild className="w-full sm:w-auto" size="lg">
               <Link href="#contact">{config.main_button?.main_button_1}</Link>
             </Button>
             <Button
               asChild
+              className="w-full sm:w-auto"
               size="lg"
               variant="outline"
-              className="w-full sm:w-auto"
             >
               <Link href="#realisations">
                 {config.main_button?.main_button_2}
@@ -59,9 +59,9 @@ export default function HeroSection({ config }: { config: Config1 }) {
             <Dialog>
               <DialogTrigger asChild>
                 <Button
+                  className="w-full sm:w-auto text-sm sm:text-base"
                   size="lg"
                   variant="outline"
-                  className="w-full sm:w-auto text-sm sm:text-base"
                 >
                   Télécharger le guide
                 </Button>
@@ -84,9 +84,9 @@ export default function HeroSection({ config }: { config: Config1 }) {
             <Dialog>
               <DialogTrigger asChild>
                 <Button
+                  className="w-full sm:w-auto text-sm sm:text-base"
                   size="lg"
                   variant="destructive"
-                  className="w-full sm:w-auto text-sm sm:text-base"
                 >
                   Télécharger la documentation
                 </Button>
@@ -113,7 +113,7 @@ export default function HeroSection({ config }: { config: Config1 }) {
           <Card className="overflow-hidden p-0">
             <CardContent className="p-0 relative w-full h-[20rem] sm:h-[25rem] md:h-[30rem] lg:h-[35rem]">
               <Image
-                alt="Salle de bain moderne adaptée aux seniors"
+                alt="Douche senior sécurisée plain-pied avec barres d'appui et sol antidérapant - Installation en 1 jour"
                 fill
                 priority
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 600px"

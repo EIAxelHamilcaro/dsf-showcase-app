@@ -7,19 +7,19 @@
  */
 
 import type {} from "@payloadcms/db-postgres";
+import { relations } from "@payloadcms/db-postgres/drizzle";
 import {
-  pgTable,
-  index,
-  uniqueIndex,
   foreignKey,
+  index,
   integer,
-  varchar,
-  timestamp,
-  serial,
-  numeric,
   jsonb,
+  numeric,
+  pgTable,
+  serial,
+  timestamp,
+  uniqueIndex,
+  varchar,
 } from "@payloadcms/db-postgres/drizzle/pg-core";
-import { sql, relations } from "@payloadcms/db-postgres/drizzle";
 
 export const users_sessions = pgTable(
   "users_sessions",
@@ -42,7 +42,7 @@ export const users_sessions = pgTable(
     _orderIdx: index("users_sessions_order_idx").on(columns._order),
     _parentIDIdx: index("users_sessions_parent_id_idx").on(columns._parentID),
     _parentIDFk: foreignKey({
-      columns: [columns["_parentID"]],
+      columns: [columns._parentID],
       foreignColumns: [users.id],
       name: "users_sessions_parent_id_fk",
     }).onDelete("cascade"),
@@ -222,22 +222,22 @@ export const payload_locked_documents_rels = pgTable(
       "payload_locked_documents_rels_media_id_idx",
     ).on(columns.mediaID),
     parentFk: foreignKey({
-      columns: [columns["parent"]],
+      columns: [columns.parent],
       foreignColumns: [payload_locked_documents.id],
       name: "payload_locked_documents_rels_parent_fk",
     }).onDelete("cascade"),
     usersIdFk: foreignKey({
-      columns: [columns["usersID"]],
+      columns: [columns.usersID],
       foreignColumns: [users.id],
       name: "payload_locked_documents_rels_users_fk",
     }).onDelete("cascade"),
     configIdFk: foreignKey({
-      columns: [columns["configID"]],
+      columns: [columns.configID],
       foreignColumns: [config.id],
       name: "payload_locked_documents_rels_config_fk",
     }).onDelete("cascade"),
     mediaIdFk: foreignKey({
-      columns: [columns["mediaID"]],
+      columns: [columns.mediaID],
       foreignColumns: [media.id],
       name: "payload_locked_documents_rels_media_fk",
     }).onDelete("cascade"),
@@ -295,12 +295,12 @@ export const payload_preferences_rels = pgTable(
       "payload_preferences_rels_users_id_idx",
     ).on(columns.usersID),
     parentFk: foreignKey({
-      columns: [columns["parent"]],
+      columns: [columns.parent],
       foreignColumns: [payload_preferences.id],
       name: "payload_preferences_rels_parent_fk",
     }).onDelete("cascade"),
     usersIdFk: foreignKey({
-      columns: [columns["usersID"]],
+      columns: [columns.usersID],
       foreignColumns: [users.id],
       name: "payload_preferences_rels_users_fk",
     }).onDelete("cascade"),

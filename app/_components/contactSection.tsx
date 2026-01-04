@@ -2,7 +2,6 @@
 "use client";
 import { load } from "@fingerprintjs/botd";
 import { Clock, Mail, MapPin, Phone } from "lucide-react";
-import Link from "next/link";
 import type React from "react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -106,7 +105,9 @@ export function ContactSection({ config }: { config: Config1 }) {
         {/* Contact Form */}
         <Card>
           <CardHeader className="pb-4">
-            <CardTitle className="text-xl sm:text-2xl">Formulaire de contact</CardTitle>
+            <CardTitle className="text-xl sm:text-2xl">
+              Formulaire de contact
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <form className="space-y-4" onSubmit={handleSubmit}>
@@ -240,7 +241,9 @@ export function ContactSection({ config }: { config: Config1 }) {
                       {config.phone}
                     </span>
                   </a>
-                  <p className="text-sm sm:text-base text-muted-foreground">{config.form_section?.disponibility}</p>
+                  <p className="text-sm sm:text-base text-muted-foreground">
+                    {config.form_section?.disponibility}
+                  </p>
                 </div>
               </div>
             </CardContent>
@@ -251,7 +254,9 @@ export function ContactSection({ config }: { config: Config1 }) {
               <div className="flex items-start gap-3 sm:gap-4">
                 <Mail className="text-primary shrink-0" size={28} />
                 <div className="min-w-0">
-                  <h3 className="font-semibold mb-1 text-sm sm:text-base">Email</h3>
+                  <h3 className="font-semibold mb-1 text-sm sm:text-base">
+                    Email
+                  </h3>
                   <a
                     className="flex items-center gap-2 text-primary py-1"
                     href={`mailto:${config.email}`}
@@ -260,7 +265,9 @@ export function ContactSection({ config }: { config: Config1 }) {
                       {config.email}
                     </span>
                   </a>
-                  <p className="text-sm sm:text-base text-muted-foreground">Réponse sous 24h maximum</p>
+                  <p className="text-sm sm:text-base text-muted-foreground">
+                    Réponse sous 24h maximum
+                  </p>
                 </div>
               </div>
             </CardContent>
