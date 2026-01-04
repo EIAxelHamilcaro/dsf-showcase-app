@@ -35,8 +35,8 @@ export function ContactModal() {
   };
 
   return (
-    <Dialog onOpenChange={setOpen} open={open}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+    <Dialog modal onOpenChange={setOpen} open={open}>
+      <DialogContent className="max-w-2xl max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
         <DialogTitle className="text-2xl font-bold">
           Demandez votre devis gratuit
         </DialogTitle>
