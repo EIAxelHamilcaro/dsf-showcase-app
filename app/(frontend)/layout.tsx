@@ -25,11 +25,11 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://www.douche-senior-france.com/"),
   title: {
     default:
-      "Douche Sans Risque de Chute | Installation 1 Jour | Aide Financière",
+      "⭐ Douche Senior Centre-Val Loire | 1 Jour | Aide 100% ☎",
     template: "%s | Douche Senior France",
   },
   description:
-    "Fini la peur de tomber dans votre baignoire. Douche de plain-pied installée en 1 journée, sans gros travaux. Devis gratuit ☎ 02 54 97 53 23",
+    "✓ Douche sécurisée 1 jour Centre-Val de Loire. Artisan certifié Handibat. Aide MaPrimeAdapt jusqu'à 100% 💰 Devis gratuit ☎ 02 54 97 53 23",
   robots: {
     index: true,
     follow: true,
@@ -46,9 +46,9 @@ export const metadata: Metadata = {
     locale: "fr_FR",
     url: "https://www.douche-senior-france.com",
     title:
-      "Douche Sans Risque de Chute | Installation 1 Jour | Aide Financière",
+      "⭐ Douche Senior Centre-Val Loire | 1 Jour | Aide 100% ☎",
     description:
-      "Fini la peur de tomber dans votre baignoire. Douche de plain-pied installée en 1 journée, sans gros travaux. Devis gratuit ☎ 02 54 97 53 23",
+      "✓ Douche sécurisée 1 jour Centre-Val de Loire. Artisan certifié Handibat. Aide MaPrimeAdapt jusqu'à 100% 💰 Devis gratuit ☎ 02 54 97 53 23",
     images: [
       {
         url: "/hero.png",
@@ -62,9 +62,9 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title:
-      "Douche Sans Risque de Chute | Installation 1 Jour | Aide Financière",
+      "⭐ Douche Senior Centre-Val Loire | 1 Jour | Aide 100% ☎",
     description:
-      "Fini la peur de tomber dans votre baignoire. Douche de plain-pied installée en 1 journée, sans gros travaux. Devis gratuit ☎ 02 54 97 53 23",
+      "✓ Douche sécurisée 1 jour Centre-Val de Loire. Artisan certifié Handibat. Aide MaPrimeAdapt jusqu'à 100% 💰 Devis gratuit ☎ 02 54 97 53 23",
     images: ["/hero.png"],
   },
   alternates: {
@@ -75,7 +75,7 @@ export const metadata: Metadata = {
     "msapplication-TileColor": "#2563eb",
     "format-detection": "telephone=yes",
     keywords:
-      "douche senior, douche sécurisée, installateur douche senior, artisan douche senior, douche seniors, douche sécurisée senior, douche PMR, douche personnes âgées, douche italienne senior, installation douche sécurisée, salle de bain senior, remplacement baignoire douche, douche adaptée senior, douche sans marche, aide MaPrimeAdapt, artisan Handibat Silverbat, Centre-Val de Loire",
+      "douche senior Centre-Val de Loire, artisan douche senior région Centre, douche PMR Centre-Val Loire, installation douche sécurisée Loiret, douche senior Loir-et-Cher, remplacement baignoire Indre-et-Loire, douche senior Cher, douche PMR Indre, artisan Handibat Centre, douche italienne senior Tours Orléans Blois, aide MaPrimeAdapt Centre-Val Loire, douche sans marche région Centre, artisan certifié Silverbat 41 37 45 36 18",
   },
 };
 
@@ -111,11 +111,41 @@ const serviceJsonLd = {
     telephone: "02 54 97 53 23",
   },
   areaServed: [
-    { "@type": "AdministrativeArea", name: "Loir-et-Cher" },
-    { "@type": "AdministrativeArea", name: "Indre" },
-    { "@type": "AdministrativeArea", name: "Cher" },
-    { "@type": "AdministrativeArea", name: "Indre-et-Loire" },
-    { "@type": "AdministrativeArea", name: "Loiret" },
+    {
+      "@type": "AdministrativeArea",
+      name: "Centre-Val de Loire",
+      identifier: "R24"
+    },
+    {
+      "@type": "AdministrativeArea",
+      name: "Loir-et-Cher",
+      identifier: "41",
+      containedInPlace: { "@type": "AdministrativeArea", name: "Centre-Val de Loire" }
+    },
+    {
+      "@type": "AdministrativeArea",
+      name: "Indre-et-Loire",
+      identifier: "37",
+      containedInPlace: { "@type": "AdministrativeArea", name: "Centre-Val de Loire" }
+    },
+    {
+      "@type": "AdministrativeArea",
+      name: "Loiret",
+      identifier: "45",
+      containedInPlace: { "@type": "AdministrativeArea", name: "Centre-Val de Loire" }
+    },
+    {
+      "@type": "AdministrativeArea",
+      name: "Indre",
+      identifier: "36",
+      containedInPlace: { "@type": "AdministrativeArea", name: "Centre-Val de Loire" }
+    },
+    {
+      "@type": "AdministrativeArea",
+      name: "Cher",
+      identifier: "18",
+      containedInPlace: { "@type": "AdministrativeArea", name: "Centre-Val de Loire" }
+    },
   ],
   hasOfferCatalog: {
     "@type": "OfferCatalog",
@@ -175,15 +205,22 @@ const localBusinessJsonLd = {
       closes: "12:00",
     },
   ],
-  areaServed: {
-    "@type": "GeoCircle",
-    geoMidpoint: {
-      "@type": "GeoCoordinates",
-      latitude: 47.28256927999651,
-      longitude: 1.5726510253114867,
+  areaServed: [
+    {
+      "@type": "AdministrativeArea",
+      name: "Centre-Val de Loire",
+      identifier: "R24"
     },
-    geoRadius: "100000",
-  },
+    {
+      "@type": "GeoCircle",
+      geoMidpoint: {
+        "@type": "GeoCoordinates",
+        latitude: 47.28256927999651,
+        longitude: 1.5726510253114867,
+      },
+      geoRadius: "100000",
+    },
+  ],
   aggregateRating: {
     "@type": "AggregateRating",
     ratingValue: "4.9",
