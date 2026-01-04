@@ -64,28 +64,36 @@ const RadioOption = ({
   isSelected?: boolean;
 }) => (
   <div
+    aria-checked={isSelected}
     className={`flex flex-col justify-center items-center gap-2 sm:gap-4 p-4 sm:p-6 md:p-8 border-4 rounded-2xl sm:rounded-3xl cursor-pointer transition-all duration-200 hover:shadow-xl ${
       isSelected
-        ? "border-blue-600 bg-blue-50"
-        : "border-gray-300 hover:border-blue-400"
+        ? "border-primary bg-primary/10"
+        : "border-gray-300 hover:border-primary/50"
     }`}
     onClick={() => onSelect(group, value, autoNext)}
+    onKeyDown={(e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        onSelect(group, value, autoNext);
+      }
+    }}
+    role="radio"
+    tabIndex={0}
   >
     {Icon && (
       <Icon
         className={`${
-          isSelected ? "text-blue-600" : "text-gray-600"
+          isSelected ? "text-primary" : "text-gray-600"
         } w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16`}
       />
     )}
-    <Label
-      className={`cursor-pointer text-base sm:text-lg md:text-2xl font-semibold text-center ${
-        isSelected ? "text-blue-700" : "text-gray-800"
+    <span
+      className={`text-base sm:text-lg md:text-2xl font-semibold text-center ${
+        isSelected ? "text-primary" : "text-gray-800"
       }`}
-      htmlFor={id}
     >
       {label}
-    </Label>
+    </span>
   </div>
 );
 
