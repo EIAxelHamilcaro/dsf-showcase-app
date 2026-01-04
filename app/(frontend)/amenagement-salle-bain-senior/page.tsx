@@ -41,7 +41,7 @@ export default async function AmenagementSalleBainPage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <ContactButton size="lg">Devis gratuit</ContactButton>
-              <Button asChild size="lg" variant="outline">
+              <Button asChild size="lg" className="bg-white text-primary hover:bg-primary hover:text-white border-white">
                 <a href={`tel:${config?.phone?.replace(/\s/g, "")}`}>
                   <Phone className="mr-2 h-5 w-5" />
                   {config?.phone}
@@ -201,10 +201,10 @@ export default async function AmenagementSalleBainPage() {
             Visite gratuite à domicile. Devis personnalisé sous 24h.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <ContactButton size="lg" variant="outline">
+            <ContactButton size="lg" className="bg-white text-primary hover:bg-primary hover:text-white border-white">
               Demander un devis
             </ContactButton>
-            <Button asChild size="lg" variant="outline">
+            <Button asChild size="lg" className="bg-white text-primary hover:bg-primary hover:text-white border-white">
               <a href={`tel:${config?.phone?.replace(/\s/g, "")}`}>
                 <Phone className="mr-2 h-5 w-5" />
                 {config?.phone}
