@@ -401,6 +401,119 @@ describe("buildPageGraph", () => {
   });
 });
 
+describe("buildPageGraph with a FAQ block or a legal page", () => {
+  const faqPage = {
+    ...service,
+    layout: [
+      {
+        blockType: "faq",
+        heading: "Questions fréquentes",
+        items: [
+          {
+            question: " Première question ? ",
+            answer: "Première  réponse.",
+            sources: [
+              {
+                label: "service-public.gouv.fr, fiche F37501",
+                url: "https://www.service-public.gouv.fr/particuliers/vosdroits/F37501",
+              },
+            ],
+          },
+          { question: "Deuxième question ?", answer: "Deuxième réponse." },
+          { question: "Sans réponse ?", answer: " " },
+        ],
+      },
+    ],
+  } as unknown as Page;
+
+  const legal = {
+    id: 9,
+    slug: "mentions-legales",
+    navLabel: "Mentions légales",
+    pageType: "legal",
+    seo: { title: "Titre légal", description: "Description légale" },
+    layout: [
+      {
+        blockType: "legalContent",
+        title: "Mentions légales",
+        sections: [{ heading: "Éditeur", paragraphs: [{ text: "Texte" }] }],
+      },
+    ],
+    updatedAt: "2026-10-06T10:00:00.000Z",
+  } as unknown as Page;
+
+  it("emits a FAQPage whose questions are the visible ones, in order, with their sources", () => {
+    const graph = buildPageGraph({
+      page: faqPage,
+      all: [...all, faqPage],
+      config: fullConfig,
+    });
+    const faq = findById(
+      graph,
+      "https://www.douche-senior-france.com/installation-douche-pmr#faq",
+    );
+
+    assert.equal(faq?.["@type"], "FAQPage");
+    assert.deepEqual(faq?.isPartOf, {
+      "@id":
+        "https://www.douche-senior-france.com/installation-douche-pmr#webpage",
+    });
+    assert.deepEqual(faq?.mainEntity, [
+      {
+        "@type": "Question",
+        name: "Première question ?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Première réponse. Source : service-public.gouv.fr, fiche F37501",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "Deuxième question ?",
+        acceptedAnswer: { "@type": "Answer", text: "Deuxième réponse." },
+      },
+    ]);
+    assert.deepEqual(danglingReferences(graph), []);
+  });
+
+  it("emits no FAQPage for a page without a FAQ block", () => {
+    const graph = buildPageGraph({ page: service, all, config: fullConfig });
+
+    assert.equal(nodesOf(graph, "FAQPage").length, 0);
+  });
+
+  it("describes a legal page with a web page and a breadcrumb only", () => {
+    const graph = buildPageGraph({
+      page: legal,
+      all: [...all, legal],
+      config: fullConfig,
+    });
+
+    assert.equal(nodesOf(graph, "Service").length, 0);
+    assert.equal(nodesOf(graph, "FAQPage").length, 0);
+    assert.equal(nodesOf(graph, "WebPage").length, 1);
+    assert.equal(nodesOf(graph, "BreadcrumbList").length, 1);
+    assert.deepEqual(danglingReferences(graph), []);
+  });
+
+  it("adds the Google profile to the business profiles once it is entered", () => {
+    const withProfile = {
+      ...fullConfig,
+      google_profile_url: "https://www.google.com/maps?cid=1",
+    } as unknown as Config1;
+    const graph = buildPageGraph({ page: legal, all, config: withProfile });
+    const business = findById(
+      graph,
+      "https://www.douche-senior-france.com/#business",
+    );
+
+    assert.deepEqual(business?.sameAs, [
+      "https://www.facebook.com/douche.senior.france/",
+      "https://www.google.com/maps?cid=1",
+    ]);
+  });
+});
+
 describe("buildHomeGraph", () => {
   it("emits the business identity from the CMS", () => {
     const graph = buildHomeGraph({ all, config: fullConfig });

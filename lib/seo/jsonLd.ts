@@ -172,20 +172,35 @@ function buildWebsite(): Node {
   };
 }
 
-function buildFaq(config: Config1, url: string): Node | undefined {
-  const questions = (config.faq_section?.faq ?? []).flatMap((item) => {
-    const name = clean(item.question);
-    const text = clean(item.answer);
+interface FaqEntry {
+  question?: string | null;
+  answer?: string | null;
+  sources?: { label?: string | null }[] | null;
+}
 
-    if (!(name && text)) {
+function buildFaq(entries: FaqEntry[], url: string): Node | undefined {
+  const questions = entries.flatMap((entry) => {
+    const name = clean(entry.question);
+    const answer = clean(entry.answer);
+
+    if (!(name && answer)) {
       return [];
     }
+
+    const sources = (entry.sources ?? []).flatMap((source) => {
+      const label = clean(source.label);
+
+      return label ? [`Source : ${label}`] : [];
+    });
 
     return [
       {
         "@type": "Question",
         name,
-        acceptedAnswer: { "@type": "Answer", text },
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: [answer, ...sources].join(" "),
+        },
       },
     ];
   });
@@ -246,7 +261,7 @@ export function buildHomeGraph({ all, config }: HomeGraphInput): JsonLdGraph {
       buildBusiness(config, all, true),
       buildWebsite(),
       webPage,
-      buildFaq(config, url),
+      buildFaq(config.faq_section?.faq ?? [], url),
     ].filter(isNode),
   };
 }
@@ -297,6 +312,10 @@ export function buildPageGraph({
           url,
         });
 
+  const faqEntries = page.layout.flatMap((block) =>
+    block.blockType === "faq" ? block.items : [],
+  );
+
   return {
     "@context": "https://schema.org",
     "@graph": [
@@ -305,6 +324,7 @@ export function buildPageGraph({
       webPage,
       breadcrumb,
       service,
+      buildFaq(faqEntries, url),
     ].filter(isNode),
   };
 }
