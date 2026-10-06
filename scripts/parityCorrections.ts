@@ -13,6 +13,15 @@ export interface TextCorrection {
   to: string;
 }
 
+const removedFormLabels: TextCorrection[] = [
+  {
+    ref: "G1",
+    page: "home",
+    from: "Formulaire de contact website",
+    to: "Formulaire de contact",
+  },
+];
+
 const followUpOf = (correction: PageFieldCorrection) =>
   pageTextFixes.find(
     (fix) =>
@@ -51,6 +60,7 @@ export const textCorrections: TextCorrection[] = [
     from,
     to,
   })),
+  ...removedFormLabels,
 ];
 
 export function applyCorrections(

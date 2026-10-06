@@ -82,6 +82,7 @@ describe("expected text of the 16 captured pages", () => {
         "home B1",
         "home B2",
         "home B3",
+        "home G1",
       ],
     );
   });
