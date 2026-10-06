@@ -1,0 +1,18 @@
+export const parityPages: readonly string[] = [
+  "home",
+  "aides-financieres",
+  "amenagement-salle-bain-senior",
+  "cher",
+  "douche-senior-blois",
+  "douche-senior-bourges",
+  "douche-senior-chateauroux",
+  "douche-senior-orleans",
+  "douche-senior-romorantin",
+  "douche-senior-tours",
+  "indre-et-loire",
+  "indre",
+  "installation-douche-pmr",
+  "loir-et-cher",
+  "loiret",
+  "remplacement-baignoire-par-douche",
+];
