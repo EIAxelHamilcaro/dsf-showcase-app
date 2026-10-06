@@ -1,12 +1,12 @@
 "use client";
 import { ChevronDown, Menu, Phone, X } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { type MouseEvent, useId, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { toTelHref } from "@/lib/seo/phone";
+import { cn } from "@/lib/utils";
 import type { Config1 } from "@/payload-types";
-import Logo from "../../public/logo.png";
 import { ContactButton } from "./contactButton";
 
 interface NavItem {
@@ -24,6 +24,12 @@ interface NavBarInteractiveProps {
   config: Config1;
 }
 
+const desktopLinkClass =
+  "flex min-h-11 items-center gap-1 rounded-md px-3 text-base font-semibold whitespace-nowrap hover:bg-muted hover:text-primary";
+
+const mobileLinkClass =
+  "flex min-h-12 w-full items-center justify-between rounded-md px-3 text-lg font-semibold hover:bg-muted hover:text-primary";
+
 export default function NavBarInteractive({
   items,
   config,
@@ -33,208 +39,191 @@ export default function NavBarInteractive({
   const [desktopDropdownOpen, setDesktopDropdownOpen] = useState(false);
   const pathname = usePathname();
   const isHomePage = pathname === "/";
+  const id = useId();
+  const phone = config.phone ?? "";
 
-  const handleServiceClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+  const scrollToServices = (event: MouseEvent<HTMLElement>) => {
     if (!isHomePage) {
       return;
     }
-    e.preventDefault();
-    const servicesSection = document.getElementById("services");
-    if (servicesSection) {
-      servicesSection.scrollIntoView({ behavior: "smooth" });
-    }
+
+    event.preventDefault();
+    document.getElementById("services")?.scrollIntoView();
+  };
+
+  const closeMobileMenu = () => {
+    setMobileMenuOpen(false);
+    setMobileServicesOpen(false);
   };
 
   return (
-    <div className="w-full">
-      {/* Mobile header */}
-      <div className="lg:hidden flex justify-between w-full items-center">
-        <Image
-          alt="Logo de Douche Senior France"
-          className="w-28 sm:w-36"
-          src={Logo}
-          width={120}
-        />
-        <Button
-          className="lg:hidden p-2"
-          onClick={() => setMobileMenuOpen((prev) => !prev)}
-          size="icon"
-          variant="outline"
-        >
-          {mobileMenuOpen ? (
-            <X className="h-6 w-6" />
-          ) : (
-            <Menu className="h-6 w-6" />
-          )}
-        </Button>
-      </div>
-
-      {/* Desktop menu */}
-      <nav className="hidden lg:flex items-center w-full relative">
-        {/* Navigation links - centered */}
-        <ul className="flex items-center gap-1 absolute left-1/2 -translate-x-1/2">
-          {items.map((item, i) => (
-            <li className="relative group" key={`nav_item_${i.toString()}`}>
+    <>
+      <nav aria-label="Navigation principale" className="hidden xl:block">
+        <ul className="flex items-center">
+          {items.map((item) => (
+            <li className="group relative" key={item.href}>
               {item.children ? (
-                <div
-                  className="relative"
-                  onMouseEnter={() => setDesktopDropdownOpen(true)}
-                  onMouseLeave={() => setDesktopDropdownOpen(false)}
-                >
-                  <button
-                    type="button"
-                    className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-foreground hover:text-primary transition-colors"
-                    onClick={(e) => {
-                      if (isHomePage) {
-                        handleServiceClick(e as any);
-                      }
-                      setDesktopDropdownOpen(!desktopDropdownOpen);
+                <>
+                  <Button
+                    aria-controls={`${id}-services`}
+                    aria-expanded={desktopDropdownOpen}
+                    className={desktopLinkClass}
+                    onClick={(event) => {
+                      scrollToServices(event);
+                      setDesktopDropdownOpen((isOpen) => !isOpen);
                     }}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" || e.key === " ") {
-                        e.preventDefault();
-                        setDesktopDropdownOpen(!desktopDropdownOpen);
-                      }
-                      if (e.key === "Escape") {
+                    onKeyDown={(event) => {
+                      if (event.key === "Escape") {
                         setDesktopDropdownOpen(false);
                       }
                     }}
-                    aria-expanded={desktopDropdownOpen}
-                    aria-haspopup="menu"
+                    type="button"
+                    variant="ghost"
                   >
                     {item.label}
-                    <ChevronDown
-                      className={`h-4 w-4 transition-transform ${desktopDropdownOpen ? "rotate-180" : ""}`}
-                    />
-                  </button>
+                    <ChevronDown aria-hidden="true" className="size-4" />
+                  </Button>
 
-                  {/* Dropdown */}
-                  <div
-                    className={`absolute left-0 top-full pt-2 transition-all duration-200 z-50 ${
-                      desktopDropdownOpen
-                        ? "opacity-100 visible"
-                        : "opacity-0 invisible"
-                    }`}
-                    role="menu"
-                    aria-hidden={!desktopDropdownOpen}
+                  <ul
+                    className={cn(
+                      "absolute top-full left-0 z-50 w-md flex-col gap-1 rounded-lg border bg-background p-2 shadow-lg",
+                      desktopDropdownOpen ? "flex" : "hidden group-hover:flex",
+                    )}
+                    id={`${id}-services`}
                   >
-                    <div className="bg-background border border-border rounded-lg shadow-xl overflow-hidden w-[450px]">
-                      <ul className="p-2 gap-1 flex flex-col">
-                        {item.children.map((child, j) => (
-                          <li key={`nav_child_${i.toString()}_${j.toString()}`} role="none">
-                            <Link
-                              className="block p-3 rounded-md transition-all duration-150 hover:bg-primary/10 hover:border-primary/20 border border-transparent group/item"
-                              href={child.href}
-                              role="menuitem"
-                              onClick={() => setDesktopDropdownOpen(false)}
-                            >
-                              <div className="text-sm font-semibold leading-none mb-1.5 text-foreground group-hover/item:text-primary transition-colors">
-                                {child.label}
-                              </div>
-                              {child.description && (
-                                <p className="text-xs leading-snug text-muted-foreground">
-                                  {child.description}
-                                </p>
-                              )}
-                            </Link>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-                </div>
+                    {item.children.map((child) => (
+                      <li key={child.href}>
+                        <Link
+                          className="block rounded-md p-3 hover:bg-muted"
+                          href={child.href}
+                          onClick={() => setDesktopDropdownOpen(false)}
+                        >
+                          <span className="block font-bold text-primary">
+                            {child.label}
+                          </span>
+                          {child.description ? (
+                            <span className="block text-small text-muted-foreground">
+                              {child.description}
+                            </span>
+                          ) : null}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </>
               ) : (
-                <Link
-                  className="block px-4 py-2 text-sm font-medium text-foreground hover:text-primary transition-colors"
-                  href={item.href}
-                >
+                <Link className={desktopLinkClass} href={item.href}>
                   {item.label}
                 </Link>
               )}
             </li>
           ))}
         </ul>
-
-        {/* Right actions */}
-        <div className="flex items-center gap-2 ml-auto">
-          <Button asChild variant="link">
-            <Link
-              className="flex items-center gap-1.5 text-primary py-2"
-              href="tel:+33254975323"
-            >
-              <Phone className="h-4 w-4" />
-              <span className="font-medium text-lg whitespace-nowrap">
-                {config.phone}
-              </span>
-            </Link>
-          </Button>
-          <ContactButton>Devis gratuit</ContactButton>
-        </div>
       </nav>
 
-      {/* Mobile menu */}
-      {mobileMenuOpen && (
-        <nav className="lg:hidden w-full mt-4 pb-4 border-t border-border">
-          <ul className="flex flex-col w-full pt-4 space-y-1">
-            {items.map((item, i) => (
-              <li className="w-full" key={`nav_mobile_${i.toString()}`}>
+      <div className="flex items-center gap-2 sm:gap-3 xl:gap-1">
+        <Button
+          asChild
+          className="px-0 text-base sm:px-3 sm:text-lg font-extrabold text-primary"
+          variant="link"
+        >
+          <a href={toTelHref(phone)}>
+            <Phone aria-hidden="true" className="size-5 max-[400px]:hidden" />
+            {phone}
+          </a>
+        </Button>
+        <ContactButton className="hidden sm:inline-flex font-bold">
+          Devis gratuit
+        </ContactButton>
+        <Button
+          aria-controls={`${id}-menu`}
+          aria-expanded={mobileMenuOpen}
+          aria-label={mobileMenuOpen ? "Fermer le menu" : "Ouvrir le menu"}
+          className="xl:hidden border-control-border"
+          onClick={() => setMobileMenuOpen((isOpen) => !isOpen)}
+          size="icon"
+          variant="outline"
+        >
+          {mobileMenuOpen ? (
+            <X aria-hidden="true" className="size-6" />
+          ) : (
+            <Menu aria-hidden="true" className="size-6" />
+          )}
+        </Button>
+      </div>
+
+      {mobileMenuOpen ? (
+        <nav
+          aria-label="Navigation principale"
+          className="xl:hidden basis-full border-t mt-2 pt-2 pb-3 max-h-[calc(100dvh-5rem)] overflow-y-auto"
+          id={`${id}-menu`}
+        >
+          <ul className="flex flex-col gap-1">
+            {items.map((item) => (
+              <li key={item.href}>
                 {item.children ? (
-                  <div className="w-full">
-                    <button
-                      className="flex items-center justify-between w-full py-3 px-2 text-base font-medium text-foreground hover:bg-muted rounded-md transition-colors"
-                      onClick={() => setMobileServicesOpen((prev) => !prev)}
+                  <>
+                    <Button
+                      aria-controls={`${id}-mobile-services`}
+                      aria-expanded={mobileServicesOpen}
+                      className={mobileLinkClass}
+                      onClick={() => setMobileServicesOpen((isOpen) => !isOpen)}
                       type="button"
+                      variant="ghost"
                     >
                       {item.label}
                       <ChevronDown
-                        className={`h-5 w-5 transition-transform ${mobileServicesOpen ? "rotate-180" : ""}`}
+                        aria-hidden="true"
+                        className={cn(
+                          "size-5",
+                          mobileServicesOpen && "rotate-180",
+                        )}
                       />
-                    </button>
+                    </Button>
 
-                    {mobileServicesOpen && (
-                      <ul className="ml-4 space-y-1 mt-2">
+                    {mobileServicesOpen ? (
+                      <ul
+                        className="ml-3 flex flex-col gap-1 border-l-2 border-primary pl-2"
+                        id={`${id}-mobile-services`}
+                      >
                         <li>
                           <Link
-                            className="block w-full py-2 px-2 text-sm text-primary font-medium hover:bg-muted rounded-md transition-colors"
+                            className={cn(mobileLinkClass, "text-primary")}
                             href={item.href}
-                            onClick={(e) => {
-                              handleServiceClick(e);
-                              setMobileMenuOpen(false);
-                              setMobileServicesOpen(false);
+                            onClick={(event) => {
+                              scrollToServices(event);
+                              closeMobileMenu();
                             }}
                           >
                             Voir tous les services
                           </Link>
                         </li>
-                        {item.children.map((child, j) => (
-                          <li
-                            key={`nav_mobile_child_${i.toString()}_${j.toString()}`}
-                          >
+                        {item.children.map((child) => (
+                          <li key={child.href}>
                             <Link
-                              className="block w-full py-2 px-2 text-sm hover:bg-muted rounded-md transition-colors"
+                              className="block rounded-md px-3 py-2 hover:bg-muted"
                               href={child.href}
-                              onClick={() => {
-                                setMobileMenuOpen(false);
-                                setMobileServicesOpen(false);
-                              }}
+                              onClick={closeMobileMenu}
                             >
-                              <div className="font-medium">{child.label}</div>
-                              {child.description && (
-                                <div className="text-xs text-muted-foreground mt-0.5">
+                              <span className="block text-lg font-semibold">
+                                {child.label}
+                              </span>
+                              {child.description ? (
+                                <span className="block text-small text-muted-foreground">
                                   {child.description}
-                                </div>
-                              )}
+                                </span>
+                              ) : null}
                             </Link>
                           </li>
                         ))}
                       </ul>
-                    )}
-                  </div>
+                    ) : null}
+                  </>
                 ) : (
                   <Link
-                    className="block w-full py-3 px-2 text-base font-medium hover:bg-muted rounded-md transition-colors"
+                    className={mobileLinkClass}
                     href={item.href}
-                    onClick={() => setMobileMenuOpen(false)}
+                    onClick={closeMobileMenu}
                   >
                     {item.label}
                   </Link>
@@ -243,27 +232,15 @@ export default function NavBarInteractive({
             ))}
           </ul>
 
-          <div className="border-t border-border mt-4 pt-4 space-y-3 px-2">
-            <a
-              className="flex items-center text-primary py-2"
-              href="tel:+33254975323"
-            >
-              <Phone className="h-5 w-5 mr-3" />
-              <span className="font-medium text-lg">{config.phone}</span>
-            </a>
-            <ContactButton
-              className="w-full"
-              onClick={() => {
-                setMobileMenuOpen(false);
-                setMobileServicesOpen(false);
-              }}
-              size="lg"
-            >
-              Devis gratuit
-            </ContactButton>
-          </div>
+          <ContactButton
+            className="mt-3 w-full sm:hidden font-bold"
+            onClick={closeMobileMenu}
+            size="lg"
+          >
+            Devis gratuit
+          </ContactButton>
         </nav>
-      )}
-    </div>
+      ) : null}
+    </>
   );
 }

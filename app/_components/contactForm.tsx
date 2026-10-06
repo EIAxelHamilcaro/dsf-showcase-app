@@ -13,6 +13,8 @@ import {
 } from "./contactFeedback";
 import { useContactSubmission } from "./useContactSubmission";
 
+const fieldClass = "mt-1 h-12 text-lg md:text-lg";
+
 const emptyForm = {
   name: "",
   phone: "",
@@ -49,7 +51,7 @@ export function ContactForm({ phone }: { phone?: string | null }) {
         ref={(node) => node?.focus()}
         tabIndex={-1}
       >
-        <Check className="mx-auto text-green-500 w-16 h-16" />
+        <Check aria-hidden="true" className="mx-auto size-16 text-success" />
         <p className="text-2xl font-bold">Merci pour votre demande !</p>
         <p className="text-lg">Votre demande a bien été envoyée.</p>
       </output>
@@ -64,13 +66,13 @@ export function ContactForm({ phone }: { phone?: string | null }) {
       ref={formRef}
     >
       <div>
-        <Label className="text-base" htmlFor={`${id}-name`}>
+        <Label className="text-lg" htmlFor={`${id}-name`}>
           Nom complet *
         </Label>
         <Input
           {...errorProps(`${id}-name`, errors.name)}
           autoComplete="name"
-          className="mt-1"
+          className={fieldClass}
           name="name"
           onChange={handleChange}
           placeholder="Votre nom et prénom"
@@ -81,13 +83,13 @@ export function ContactForm({ phone }: { phone?: string | null }) {
       </div>
 
       <div>
-        <Label className="text-base" htmlFor={`${id}-phone`}>
+        <Label className="text-lg" htmlFor={`${id}-phone`}>
           Téléphone *
         </Label>
         <Input
           {...errorProps(`${id}-phone`, errors.phone)}
           autoComplete="tel"
-          className="mt-1"
+          className={fieldClass}
           inputMode="tel"
           name="phone"
           onChange={handleChange}
@@ -100,13 +102,13 @@ export function ContactForm({ phone }: { phone?: string | null }) {
       </div>
 
       <div>
-        <Label className="text-base" htmlFor={`${id}-email`}>
+        <Label className="text-lg" htmlFor={`${id}-email`}>
           Email *
         </Label>
         <Input
           {...errorProps(`${id}-email`, errors.email)}
           autoComplete="email"
-          className="mt-1"
+          className={fieldClass}
           inputMode="email"
           name="email"
           onChange={handleChange}
@@ -119,13 +121,13 @@ export function ContactForm({ phone }: { phone?: string | null }) {
       </div>
 
       <div>
-        <Label className="text-base" htmlFor={`${id}-adress`}>
+        <Label className="text-lg" htmlFor={`${id}-adress`}>
           Adresse *
         </Label>
         <Input
           {...errorProps(`${id}-adress`, errors.adress)}
           autoComplete="street-address"
-          className="mt-1"
+          className={fieldClass}
           name="adress"
           onChange={handleChange}
           placeholder="Votre adresse complète"
@@ -136,12 +138,12 @@ export function ContactForm({ phone }: { phone?: string | null }) {
       </div>
 
       <div>
-        <Label className="text-base" htmlFor={`${id}-message`}>
+        <Label className="text-lg" htmlFor={`${id}-message`}>
           Message (optionnel)
         </Label>
         <Textarea
           {...errorProps(`${id}-message`, errors.message)}
-          className="mt-1 min-h-32"
+          className="mt-1 min-h-32 text-lg md:text-lg"
           name="message"
           onChange={handleChange}
           placeholder="Décrivez votre projet..."
@@ -156,14 +158,14 @@ export function ContactForm({ phone }: { phone?: string | null }) {
 
       <Button
         aria-busy={isPending}
-        className="w-full text-lg py-6"
+        className="h-14 w-full text-xl font-bold"
         disabled={isPending}
         size="lg"
         type="submit"
       >
         {isPending ? (
           <>
-            <Loader2 className="h-5 w-5 animate-spin mr-2" />
+            <Loader2 aria-hidden="true" className="size-5 animate-spin" />
             Envoi en cours...
           </>
         ) : (

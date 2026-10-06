@@ -130,6 +130,7 @@ function RadioOption({
     >
       {Icon && (
         <Icon
+          aria-hidden="true"
           className={`${
             isSelected ? "text-primary" : "text-gray-600"
           } w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16`}
@@ -313,7 +314,7 @@ function ConsentStep({
               Douche Senior France et ses éventuels sous-traitants, pour le
               suivi de ma demande et de la relation commerciale qui peut en
               découler.
-              <span className="text-red-500">*</span>
+              <span className="text-destructive">*</span>
             </Label>
           </div>
           <FieldError error={errors.consentMain} id={`${id}-main`} />
@@ -414,14 +415,14 @@ export function ModalMultiStepForm({ link, phone }: ModalFormProps) {
   if (isSubmitted)
     return (
       <div className="text-center space-y-10 py-10 flex flex-col">
-        <Check className="mx-auto text-green-500 w-20 h-20" />
+        <Check aria-hidden="true" className="mx-auto size-20 text-success" />
         <h2 className="text-4xl font-bold">Merci pour votre demande !</h2>
         <p className="text-2xl text-gray-700">
           Votre demande a bien été envoyée.
         </p>
         {link && (
           <Button asChild className="text-xl px-10 py-6">
-            <Link href={link} target="_blank">
+            <Link href={link} rel="noopener" target="_blank">
               Accéder au document
             </Link>
           </Button>
@@ -486,7 +487,10 @@ export function ModalMultiStepForm({ link, phone }: ModalFormProps) {
               >
                 {isPending ? (
                   <>
-                    <Loader2 className="h-5 w-5 animate-spin mr-2" />
+                    <Loader2
+                      aria-hidden="true"
+                      className="size-5 animate-spin"
+                    />
                     Envoi en cours...
                   </>
                 ) : (

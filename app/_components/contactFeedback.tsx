@@ -26,7 +26,10 @@ export function PhoneFallback({ phone }: { phone?: string | null }) {
   return (
     <p className="text-base">
       Vous pouvez aussi nous appeler au{" "}
-      <a className="font-semibold underline" href={toTelHref(phone)}>
+      <a
+        className="inline-flex min-h-11 items-center font-bold text-primary underline"
+        href={toTelHref(phone)}
+      >
         {phone}
       </a>
       .
@@ -47,7 +50,7 @@ export function FormError({
 
   return (
     <div
-      className="p-3 bg-destructive/10 border border-destructive text-destructive rounded-md"
+      className="rounded-md border-2 border-destructive bg-destructive/10 p-3"
       role="alert"
     >
       <p>{message}</p>

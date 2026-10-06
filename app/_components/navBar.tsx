@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import type { Config1 } from "@/payload-types";
 import Logo from "../../public/logo.png";
 import NavBarInteractive from "./navBarInteractive";
@@ -63,14 +64,18 @@ export default function NavBar({ config }: { config: Config1 }) {
   ];
 
   return (
-    <header className="bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 sticky top-0 z-50 w-full px-4 sm:px-6 py-3">
-      <div className="w-full flex items-center justify-between">
-        <Image
-          alt="Logo de Douche Senior France"
-          className="hidden lg:block shrink-0"
-          src={Logo}
-          width={185}
-        />
+    <header className="sticky top-0 z-50 border-b bg-background">
+      <div className="mx-auto flex max-w-page flex-wrap items-center justify-between gap-x-2 px-gutter py-2">
+        <Link className="flex min-h-11 shrink-0 items-center" href="/">
+          <Image
+            alt="Logo de Douche Senior France"
+            className="h-8 w-auto min-[400px]:h-10 sm:h-12"
+            fetchPriority="low"
+            loading="eager"
+            sizes="160px"
+            src={Logo}
+          />
+        </Link>
 
         <NavBarInteractive config={config} items={items} />
       </div>

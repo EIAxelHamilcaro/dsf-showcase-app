@@ -13,9 +13,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { toTelHref } from "@/lib/seo/phone";
 import type { Config1 } from "@/payload-types";
 import { errorProps, FieldError, FormError } from "./contactFeedback";
+import { PageSection, sectionLeadClass } from "./pageSection";
 import { useContactSubmission } from "./useContactSubmission";
+
+const fieldClass = "mt-1 h-12 text-lg md:text-lg";
 
 const emptyForm = {
   name: "",
@@ -61,28 +65,23 @@ export function ContactSection({ config }: { config: Config1 }) {
   };
 
   return (
-    <section
-      className="py-12 md:py-16 lg:py-24 bg-muted mx-auto px-4 sm:px-10 md:px-16 lg:px-32 overflow-hidden"
-      id="contact"
-    >
-      <div className="text-center mb-16">
-        <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4 text-balance">
+    <PageSection id="contact" tone="muted">
+      <div className="mb-10 space-y-4 text-center">
+        <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold">
           Demandez votre devis gratuit
         </h2>
-        <p className="text-lg md:text-xl text-muted-foreground text-pretty">
+        <p className={sectionLeadClass}>
           Intervention rapide dans votre région. Étude personnalisée de vos
           besoins.
         </p>
       </div>
 
       <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
-        <Card>
-          <CardHeader className="pb-4">
-            <CardTitle className="text-xl sm:text-2xl">
-              Formulaire de contact
-            </CardTitle>
+        <Card className="min-w-0 bg-background shadow-none">
+          <CardHeader className="px-3 sm:px-6">
+            <CardTitle className="text-2xl">Formulaire de contact</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="px-3 sm:px-6">
             <form
               className="space-y-4"
               noValidate
@@ -90,13 +89,13 @@ export function ContactSection({ config }: { config: Config1 }) {
               ref={formRef}
             >
               <div>
-                <Label className="text-base sm:text-lg" htmlFor={`${id}-name`}>
+                <Label className="text-lg" htmlFor={`${id}-name`}>
                   Nom complet *
                 </Label>
                 <Input
                   {...errorProps(`${id}-name`, errors.name)}
                   autoComplete="name"
-                  className="mt-1"
+                  className={fieldClass}
                   name="name"
                   onChange={handleChange}
                   placeholder="Votre nom et prénom"
@@ -107,13 +106,13 @@ export function ContactSection({ config }: { config: Config1 }) {
               </div>
 
               <div>
-                <Label className="text-base sm:text-lg" htmlFor={`${id}-phone`}>
+                <Label className="text-lg" htmlFor={`${id}-phone`}>
                   Téléphone *
                 </Label>
                 <Input
                   {...errorProps(`${id}-phone`, errors.phone)}
                   autoComplete="tel"
-                  className="mt-1"
+                  className={fieldClass}
                   inputMode="tel"
                   name="phone"
                   onChange={handleChange}
@@ -126,13 +125,13 @@ export function ContactSection({ config }: { config: Config1 }) {
               </div>
 
               <div>
-                <Label className="text-base sm:text-lg" htmlFor={`${id}-email`}>
+                <Label className="text-lg" htmlFor={`${id}-email`}>
                   Email *
                 </Label>
                 <Input
                   {...errorProps(`${id}-email`, errors.email)}
                   autoComplete="email"
-                  className="mt-1"
+                  className={fieldClass}
                   inputMode="email"
                   name="email"
                   onChange={handleChange}
@@ -145,16 +144,13 @@ export function ContactSection({ config }: { config: Config1 }) {
               </div>
 
               <div>
-                <Label
-                  className="text-base sm:text-lg"
-                  htmlFor={`${id}-adress`}
-                >
+                <Label className="text-lg" htmlFor={`${id}-adress`}>
                   Adresse *
                 </Label>
                 <Input
                   {...errorProps(`${id}-adress`, errors.adress)}
                   autoComplete="street-address"
-                  className="mt-1"
+                  className={fieldClass}
                   name="adress"
                   onChange={handleChange}
                   placeholder="ville - département"
@@ -166,15 +162,12 @@ export function ContactSection({ config }: { config: Config1 }) {
               </div>
 
               <div>
-                <Label
-                  className="text-base sm:text-lg"
-                  htmlFor={`${id}-message`}
-                >
+                <Label className="text-lg" htmlFor={`${id}-message`}>
                   Votre projet
                 </Label>
                 <Textarea
                   {...errorProps(`${id}-message`, errors.message)}
-                  className="mt-1"
+                  className="mt-1 min-h-32 text-lg md:text-lg"
                   name="message"
                   onChange={handleChange}
                   placeholder="Décrivez-nous votre projet d'adaptation de salle de bain..."
@@ -208,101 +201,101 @@ export function ContactSection({ config }: { config: Config1 }) {
                 {isPending ? "Envoi en cours..." : "Envoyer ma demande"}
               </Button>
 
-              <p className="text-sm sm:text-base text-muted-foreground text-center">
+              <p className="text-muted-foreground text-center">
                 * Champs obligatoires. Réponse sous 24h maximum.
               </p>
             </form>
           </CardContent>
         </Card>
 
-        <div className="space-y-4 sm:space-y-6">
-          <Card>
-            <CardContent className="pt-4 sm:pt-6">
-              <div className="flex items-start gap-3 sm:gap-4">
-                <Phone className="text-primary shrink-0" size={28} />
-                <div className="min-w-0">
-                  <h3 className="font-semibold mb-1 text-sm sm:text-base">
-                    Appelez-nous directement
-                  </h3>
-                  <a
-                    className="flex items-center gap-2 text-primary py-1"
-                    href={`tel:+33${config?.phone?.replace(/\s|^0/g, "")}`}
-                  >
-                    <span className="font-medium text-base sm:text-lg break-all">
-                      {config.phone}
-                    </span>
-                  </a>
-                  <p className="text-sm sm:text-base text-muted-foreground">
-                    {config.form_section?.disponibility}
-                  </p>
-                </div>
+        <div className="min-w-0 space-y-4">
+          <Card className="bg-background shadow-none">
+            <CardContent className="flex items-start gap-4">
+              <Phone
+                aria-hidden="true"
+                className="mt-1 text-primary shrink-0"
+                size={28}
+              />
+              <div className="min-w-0">
+                <h3 className="text-lg font-bold">Appelez-nous directement</h3>
+                <a
+                  className="flex min-h-11 items-center text-xl font-extrabold text-primary underline hover:no-underline"
+                  href={toTelHref(config.phone ?? "")}
+                >
+                  <span className="break-all">{config.phone}</span>
+                </a>
+                <p className="text-muted-foreground">
+                  {config.form_section?.disponibility}
+                </p>
               </div>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardContent className="pt-4 sm:pt-6">
-              <div className="flex items-start gap-3 sm:gap-4">
-                <Mail className="text-primary shrink-0" size={28} />
-                <div className="min-w-0">
-                  <h3 className="font-semibold mb-1 text-sm sm:text-base">
-                    Email
-                  </h3>
-                  <a
-                    className="flex items-center gap-2 text-primary py-1"
-                    href={`mailto:${config.email}`}
-                  >
-                    <span className="font-medium text-base sm:text-lg break-all">
-                      {config.email}
-                    </span>
-                  </a>
-                  <p className="text-sm sm:text-base text-muted-foreground">
-                    Réponse sous 24h maximum
-                  </p>
-                </div>
+          <Card className="bg-background shadow-none">
+            <CardContent className="flex items-start gap-4">
+              <Mail
+                aria-hidden="true"
+                className="mt-1 text-primary shrink-0"
+                size={28}
+              />
+              <div className="min-w-0">
+                <h3 className="text-lg font-bold">Email</h3>
+                <a
+                  className="flex min-h-11 items-center text-xl font-extrabold text-primary underline hover:no-underline"
+                  href={`mailto:${config.email}`}
+                >
+                  <span className="break-all">{config.email}</span>
+                </a>
+                <p className="text-muted-foreground">
+                  Réponse sous 24h maximum
+                </p>
               </div>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardContent className="pt-4 sm:pt-6">
-              <div className="flex items-start gap-3 sm:gap-4">
-                <MapPin className="text-primary shrink-0" size={28} />
-                <div className="min-w-0">
-                  <h3 className="font-semibold mb-1 text-sm sm:text-base">
-                    {config.form_section?.work_zone?.title}
-                  </h3>
-                  <p className="text-sm sm:text-base text-muted-foreground">
-                    {config.form_section?.work_zone?.region}
-                    <br />
-                    {config.form_section?.work_zone?.radius}
-                  </p>
-                </div>
+          <Card className="bg-background shadow-none">
+            <CardContent className="flex items-start gap-4">
+              <MapPin
+                aria-hidden="true"
+                className="mt-1 text-primary shrink-0"
+                size={28}
+              />
+              <div className="min-w-0">
+                <h3 className="text-lg font-bold">
+                  {config.form_section?.work_zone?.title}
+                </h3>
+                <p className="text-muted-foreground">
+                  {config.form_section?.work_zone?.region}
+                  <br />
+                  {config.form_section?.work_zone?.radius}
+                </p>
               </div>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardContent className="pt-4 sm:pt-6">
-              <div className="flex items-start gap-3 sm:gap-4">
-                <Clock className="text-primary shrink-0" size={28} />
-                <div className="min-w-0">
-                  <h3 className="font-semibold mb-1 text-sm sm:text-base">
-                    {config.form_section?.time_section?.title}
-                  </h3>
-                  <p className="text-sm sm:text-base text-muted-foreground">
-                    {config.form_section?.time_section?.list?.devis}
-                    <br />
-                    {config.form_section?.time_section?.list?.travaux}
-                    <br />
-                    {config.form_section?.time_section?.list?.total}
-                  </p>
-                </div>
+          <Card className="bg-background shadow-none">
+            <CardContent className="flex items-start gap-4">
+              <Clock
+                aria-hidden="true"
+                className="mt-1 text-primary shrink-0"
+                size={28}
+              />
+              <div className="min-w-0">
+                <h3 className="text-lg font-bold">
+                  {config.form_section?.time_section?.title}
+                </h3>
+                <p className="text-muted-foreground">
+                  {config.form_section?.time_section?.list?.devis}
+                  <br />
+                  {config.form_section?.time_section?.list?.travaux}
+                  <br />
+                  {config.form_section?.time_section?.list?.total}
+                </p>
               </div>
             </CardContent>
           </Card>
         </div>
       </div>
-    </section>
+    </PageSection>
   );
 }

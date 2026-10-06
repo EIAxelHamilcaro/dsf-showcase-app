@@ -1,6 +1,7 @@
 import { Mail, MapPin, Phone } from "lucide-react";
 import Link from "next/link";
 import type { PageLink } from "@/lib/pages/pageLinks";
+import { toTelHref } from "@/lib/seo/phone";
 import type { Config1 } from "@/payload-types";
 
 interface FooterProps {
@@ -8,74 +9,77 @@ interface FooterProps {
   legalLinks: PageLink[];
 }
 
+const contactLinkClass =
+  "flex min-h-11 items-center gap-3 underline hover:no-underline";
+
 export function Footer({ config, legalLinks }: FooterProps) {
   return (
-    <footer className="pt-8 lg:pt-12 bg-foreground text-background mx-auto px-4 sm:px-10 md:px-16 lg:px-32">
-      <div className="grid md:grid-cols-2 gap-6 sm:gap-8">
-        <div>
-          <h3 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
-            {config?.footer_section?.title}
-          </h3>
-          <p className="text-background/80 mb-4 text-sm sm:text-base">
-            {config?.footer_section?.description}
-          </p>
-        </div>
+    <footer className="bg-foreground text-background">
+      <div className="mx-auto max-w-page px-gutter pt-12">
+        <div className="grid gap-8 md:grid-cols-2">
+          <div className="space-y-3">
+            <h3 className="text-xl font-extrabold">
+              {config?.footer_section?.title}
+            </h3>
+            <p className="max-w-reading text-background/80">
+              {config?.footer_section?.description}
+            </p>
+          </div>
 
-        <div>
-          <h4 className="font-semibold mb-3 sm:mb-4 text-base sm:text-lg">
-            Contact
-          </h4>
-          <div className="space-y-2 text-sm sm:text-base">
-            <div className="flex items-center gap-2">
-              <Phone className="h-4 w-4 shrink-0" />
-              <span className="break-all">{config?.phone}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Mail className="h-4 w-4 shrink-0" />
+          <div>
+            <h4 className="mb-2 text-lg font-bold">Contact</h4>
+            {config?.phone ? (
+              <a className={contactLinkClass} href={toTelHref(config.phone)}>
+                <Phone aria-hidden="true" className="size-5 shrink-0" />
+                <span>{config.phone}</span>
+              </a>
+            ) : null}
+            <a className={contactLinkClass} href={`mailto:${config?.email}`}>
+              <Mail aria-hidden="true" className="size-5 shrink-0" />
               <span className="break-all">{config?.email}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <MapPin className="h-4 w-4 shrink-0" />
+            </a>
+            <div className="flex min-h-11 items-center gap-3">
+              <MapPin aria-hidden="true" className="size-5 shrink-0" />
               <span>{config?.footer_section?.region}</span>
             </div>
           </div>
         </div>
-      </div>
 
-      <div className="border-t border-background/20 mt-6 sm:mt-8 py-4 text-center space-y-2">
-        <p className="text-background/60 text-xs sm:text-sm">
-          ©{new Date().getFullYear()} Douche Senior France. Tous droits
-          réservés. | Artisan français certifié | Devis gratuit
-        </p>
+        <div className="mt-8 space-y-2 border-t border-background/30 py-6 text-center text-small">
+          <p className="text-background/80">
+            ©{new Date().getFullYear()} Douche Senior France. Tous droits
+            réservés. | Artisan français certifié | Devis gratuit
+          </p>
 
-        {legalLinks.length > 0 ? (
-          <nav
-            aria-label="Informations légales"
-            className="flex flex-wrap justify-center gap-x-4 gap-y-1 text-xs sm:text-sm"
-          >
-            {legalLinks.map((link) => (
-              <Link
-                className="text-background/80 underline hover:text-primary transition-colors"
-                href={link.href}
-                key={link.href}
-              >
-                {link.label}
-              </Link>
-            ))}
-          </nav>
-        ) : null}
+          {legalLinks.length > 0 ? (
+            <nav
+              aria-label="Informations légales"
+              className="flex flex-wrap justify-center gap-x-6"
+            >
+              {legalLinks.map((link) => (
+                <Link
+                  className="inline-flex min-h-11 items-center underline hover:no-underline"
+                  href={link.href}
+                  key={link.href}
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </nav>
+          ) : null}
 
-        <p className="text-background/50 text-xs">
-          Site conçu par{" "}
-          <Link
-            className="hover:text-primary font-medium transition-colors"
-            href="https://axelhamilcaro.com/"
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            Axel Hamilcaro - Developpeur Web
-          </Link>
-        </p>
+          <p className="text-background/80">
+            Site conçu par{" "}
+            <Link
+              className="inline-flex min-h-11 items-center font-semibold underline hover:no-underline"
+              href="https://axelhamilcaro.com/"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              Axel Hamilcaro - Developpeur Web
+            </Link>
+          </p>
+        </div>
       </div>
     </footer>
   );
