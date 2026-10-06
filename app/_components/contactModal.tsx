@@ -1,12 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { CloseDialogButton } from "./closeDialogButton";
 import { ContactForm } from "./contactForm";
 
 interface WindowWithModal extends Window {
@@ -15,36 +17,47 @@ interface WindowWithModal extends Window {
 
 declare const window: WindowWithModal;
 
-export function ContactModal() {
+export interface ContactModalProps {
+  phone?: string | null;
+}
+
+export function ContactModal({ phone }: ContactModalProps) {
   const [open, setOpen] = useState(false);
+  const opener = useRef<Element | null>(null);
 
   useEffect(() => {
-    // Définir la fonction globale
     window.openContactModal = () => {
+      opener.current = document.activeElement;
       setOpen(true);
     };
 
-    // Nettoyer au démontage
     return () => {
       delete window.openContactModal;
     };
   }, []);
 
-  const handleSuccess = () => {
-    setOpen(false);
-  };
-
   return (
-    <Dialog modal onOpenChange={setOpen} open={open}>
-      <DialogContent className="max-w-2xl max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
-        <DialogTitle className="text-2xl font-bold">
-          Demandez votre devis gratuit
-        </DialogTitle>
-        <DialogDescription className="text-muted-foreground">
-          Intervention rapide dans votre région. Étude personnalisée de vos
-          besoins.
-        </DialogDescription>
-        <ContactForm onSuccess={handleSuccess} />
+    <Dialog onOpenChange={setOpen} open={open}>
+      <DialogContent
+        onCloseAutoFocus={(event) => {
+          if (opener.current instanceof HTMLElement) {
+            event.preventDefault();
+            opener.current.focus();
+          }
+        }}
+        showCloseButton={false}
+      >
+        <div className="dialog-body">
+          <DialogHeader>
+            <DialogTitle>Demandez votre devis gratuit</DialogTitle>
+            <DialogDescription>
+              Nous vous rappelons sous 24 heures. Le devis est gratuit et sans
+              engagement.
+            </DialogDescription>
+          </DialogHeader>
+          <ContactForm phone={phone} />
+        </div>
+        <CloseDialogButton />
       </DialogContent>
     </Dialog>
   );

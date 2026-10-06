@@ -1,0 +1,43 @@
+export const siteUrl = "https://www.douche-senior-france.com";
+export const siteName = "Douche Senior France";
+export const siteRegion = "Centre-Val de Loire";
+export const defaultOgImage = "/og-default.jpg";
+export const reservedSlugs: readonly string[] = ["admin", "api"];
+
+export const homeSeo = {
+  title: "Douche Senior Centre-Val de Loire | Installation en 1 Jour",
+  description:
+    "Douche sécurisée en 1 jour en Centre-Val de Loire. Artisan certifié Handibat. Aide MaPrimeAdapt' de 50 % ou 70 %. Devis gratuit au 02 54 97 53 23.",
+};
+
+export const aiCrawlers: readonly string[] = [
+  "GPTBot",
+  "ChatGPT-User",
+  "OAI-SearchBot",
+  "ClaudeBot",
+  "Claude-SearchBot",
+  "Claude-User",
+  "PerplexityBot",
+  "Google-Extended",
+  "Applebot-Extended",
+  "CCBot",
+];
+
+export const privatePaths: readonly string[] = [
+  "/admin$",
+  "/admin/",
+  "/api$",
+  "/api/",
+];
+
+export const crawlablePaths: readonly string[] = ["/", "/api/media/file/"];
+
+export const businessFacts = {
+  facebookUrl: "https://www.facebook.com/douche.senior.france/",
+  logoPath: "/logo.png",
+  latitude: 47.28256927999651,
+  longitude: 1.5726510253114867,
+  serviceTypeName: "Installation de douches sécurisées pour seniors et PMR",
+  description:
+    "Artisan spécialisé dans le remplacement de baignoire par douche sécurisée pour seniors et PMR",
+};

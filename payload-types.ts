@@ -71,6 +71,8 @@ export interface Config {
     config: Config1;
     users: User;
     media: Media;
+    pages: Page;
+    cities: City;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -82,6 +84,8 @@ export interface Config {
     config: ConfigSelect<false> | ConfigSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
+    pages: PagesSelect<false> | PagesSelect<true>;
+    cities: CitiesSelect<false> | CitiesSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -91,12 +95,17 @@ export interface Config {
     defaultIDType: number;
   };
   fallbackLocale: null;
-  globals: {};
-  globalsSelect: {};
-  locale: null;
-  user: User & {
-    collection: 'users';
+  globals: {
+    cityTemplate: CityTemplate;
   };
+  globalsSelect: {
+    cityTemplate: CityTemplateSelect<false> | CityTemplateSelect<true>;
+  };
+  locale: null;
+  widgets: {
+    collections: CollectionsWidget;
+  };
+  user: User;
   jobs: {
     tasks: unknown;
     workflows: unknown;
@@ -375,6 +384,12 @@ export interface Config1 {
          * Ville, région ou lieu du client
          */
         location?: string | null;
+        /**
+         * Note donnée par le client, entier de 1 à 5. Laisser vide si inconnue.
+         */
+        rating?: number | null;
+        date?: string | null;
+        source?: ('direct' | 'google') | null;
         id?: string | null;
       }[]
     | null;
@@ -637,6 +652,47 @@ export interface Config1 {
     description?: string | null;
     region?: string | null;
   };
+  /**
+   * Informations légales de l'entreprise, reprises dans les données structurées du site
+   */
+  legal_section?: {
+    legal_name?: string | null;
+    legal_form?: string | null;
+    siren?: string | null;
+    street_address?: string | null;
+    postal_code?: string | null;
+    locality?: string | null;
+  };
+  /**
+   * Titre et description de l'accueil dans les moteurs de recherche. Un champ laissé vide reprend la valeur par défaut du site.
+   */
+  seo?: {
+    title?: string | null;
+    description?: string | null;
+  };
+  /**
+   * Note moyenne de la fiche Google, telle qu'affichée sur Google. Laisser vide si inconnue.
+   */
+  google_rating?: number | null;
+  /**
+   * Nombre d'avis de la fiche Google, tel qu'affiché sur Google.
+   */
+  google_review_count?: number | null;
+  /**
+   * Adresse https de la fiche Google, pour que la note soit vérifiable.
+   */
+  google_profile_url?: string | null;
+  /**
+   * Liens affichés dans le menu déroulant Services
+   */
+  menu_services?:
+    | {
+        label: string;
+        href: string;
+        description?: string | null;
+        id?: string | null;
+      }[]
+    | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -646,6 +702,11 @@ export interface Config1 {
  */
 export interface Media {
   id: number;
+  /**
+   * Description courte de l'image, lue par les lecteurs d'écran
+   */
+  alt?: string | null;
+  _objectKey?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -672,6 +733,7 @@ export interface User {
   resetPasswordExpiration?: string | null;
   salt?: string | null;
   hash?: string | null;
+  resetPasswordRequestedAt?: string | null;
   loginAttempts?: number | null;
   lockUntil?: string | null;
   sessions?:
@@ -682,6 +744,409 @@ export interface User {
       }[]
     | null;
   password?: string | null;
+  collection: 'users';
+}
+/**
+ * Pages du site : départements, services, pages légales. Les villes ont leur propre rubrique
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pages".
+ */
+export interface Page {
+  id: number;
+  /**
+   * Partie finale de l'URL, par exemple aides-financieres
+   */
+  slug: string;
+  /**
+   * Utilisé dans le fil d'Ariane et les liens vers cette page
+   */
+  navLabel: string;
+  pageType: 'city' | 'department' | 'service' | 'legal';
+  parent?: (number | null) | Page;
+  /**
+   * Nom du département, repris dans les données structurées
+   */
+  areaName?: string | null;
+  departmentCode?: string | null;
+  seo: {
+    title: string;
+    description: string;
+    /**
+     * Image 1200 x 630, remplacée par l'image par défaut si vide
+     */
+    image?: (number | null) | Media;
+    /**
+     * Cochée : la page n'est pas décrite comme un service de l'entreprise dans les données structurées
+     */
+    informationOnly?: boolean | null;
+  };
+  layout: (
+    | HeroBlock
+    | FeatureCardsBlock
+    | ZoneListBlock
+    | TestimonialBlock
+    | ServiceCardsBlock
+    | AidCardsBlock
+    | StepsBlock
+    | LinkCardsBlock
+    | TextSectionBlock
+    | FaqBlock
+    | LegalContentBlock
+    | CtaBlock
+  )[];
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HeroBlock".
+ */
+export interface HeroBlock {
+  /**
+   * Ligne affichée avec un repère au dessus du titre (villes)
+   */
+  location?: string | null;
+  titleBefore: string;
+  titleHighlight: string;
+  titleAfter?: string | null;
+  intro: string;
+  ctaLabel: string;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'hero';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "FeatureCardsBlock".
+ */
+export interface FeatureCardsBlock {
+  background: 'default' | 'muted';
+  heading?: string | null;
+  intro?: string | null;
+  layout: 'centered' | 'left' | 'inline';
+  columns: '1' | '2' | '3' | '4';
+  spacing?: ('compact' | 'spacious') | null;
+  cards: {
+    icon: 'none' | 'mapPin' | 'clock' | 'shield' | 'euro' | 'checkCircle' | 'fileText';
+    title: string;
+    text: string;
+    id?: string | null;
+  }[];
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'featureCards';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ZoneListBlock".
+ */
+export interface ZoneListBlock {
+  background: 'default' | 'muted';
+  heading: string;
+  showMapIcon?: boolean | null;
+  columns?: ('4' | '5') | null;
+  intro?: string | null;
+  items: {
+    name: string;
+    id?: string | null;
+  }[];
+  outro?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'zoneList';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TestimonialBlock".
+ */
+export interface TestimonialBlock {
+  background: 'default' | 'muted';
+  quote: string;
+  author: string;
+  /**
+   * Note donnée par le client, entier de 1 à 5. Laisser vide pour ne pas afficher d'étoiles.
+   */
+  rating?: number | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'testimonial';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ServiceCardsBlock".
+ */
+export interface ServiceCardsBlock {
+  background: 'default' | 'muted';
+  heading: string;
+  columns: '2' | '3';
+  cards: {
+    title: string;
+    description?: string | null;
+    bullets?:
+      | {
+          text: string;
+          id?: string | null;
+        }[]
+      | null;
+    linkLabel?: string | null;
+    linkHref?: string | null;
+    id?: string | null;
+  }[];
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'serviceCards';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "AidCardsBlock".
+ */
+export interface AidCardsBlock {
+  background: 'default' | 'muted';
+  variant?: ('compact' | 'detailed') | null;
+  heading: string;
+  intro?: string | null;
+  cards?:
+    | {
+        icon: 'none' | 'mapPin' | 'clock' | 'shield' | 'euro' | 'checkCircle' | 'fileText';
+        title: string;
+        text: string;
+        highlight?: string | null;
+        details?:
+          | {
+              label: string;
+              text: string;
+              id?: string | null;
+            }[]
+          | null;
+        note?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  buttonLabel?: string | null;
+  buttonHref?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'aidCards';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "StepsBlock".
+ */
+export interface StepsBlock {
+  background: 'default' | 'muted';
+  heading: string;
+  withCards?: boolean | null;
+  items: {
+    title: string;
+    text: string;
+    id?: string | null;
+  }[];
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'steps';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "LinkCardsBlock".
+ */
+export interface LinkCardsBlock {
+  background: 'default' | 'muted';
+  heading: string;
+  intro?: string | null;
+  links: {
+    label: string;
+    description: string;
+    href: string;
+    id?: string | null;
+  }[];
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'linkCards';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TextSectionBlock".
+ */
+export interface TextSectionBlock {
+  background: 'default' | 'muted';
+  heading: string;
+  paragraphs: {
+    text: string;
+    id?: string | null;
+  }[];
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'textSection';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "FaqBlock".
+ */
+export interface FaqBlock {
+  background: 'default' | 'muted';
+  heading: string;
+  items: {
+    question: string;
+    answer: string;
+    /**
+     * Affichées sous la réponse, avec un lien vers la page officielle
+     */
+    sources?:
+      | {
+          label: string;
+          url: string;
+          id?: string | null;
+        }[]
+      | null;
+    id?: string | null;
+  }[];
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'faq';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "LegalContentBlock".
+ */
+export interface LegalContentBlock {
+  /**
+   * Titre principal de la page, à utiliser sans bloc Hero au dessus
+   */
+  title: string;
+  sections: {
+    /**
+     * Laisser vide pour continuer la section précédente après une liste ou un tableau
+     */
+    heading?: string | null;
+    paragraphs?:
+      | {
+          /**
+           * Un retour à la ligne est conservé, une adresse https devient un lien
+           */
+          text: string;
+          id?: string | null;
+        }[]
+      | null;
+    items?:
+      | {
+          text: string;
+          id?: string | null;
+        }[]
+      | null;
+    headers?:
+      | {
+          label: string;
+          id?: string | null;
+        }[]
+      | null;
+    rows?:
+      | {
+          cells: {
+            text: string;
+            id?: string | null;
+          }[];
+          id?: string | null;
+        }[]
+      | null;
+    id?: string | null;
+  }[];
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'legalContent';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CtaBlock".
+ */
+export interface CtaBlock {
+  heading: string;
+  text: string;
+  ctaLabel: string;
+  /**
+   * Laisser vide pour afficher le numéro de téléphone
+   */
+  phoneLabel?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'cta';
+}
+/**
+ * Une fiche par ville. Toutes les pages ville suivent le modèle des pages ville, seul le contenu de cette fiche change
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "cities".
+ */
+export interface City {
+  id: number;
+  /**
+   * Remplace {ville} dans le modèle des pages ville, par exemple Tours
+   */
+  name: string;
+  /**
+   * Partie finale de l'URL, par exemple douche-senior-tours
+   */
+  slug: string;
+  /**
+   * Remplace {departement} et {code} dans le modèle, et place la ville dans le fil d'Ariane et sur la page du département
+   */
+  department: number | Page;
+  /**
+   * À remplir seulement s'il diffère du nom de la ville (Romorantin-Lanthenay). Repris dans les données structurées
+   */
+  areaName?: string | null;
+  locationLine?: string | null;
+  zonesHeading?: string | null;
+  /**
+   * La ville en première ligne, puis une ligne par commune ou quartier
+   */
+  zones: {
+    name: string;
+    id?: string | null;
+  }[];
+  /**
+   * Facultatif. Affiché entre la liste des communes et les prestations
+   */
+  extraSections?: (TestimonialBlock | ServiceCardsBlock | AidCardsBlock)[] | null;
+  localSection: {
+    background: 'default' | 'muted';
+    heading: string;
+    paragraphs: {
+      text: string;
+      id?: string | null;
+    }[];
+  };
+  faq: {
+    background: 'default' | 'muted';
+    heading: string;
+    items: {
+      question: string;
+      answer: string;
+      /**
+       * Affichées sous la réponse, avec un lien vers la page officielle
+       */
+      sources?:
+        | {
+            label: string;
+            url: string;
+            id?: string | null;
+          }[]
+        | null;
+      id?: string | null;
+    }[];
+  };
+  /**
+   * Laisser vide pour utiliser le titre et la description du modèle
+   */
+  seo?: {
+    /**
+     * Obligatoire quand le titre du modèle dépasse 60 caractères avec le nom de cette ville
+     */
+    title?: string | null;
+    description?: string | null;
+  };
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -722,6 +1187,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'media';
         value: number | Media;
+      } | null)
+    | ({
+        relationTo: 'pages';
+        value: number | Page;
+      } | null)
+    | ({
+        relationTo: 'cities';
+        value: number | City;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -874,6 +1347,9 @@ export interface ConfigSelect<T extends boolean = true> {
         age?: T;
         text?: T;
         location?: T;
+        rating?: T;
+        date?: T;
+        source?: T;
         id?: T;
       };
   services_section?:
@@ -1000,6 +1476,33 @@ export interface ConfigSelect<T extends boolean = true> {
         description?: T;
         region?: T;
       };
+  legal_section?:
+    | T
+    | {
+        legal_name?: T;
+        legal_form?: T;
+        siren?: T;
+        street_address?: T;
+        postal_code?: T;
+        locality?: T;
+      };
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+      };
+  google_rating?: T;
+  google_review_count?: T;
+  google_profile_url?: T;
+  menu_services?:
+    | T
+    | {
+        label?: T;
+        href?: T;
+        description?: T;
+        id?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1015,6 +1518,7 @@ export interface UsersSelect<T extends boolean = true> {
   resetPasswordExpiration?: T;
   salt?: T;
   hash?: T;
+  resetPasswordRequestedAt?: T;
   loginAttempts?: T;
   lockUntil?: T;
   sessions?:
@@ -1030,6 +1534,8 @@ export interface UsersSelect<T extends boolean = true> {
  * via the `definition` "media_select".
  */
 export interface MediaSelect<T extends boolean = true> {
+  alt?: T;
+  _objectKey?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -1042,6 +1548,367 @@ export interface MediaSelect<T extends boolean = true> {
   focalX?: T;
   focalY?: T;
   sizes?: T | {};
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pages_select".
+ */
+export interface PagesSelect<T extends boolean = true> {
+  slug?: T;
+  navLabel?: T;
+  pageType?: T;
+  parent?: T;
+  areaName?: T;
+  departmentCode?: T;
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+        informationOnly?: T;
+      };
+  layout?:
+    | T
+    | {
+        hero?: T | HeroBlockSelect<T>;
+        featureCards?: T | FeatureCardsBlockSelect<T>;
+        zoneList?: T | ZoneListBlockSelect<T>;
+        testimonial?: T | TestimonialBlockSelect<T>;
+        serviceCards?: T | ServiceCardsBlockSelect<T>;
+        aidCards?: T | AidCardsBlockSelect<T>;
+        steps?: T | StepsBlockSelect<T>;
+        linkCards?: T | LinkCardsBlockSelect<T>;
+        textSection?: T | TextSectionBlockSelect<T>;
+        faq?: T | FaqBlockSelect<T>;
+        legalContent?: T | LegalContentBlockSelect<T>;
+        cta?: T | CtaBlockSelect<T>;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HeroBlock_select".
+ */
+export interface HeroBlockSelect<T extends boolean = true> {
+  location?: T;
+  titleBefore?: T;
+  titleHighlight?: T;
+  titleAfter?: T;
+  intro?: T;
+  ctaLabel?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "FeatureCardsBlock_select".
+ */
+export interface FeatureCardsBlockSelect<T extends boolean = true> {
+  background?: T;
+  heading?: T;
+  intro?: T;
+  layout?: T;
+  columns?: T;
+  spacing?: T;
+  cards?:
+    | T
+    | {
+        icon?: T;
+        title?: T;
+        text?: T;
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ZoneListBlock_select".
+ */
+export interface ZoneListBlockSelect<T extends boolean = true> {
+  background?: T;
+  heading?: T;
+  showMapIcon?: T;
+  columns?: T;
+  intro?: T;
+  items?:
+    | T
+    | {
+        name?: T;
+        id?: T;
+      };
+  outro?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TestimonialBlock_select".
+ */
+export interface TestimonialBlockSelect<T extends boolean = true> {
+  background?: T;
+  quote?: T;
+  author?: T;
+  rating?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ServiceCardsBlock_select".
+ */
+export interface ServiceCardsBlockSelect<T extends boolean = true> {
+  background?: T;
+  heading?: T;
+  columns?: T;
+  cards?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        bullets?:
+          | T
+          | {
+              text?: T;
+              id?: T;
+            };
+        linkLabel?: T;
+        linkHref?: T;
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "AidCardsBlock_select".
+ */
+export interface AidCardsBlockSelect<T extends boolean = true> {
+  background?: T;
+  variant?: T;
+  heading?: T;
+  intro?: T;
+  cards?:
+    | T
+    | {
+        icon?: T;
+        title?: T;
+        text?: T;
+        highlight?: T;
+        details?:
+          | T
+          | {
+              label?: T;
+              text?: T;
+              id?: T;
+            };
+        note?: T;
+        id?: T;
+      };
+  buttonLabel?: T;
+  buttonHref?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "StepsBlock_select".
+ */
+export interface StepsBlockSelect<T extends boolean = true> {
+  background?: T;
+  heading?: T;
+  withCards?: T;
+  items?:
+    | T
+    | {
+        title?: T;
+        text?: T;
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "LinkCardsBlock_select".
+ */
+export interface LinkCardsBlockSelect<T extends boolean = true> {
+  background?: T;
+  heading?: T;
+  intro?: T;
+  links?:
+    | T
+    | {
+        label?: T;
+        description?: T;
+        href?: T;
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TextSectionBlock_select".
+ */
+export interface TextSectionBlockSelect<T extends boolean = true> {
+  background?: T;
+  heading?: T;
+  paragraphs?:
+    | T
+    | {
+        text?: T;
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "FaqBlock_select".
+ */
+export interface FaqBlockSelect<T extends boolean = true> {
+  background?: T;
+  heading?: T;
+  items?:
+    | T
+    | {
+        question?: T;
+        answer?: T;
+        sources?:
+          | T
+          | {
+              label?: T;
+              url?: T;
+              id?: T;
+            };
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "LegalContentBlock_select".
+ */
+export interface LegalContentBlockSelect<T extends boolean = true> {
+  title?: T;
+  sections?:
+    | T
+    | {
+        heading?: T;
+        paragraphs?:
+          | T
+          | {
+              text?: T;
+              id?: T;
+            };
+        items?:
+          | T
+          | {
+              text?: T;
+              id?: T;
+            };
+        headers?:
+          | T
+          | {
+              label?: T;
+              id?: T;
+            };
+        rows?:
+          | T
+          | {
+              cells?:
+                | T
+                | {
+                    text?: T;
+                    id?: T;
+                  };
+              id?: T;
+            };
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CtaBlock_select".
+ */
+export interface CtaBlockSelect<T extends boolean = true> {
+  heading?: T;
+  text?: T;
+  ctaLabel?: T;
+  phoneLabel?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "cities_select".
+ */
+export interface CitiesSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  department?: T;
+  areaName?: T;
+  locationLine?: T;
+  zonesHeading?: T;
+  zones?:
+    | T
+    | {
+        name?: T;
+        id?: T;
+      };
+  extraSections?:
+    | T
+    | {
+        testimonial?: T | TestimonialBlockSelect<T>;
+        serviceCards?: T | ServiceCardsBlockSelect<T>;
+        aidCards?: T | AidCardsBlockSelect<T>;
+      };
+  localSection?:
+    | T
+    | {
+        background?: T;
+        heading?: T;
+        paragraphs?:
+          | T
+          | {
+              text?: T;
+              id?: T;
+            };
+      };
+  faq?:
+    | T
+    | {
+        background?: T;
+        heading?: T;
+        items?:
+          | T
+          | {
+              question?: T;
+              answer?: T;
+              sources?:
+                | T
+                | {
+                    label?: T;
+                    url?: T;
+                    id?: T;
+                  };
+              id?: T;
+            };
+      };
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1082,6 +1949,240 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   batch?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * Texte commun à toutes les pages ville. {ville}, {departement}, {code} sont remplacés par le nom de la ville, puis le nom et le numéro de son département
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "cityTemplate".
+ */
+export interface CityTemplate {
+  id: number;
+  /**
+   * Utilisé dans le fil d'Ariane et les liens vers la page, par exemple Douche Senior {ville}
+   */
+  navLabel: string;
+  seo: {
+    title: string;
+    description: string;
+  };
+  hero: {
+    /**
+     * Ligne affichée avec un repère au dessus du titre (villes)
+     */
+    location?: string | null;
+    titleBefore: string;
+    titleHighlight: string;
+    titleAfter?: string | null;
+    intro: string;
+    ctaLabel: string;
+  };
+  featureCards: {
+    background: 'default' | 'muted';
+    heading?: string | null;
+    intro?: string | null;
+    layout: 'centered' | 'left' | 'inline';
+    columns: '1' | '2' | '3' | '4';
+    spacing?: ('compact' | 'spacious') | null;
+    cards: {
+      icon: 'none' | 'mapPin' | 'clock' | 'shield' | 'euro' | 'checkCircle' | 'fileText';
+      title: string;
+      text: string;
+      id?: string | null;
+    }[];
+  };
+  /**
+   * Les communes elles-mêmes se saisissent dans chaque ville
+   */
+  zoneList: {
+    background: 'default' | 'muted';
+    heading: string;
+    showMapIcon?: boolean | null;
+    intro?: string | null;
+    outro?: string | null;
+  };
+  /**
+   * Section affichée si elle a un titre et des cartes
+   */
+  serviceCards?: {
+    background?: ('default' | 'muted') | null;
+    heading?: string | null;
+    columns?: ('2' | '3') | null;
+    cards?:
+      | {
+          title: string;
+          description?: string | null;
+          bullets?:
+            | {
+                text: string;
+                id?: string | null;
+              }[]
+            | null;
+          linkLabel?: string | null;
+          linkHref?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  /**
+   * Section affichée si elle a un titre
+   */
+  aidCards?: {
+    background?: ('default' | 'muted') | null;
+    variant?: ('compact' | 'detailed') | null;
+    heading?: string | null;
+    intro?: string | null;
+    cards?:
+      | {
+          icon: 'none' | 'mapPin' | 'clock' | 'shield' | 'euro' | 'checkCircle' | 'fileText';
+          title: string;
+          text: string;
+          highlight?: string | null;
+          details?:
+            | {
+                label: string;
+                text: string;
+                id?: string | null;
+              }[]
+            | null;
+          note?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+    buttonLabel?: string | null;
+    buttonHref?: string | null;
+  };
+  cta: {
+    heading: string;
+    text: string;
+    ctaLabel: string;
+    /**
+     * Laisser vide pour afficher le numéro de téléphone
+     */
+    phoneLabel?: string | null;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "cityTemplate_select".
+ */
+export interface CityTemplateSelect<T extends boolean = true> {
+  navLabel?: T;
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+      };
+  hero?:
+    | T
+    | {
+        location?: T;
+        titleBefore?: T;
+        titleHighlight?: T;
+        titleAfter?: T;
+        intro?: T;
+        ctaLabel?: T;
+      };
+  featureCards?:
+    | T
+    | {
+        background?: T;
+        heading?: T;
+        intro?: T;
+        layout?: T;
+        columns?: T;
+        spacing?: T;
+        cards?:
+          | T
+          | {
+              icon?: T;
+              title?: T;
+              text?: T;
+              id?: T;
+            };
+      };
+  zoneList?:
+    | T
+    | {
+        background?: T;
+        heading?: T;
+        showMapIcon?: T;
+        intro?: T;
+        outro?: T;
+      };
+  serviceCards?:
+    | T
+    | {
+        background?: T;
+        heading?: T;
+        columns?: T;
+        cards?:
+          | T
+          | {
+              title?: T;
+              description?: T;
+              bullets?:
+                | T
+                | {
+                    text?: T;
+                    id?: T;
+                  };
+              linkLabel?: T;
+              linkHref?: T;
+              id?: T;
+            };
+      };
+  aidCards?:
+    | T
+    | {
+        background?: T;
+        variant?: T;
+        heading?: T;
+        intro?: T;
+        cards?:
+          | T
+          | {
+              icon?: T;
+              title?: T;
+              text?: T;
+              highlight?: T;
+              details?:
+                | T
+                | {
+                    label?: T;
+                    text?: T;
+                    id?: T;
+                  };
+              note?: T;
+              id?: T;
+            };
+        buttonLabel?: T;
+        buttonHref?: T;
+      };
+  cta?:
+    | T
+    | {
+        heading?: T;
+        text?: T;
+        ctaLabel?: T;
+        phoneLabel?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "collections_widget".
+ */
+export interface CollectionsWidget {
+  data?: {
+    [k: string]: unknown;
+  };
+  width: 'full';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

@@ -1,95 +1,65 @@
-/** biome-ignore-all lint/suspicious/noExplicitAny: ok */
 import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 import { getPayload } from "payload";
+import {
+  handleContact,
+  type Lead,
+  type LeadMail,
+} from "@/lib/contact/handleContact";
+import { verifyTurnstile } from "@/lib/contact/turnstile";
 import payloadConfig from "@/payload.config";
 
-export async function POST(req: Request) {
-  let body: any;
+export const maxDuration = 30;
 
-  try {
-    body = await req.json();
-  } catch {
-    return NextResponse.json(
-      { success: false, error: "Requête invalide" },
-      { status: 400 },
-    );
-  }
+const logError = (message: string, context: Record<string, unknown>) =>
+  // biome-ignore lint/suspicious/noConsole: server log read in the hosting dashboard
+  console.error(`[contact] ${message}`, context);
 
-  const {
-    name,
-    phone,
-    email,
-    message,
-    adress,
-    step1,
-    step2,
-    step3,
-    step4,
-    consentMain,
-    consentPartners,
-    website,
-  } = body ?? {};
+async function saveLead(lead: Lead) {
+  const payload = await getPayload({ config: payloadConfig });
+  const { id } = await payload.create({ collection: "leads", data: lead });
 
-  if (website && website.trim().length > 0) {
-    console.log("[SPAM] Honeypot rempli, requête ignorée");
-    return NextResponse.json({ success: true });
-  }
+  return id;
+}
 
-  if (!name || !email || !adress || !phone) {
-    return NextResponse.json(
-      { success: false, error: "Champs obligatoires manquants" },
-      { status: 400 },
-    );
-  }
+function sendMail(mail: LeadMail) {
+  const transport = nodemailer.createTransport({
+    service: "gmail",
+    auth: { user: process.env.GMAIL_CONTACT, pass: process.env.GMAIL_PASS },
+    connectionTimeout: 10_000,
+    greetingTimeout: 10_000,
+    socketTimeout: 15_000,
+  });
 
-  try {
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.GMAIL_CONTACT,
-        pass: process.env.GMAIL_PASS,
-      },
-    });
+  return transport.sendMail({
+    from: `"Site DSF contact" <${process.env.GMAIL_CONTACT}>`,
+    to: process.env.GMAIL_USER,
+    ...mail,
+  });
+}
 
-    await transporter.sendMail({
-      from: `"Site DSF contact" <${process.env.GMAIL_CONTACT}>`,
-      to: process.env.GMAIL_USER,
-      subject: `Nouveau contact : ${name}`,
-      text: `
-        Nom : ${name}
-        Téléphone : ${phone}
-        Email : ${email}
-        Adresse : ${adress}
-        Type : ${step1 || "--"}
-        Logement : ${step2 || "--"}
-        Type Salle de bain: ${step3 || "--"}
-        Age: ${step4 || "--"}
-        Message :
-        ${message || "--"}
-      `,
-    });
+export async function POST(request: Request) {
+  const body: unknown = await request.json().catch(() => undefined);
+  const remoteIp = request.headers
+    .get("x-forwarded-for")
+    ?.split(",")[0]
+    ?.trim();
 
-    const payload = await getPayload({ config: payloadConfig });
-    await payload.create({
-      collection: "leads",
-      data: {
-        name,
-        phone,
-        email,
-        message,
-        adress,
-        step1,
-        step2,
-        step3,
-        step4,
-        consentMain,
-        consentPartners,
-      },
-    });
+  const result = await handleContact(body, {
+    verifyToken: (token) =>
+      verifyTurnstile({
+        token,
+        remoteIp,
+        secret: process.env.TURNSTILE_SECRET_KEY,
+        siteKey: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY,
+        isProduction: process.env.NODE_ENV === "production",
+        isDeployed: Boolean(process.env.VERCEL_ENV),
+        logError,
+      }),
+    saveLead,
+    sendMail,
+    logError,
+  });
 
-    return NextResponse.json({ success: true });
-  } catch (error) {
-    return NextResponse.json({ success: false, error }, { status: 500 });
-  }
+  return NextResponse.json(result.body, { status: result.status });
 }

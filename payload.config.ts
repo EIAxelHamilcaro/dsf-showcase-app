@@ -7,13 +7,19 @@ import { vercelBlobStorage } from "@payloadcms/storage-vercel-blob";
 import { fr } from "@payloadcms/translations/languages/fr";
 import { buildConfig } from "payload";
 import sharp from "sharp";
+import Cities from "./collections/Cities";
+import CityTemplate from "./collections/CityTemplate";
 import Config from "./collections/Config";
 import Leads from "./collections/Leads";
 import { Media } from "./collections/Media";
+import Pages from "./collections/Pages";
 import { Users } from "./collections/Users";
+import { assertDatabaseAllowed } from "./lib/databaseGuard";
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
+
+assertDatabaseAllowed(process.env);
 
 export default buildConfig({
   admin: {
@@ -22,8 +28,8 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Leads, Config, Users, Media],
-  globals: [],
+  collections: [Leads, Config, Users, Media, Pages, Cities],
+  globals: [CityTemplate],
   i18n: {
     fallbackLanguage: "fr",
     supportedLanguages: { fr },
@@ -37,6 +43,8 @@ export default buildConfig({
     pool: {
       connectionString: process.env.DATABASE_URI || "",
     },
+    push: false,
+    migrationDir: path.resolve(dirname, "migrations"),
   }),
   sharp,
   plugins: [
@@ -44,7 +52,9 @@ export default buildConfig({
     vercelBlobStorage({
       enabled: true,
       collections: {
-        media: true,
+        media: {
+          disablePayloadAccessControl: true,
+        },
       },
       token: process.env.BLOB_READ_WRITE_TOKEN,
       // options utiles :

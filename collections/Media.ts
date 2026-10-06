@@ -1,4 +1,8 @@
 import type { CollectionConfig } from "payload";
+import {
+  revalidateSiteAfterChange,
+  revalidateSiteAfterDelete,
+} from "./hooks/revalidateSite";
 
 export const Media: CollectionConfig = {
   slug: "media",
@@ -9,5 +13,19 @@ export const Media: CollectionConfig = {
   access: {
     read: () => true,
   },
-  fields: [],
+  hooks: {
+    afterChange: [revalidateSiteAfterChange],
+    afterDelete: [revalidateSiteAfterDelete],
+  },
+  fields: [
+    {
+      name: "alt",
+      type: "text",
+      label: "Texte alternatif",
+      admin: {
+        description:
+          "Description courte de l'image, lue par les lecteurs d'écran",
+      },
+    },
+  ],
 };

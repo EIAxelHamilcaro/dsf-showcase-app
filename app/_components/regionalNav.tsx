@@ -1,75 +1,87 @@
 import { MapPin } from "lucide-react";
 import Link from "next/link";
-import { Card, CardContent } from "@/components/ui/card";
+import type { PageLink } from "@/lib/pages/pageLinks";
+import { PageSection, SectionHeader } from "./pageSection";
 
-export function RegionalNavSection() {
-  const departments = [
-    {
-      name: "Loir-et-Cher (41)",
-      slug: "/loir-et-cher",
-      cities: "Blois, Romorantin, Vendôme",
-    },
-    {
-      name: "Indre-et-Loire (37)",
-      slug: "/indre-et-loire",
-      cities: "Tours, Joué-lès-Tours, Amboise",
-    },
-    {
-      name: "Loiret (45)",
-      slug: "/loiret",
-      cities: "Orléans, Montargis, Olivet",
-    },
-    {
-      name: "Indre (36)",
-      slug: "/indre",
-      cities: "Châteauroux, Issoudun, Le Blanc",
-    },
-    {
-      name: "Cher (18)",
-      slug: "/cher",
-      cities: "Bourges, Vierzon, St-Amand",
-    },
-  ];
+const citiesByDepartment: Record<string, string> = {
+  "/loir-et-cher": "Blois, Romorantin, Vendôme",
+  "/indre-et-loire": "Tours, Joué-lès-Tours, Amboise",
+  "/loiret": "Orléans, Montargis, Olivet",
+  "/indre": "Châteauroux, Issoudun, Le Blanc",
+  "/cher": "Bourges, Vierzon, Saint-Amand-Montrond",
+};
+
+const displayOrder = Object.keys(citiesByDepartment);
+
+const displayRank = (href: string) => {
+  const rank = displayOrder.indexOf(href);
+
+  return rank === -1 ? displayOrder.length : rank;
+};
+
+export interface RegionalNavSectionProps {
+  departments: PageLink[];
+  cities: PageLink[];
+}
+
+export function RegionalNavSection({
+  departments,
+  cities,
+}: RegionalNavSectionProps) {
+  const orderedDepartments = [...departments].sort(
+    (first, second) => displayRank(first.href) - displayRank(second.href),
+  );
 
   return (
-    <section className="py-12 md:py-16 lg:py-24 bg-muted">
-      <div className="container mx-auto px-4 sm:px-10 md:px-16 lg:px-32">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
-              Toute la région Centre-Val de Loire
-            </h2>
-            <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto">
-              Artisan certifié présent dans les 5 départements. Installation rapide
-              partout en région Centre.
-            </p>
-          </div>
+    <PageSection id="zone-intervention" tone="muted">
+      <SectionHeader
+        heading="Toute la région Centre-Val de Loire"
+        intro="Artisan certifié présent dans les 5 départements. Installation rapide partout en région Centre."
+      />
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-            {departments.map((dept) => (
-              <Link href={dept.slug} key={dept.slug}>
-                <Card className="h-full hover:border-primary transition-all duration-200 hover:shadow-lg cursor-pointer group">
-                  <CardContent className="pt-6 text-center">
-                    <MapPin className="h-10 w-10 md:h-12 md:w-12 text-primary mx-auto mb-3 group-hover:scale-110 transition-transform" />
-                    <h3 className="font-bold text-lg md:text-xl mb-2 group-hover:text-primary transition-colors">
-                      {dept.name}
-                    </h3>
-                    <p className="text-sm md:text-base text-muted-foreground">
-                      {dept.cities}
-                    </p>
-                  </CardContent>
-                </Card>
+      <nav aria-label="Départements desservis">
+        <ul className="tile-wall sm:grid-cols-2 lg:grid-cols-3">
+          {orderedDepartments.map((department) => (
+            <li key={department.href}>
+              <Link
+                className="tile flex h-full items-start gap-stack"
+                href={department.href}
+              >
+                <MapPin aria-hidden="true" className="icon-mark" />
+                <span className="grid">
+                  <strong className="tile-title">{department.label}</strong>
+                  <span className="soft">
+                    {citiesByDepartment[department.href]}
+                  </span>
+                </span>
               </Link>
-            ))}
-          </div>
+            </li>
+          ))}
+        </ul>
+      </nav>
 
-          <div className="mt-8 text-center">
-            <p className="text-muted-foreground">
-              + toutes les communes des 5 départements
-            </p>
-          </div>
-        </div>
-      </div>
-    </section>
+      {cities.length > 0 ? (
+        <nav aria-labelledby="villes-desservies" className="grid gap-stack">
+          <h3 id="villes-desservies">Nos pages par ville</h3>
+          <ul className="tile-wall" data-fit="auto">
+            {cities.map((city) => (
+              <li key={city.href}>
+                <Link
+                  className="tile flex h-full items-center"
+                  data-size="compact"
+                  href={city.href}
+                >
+                  <span className="tile-title">{city.label}</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+          <p className="soft">
+            Nous intervenons aussi dans toutes les autres communes des 5
+            départements.
+          </p>
+        </nav>
+      ) : null}
+    </PageSection>
   );
 }

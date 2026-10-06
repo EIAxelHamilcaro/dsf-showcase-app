@@ -1,0 +1,16 @@
+config|*|financial_section_financial_help_1_icon_text
+config|*|financial_section_financial_help_1_title
+config|*|financial_section_financial_help_1_description
+config|*|google_profile_url
+config|*|legal_section_legal_name
+config|*|legal_section_legal_form
+config|*|legal_section_siren
+config|*|legal_section_street_address
+config|*|legal_section_postal_code
+config|*|legal_section_locality
+config|*|seo_title
+config|*|seo_description
+config|*|updated_at
+config_caroussel_section|2|before_id
+config_caroussel_section|2|after_id
+media|*|alt

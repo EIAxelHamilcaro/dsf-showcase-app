@@ -1,15 +1,13 @@
 "use client";
 import { ChevronDown, Menu, Phone, X } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { type KeyboardEvent, useEffect, useId, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
-import type { Config1 } from "@/payload-types";
-import Logo from "../../public/logo.png";
+import { toTelHref } from "@/lib/seo/phone";
+import { cn } from "@/lib/utils";
 import { ContactButton } from "./contactButton";
 
-interface NavItem {
+export interface NavItem {
   label: string;
   href: string;
   children?: {
@@ -19,134 +17,235 @@ interface NavItem {
   }[];
 }
 
-interface NavBarInteractiveProps {
+const isNotHome = (item: NavItem) => item.href !== "/#accueil";
+
+export interface NavBarInteractiveProps {
   items: NavItem[];
-  config: Config1;
+  phone: string;
 }
 
 export default function NavBarInteractive({
   items,
-  config,
+  phone,
 }: NavBarInteractiveProps) {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [mobileServicesOpen, setMobileServicesOpen] = useState(false);
-  const [desktopDropdownOpen, setDesktopDropdownOpen] = useState(false);
-  const pathname = usePathname();
-  const isHomePage = pathname === "/";
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isMenuServicesOpen, setIsMenuServicesOpen] = useState(false);
+  const [isServicesOpen, setIsServicesOpen] = useState(false);
+  const id = useId();
+  const services = useRef<HTMLLIElement>(null);
+  const servicesTrigger = useRef<HTMLButtonElement>(null);
+  const menuTrigger = useRef<HTMLButtonElement>(null);
 
-  const handleServiceClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    if (!isHomePage) {
+  useEffect(() => {
+    if (!isServicesOpen) {
       return;
     }
-    e.preventDefault();
-    const servicesSection = document.getElementById("services");
-    if (servicesSection) {
-      servicesSection.scrollIntoView({ behavior: "smooth" });
+
+    const closeOnOutsidePress = (event: PointerEvent) => {
+      if (!services.current?.contains(event.target as Node)) {
+        setIsServicesOpen(false);
+      }
+    };
+
+    document.addEventListener("pointerdown", closeOnOutsidePress);
+
+    return () =>
+      document.removeEventListener("pointerdown", closeOnOutsidePress);
+  }, [isServicesOpen]);
+
+  const closeMenu = () => {
+    setIsMenuOpen(false);
+    setIsMenuServicesOpen(false);
+  };
+
+  const closeMenuOnEscape = (event: KeyboardEvent<HTMLElement>) => {
+    if (event.key !== "Escape" || !isMenuOpen) {
+      return;
     }
+
+    closeMenu();
+    menuTrigger.current?.focus();
+  };
+
+  const closeServicesOnEscape = (event: KeyboardEvent<HTMLElement>) => {
+    if (event.key !== "Escape" || !isServicesOpen) {
+      return;
+    }
+
+    setIsServicesOpen(false);
+    servicesTrigger.current?.focus();
   };
 
   return (
-    <div className="w-full">
-      {/* Mobile header */}
-      <div className="lg:hidden flex justify-between w-full items-center">
-        <Image
-          alt="Logo de Douche Senior France"
-          className="w-28 sm:w-36"
-          src={Logo}
-          width={120}
-        />
-        <Button
-          className="lg:hidden p-2"
-          onClick={() => setMobileMenuOpen((prev) => !prev)}
-          size="icon"
-          variant="outline"
-        >
-          {mobileMenuOpen ? (
-            <X className="h-6 w-6" />
-          ) : (
-            <Menu className="h-6 w-6" />
+    <>
+      <nav aria-label="Navigation principale" className="hidden xl:block">
+        <ul className="flex items-center">
+          {items.filter(isNotHome).map((item) =>
+            item.children ? (
+              <li
+                className="relative"
+                key={item.href}
+                onBlur={(event) => {
+                  if (!event.currentTarget.contains(event.relatedTarget)) {
+                    setIsServicesOpen(false);
+                  }
+                }}
+                onKeyDown={closeServicesOnEscape}
+                ref={services}
+              >
+                <Button
+                  aria-controls={`${id}-services`}
+                  aria-expanded={isServicesOpen}
+                  onClick={() => setIsServicesOpen((isOpen) => !isOpen)}
+                  ref={servicesTrigger}
+                  type="button"
+                  variant="ghost"
+                >
+                  {item.label}
+                  <ChevronDown
+                    aria-hidden="true"
+                    className={cn(isServicesOpen && "rotate-180")}
+                  />
+                </Button>
+
+                <ul
+                  className={cn(
+                    "menu-panel absolute top-full left-0 z-50 w-md",
+                    !isServicesOpen && "hidden",
+                  )}
+                  id={`${id}-services`}
+                >
+                  {item.children.map((child) => (
+                    <li key={child.href}>
+                      <Link
+                        className="menu-item"
+                        href={child.href}
+                        onClick={() => setIsServicesOpen(false)}
+                      >
+                        <span className="menu-item-title">{child.label}</span>
+                        {child.description ? (
+                          <span className="small soft">
+                            {child.description}
+                          </span>
+                        ) : null}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </li>
+            ) : (
+              <li key={item.href}>
+                <Link className="nav-link" href={item.href}>
+                  {item.label}
+                </Link>
+              </li>
+            ),
           )}
+        </ul>
+      </nav>
+
+      <div className="flex items-center gap-grout">
+        {phone ? (
+          <Button
+            aria-label={`Appeler le ${phone}`}
+            asChild
+            data-emphasis="phone"
+            variant="link"
+          >
+            <a href={toTelHref(phone)}>
+              <Phone aria-hidden="true" className="max-[24rem]:hidden" />
+              <span className="min-[26rem]:hidden">Appeler</span>
+              <span className="max-[26rem]:hidden">{phone}</span>
+            </a>
+          </Button>
+        ) : null}
+        <ContactButton className="max-md:hidden">Devis gratuit</ContactButton>
+        <Button
+          aria-controls={`${id}-menu`}
+          aria-expanded={isMenuOpen}
+          className="xl:hidden"
+          onClick={() => (isMenuOpen ? closeMenu() : setIsMenuOpen(true))}
+          onKeyDown={closeMenuOnEscape}
+          ref={menuTrigger}
+          type="button"
+          variant="secondary"
+        >
+          {isMenuOpen ? <X aria-hidden="true" /> : <Menu aria-hidden="true" />}
+          {isMenuOpen ? "Fermer" : "Menu"}
         </Button>
       </div>
 
-      {/* Desktop menu */}
-      <nav className="hidden lg:flex items-center w-full relative">
-        {/* Navigation links - centered */}
-        <ul className="flex items-center gap-1 absolute left-1/2 -translate-x-1/2">
-          {items.map((item, i) => (
-            <li className="relative group" key={`nav_item_${i.toString()}`}>
+      <nav
+        aria-label="Navigation principale"
+        className={cn(
+          "rule-top max-h-[calc(100dvh-var(--header-height))] basis-full overflow-y-auto pb-stack xl:hidden",
+          !isMenuOpen && "hidden",
+        )}
+        id={`${id}-menu`}
+        onKeyDown={closeMenuOnEscape}
+      >
+        <ul>
+          {items.map((item) => (
+            <li key={item.href}>
               {item.children ? (
-                <div
-                  className="relative"
-                  onMouseEnter={() => setDesktopDropdownOpen(true)}
-                  onMouseLeave={() => setDesktopDropdownOpen(false)}
-                >
-                  <button
+                <>
+                  <Button
+                    aria-controls={`${id}-menu-services`}
+                    aria-expanded={isMenuServicesOpen}
+                    className="nav-link w-full justify-between"
+                    data-size="lg"
+                    onClick={() => setIsMenuServicesOpen((isOpen) => !isOpen)}
                     type="button"
-                    className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-foreground hover:text-primary transition-colors"
-                    onClick={(e) => {
-                      if (isHomePage) {
-                        handleServiceClick(e as any);
-                      }
-                      setDesktopDropdownOpen(!desktopDropdownOpen);
-                    }}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" || e.key === " ") {
-                        e.preventDefault();
-                        setDesktopDropdownOpen(!desktopDropdownOpen);
-                      }
-                      if (e.key === "Escape") {
-                        setDesktopDropdownOpen(false);
-                      }
-                    }}
-                    aria-expanded={desktopDropdownOpen}
-                    aria-haspopup="menu"
+                    variant="ghost"
                   >
                     {item.label}
                     <ChevronDown
-                      className={`h-4 w-4 transition-transform ${desktopDropdownOpen ? "rotate-180" : ""}`}
+                      aria-hidden="true"
+                      className={cn(isMenuServicesOpen && "rotate-180")}
                     />
-                  </button>
+                  </Button>
 
-                  {/* Dropdown */}
-                  <div
-                    className={`absolute left-0 top-full pt-2 transition-all duration-200 z-50 ${
-                      desktopDropdownOpen
-                        ? "opacity-100 visible"
-                        : "opacity-0 invisible"
-                    }`}
-                    role="menu"
-                    aria-hidden={!desktopDropdownOpen}
+                  <ul
+                    className={cn(
+                      "rule-start",
+                      !isMenuServicesOpen && "hidden",
+                    )}
+                    id={`${id}-menu-services`}
                   >
-                    <div className="bg-background border border-border rounded-lg shadow-xl overflow-hidden w-[450px]">
-                      <ul className="p-2 gap-1 flex flex-col">
-                        {item.children.map((child, j) => (
-                          <li key={`nav_child_${i.toString()}_${j.toString()}`} role="none">
-                            <Link
-                              className="block p-3 rounded-md transition-all duration-150 hover:bg-primary/10 hover:border-primary/20 border border-transparent group/item"
-                              href={child.href}
-                              role="menuitem"
-                              onClick={() => setDesktopDropdownOpen(false)}
-                            >
-                              <div className="text-sm font-semibold leading-none mb-1.5 text-foreground group-hover/item:text-primary transition-colors">
-                                {child.label}
-                              </div>
-                              {child.description && (
-                                <p className="text-xs leading-snug text-muted-foreground">
-                                  {child.description}
-                                </p>
-                              )}
-                            </Link>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-                </div>
+                    <li>
+                      <Link
+                        className="nav-link"
+                        data-size="lg"
+                        href={item.href}
+                        onClick={closeMenu}
+                      >
+                        Voir tous les services
+                      </Link>
+                    </li>
+                    {item.children.map((child) => (
+                      <li key={child.href}>
+                        <Link
+                          className="menu-item"
+                          href={child.href}
+                          onClick={closeMenu}
+                        >
+                          <span className="menu-item-title">{child.label}</span>
+                          {child.description ? (
+                            <span className="small soft">
+                              {child.description}
+                            </span>
+                          ) : null}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </>
               ) : (
                 <Link
-                  className="block px-4 py-2 text-sm font-medium text-foreground hover:text-primary transition-colors"
+                  className="nav-link"
+                  data-size="lg"
                   href={item.href}
+                  onClick={closeMenu}
                 >
                   {item.label}
                 </Link>
@@ -155,115 +254,17 @@ export default function NavBarInteractive({
           ))}
         </ul>
 
-        {/* Right actions */}
-        <div className="flex items-center gap-2 ml-auto">
-          <Button asChild variant="link">
-            <Link
-              className="flex items-center gap-1.5 text-primary py-2"
-              href="tel:+33254975323"
-            >
-              <Phone className="h-4 w-4" />
-              <span className="font-medium text-lg whitespace-nowrap">
-                {config.phone}
-              </span>
-            </Link>
-          </Button>
-          <ContactButton>Devis gratuit</ContactButton>
-        </div>
+        <ContactButton
+          className="w-full md:hidden"
+          onClick={() => {
+            closeMenu();
+            menuTrigger.current?.focus();
+          }}
+          size="lg"
+        >
+          Devis gratuit
+        </ContactButton>
       </nav>
-
-      {/* Mobile menu */}
-      {mobileMenuOpen && (
-        <nav className="lg:hidden w-full mt-4 pb-4 border-t border-border">
-          <ul className="flex flex-col w-full pt-4 space-y-1">
-            {items.map((item, i) => (
-              <li className="w-full" key={`nav_mobile_${i.toString()}`}>
-                {item.children ? (
-                  <div className="w-full">
-                    <button
-                      className="flex items-center justify-between w-full py-3 px-2 text-base font-medium text-foreground hover:bg-muted rounded-md transition-colors"
-                      onClick={() => setMobileServicesOpen((prev) => !prev)}
-                      type="button"
-                    >
-                      {item.label}
-                      <ChevronDown
-                        className={`h-5 w-5 transition-transform ${mobileServicesOpen ? "rotate-180" : ""}`}
-                      />
-                    </button>
-
-                    {mobileServicesOpen && (
-                      <ul className="ml-4 space-y-1 mt-2">
-                        <li>
-                          <Link
-                            className="block w-full py-2 px-2 text-sm text-primary font-medium hover:bg-muted rounded-md transition-colors"
-                            href={item.href}
-                            onClick={(e) => {
-                              handleServiceClick(e);
-                              setMobileMenuOpen(false);
-                              setMobileServicesOpen(false);
-                            }}
-                          >
-                            Voir tous les services
-                          </Link>
-                        </li>
-                        {item.children.map((child, j) => (
-                          <li
-                            key={`nav_mobile_child_${i.toString()}_${j.toString()}`}
-                          >
-                            <Link
-                              className="block w-full py-2 px-2 text-sm hover:bg-muted rounded-md transition-colors"
-                              href={child.href}
-                              onClick={() => {
-                                setMobileMenuOpen(false);
-                                setMobileServicesOpen(false);
-                              }}
-                            >
-                              <div className="font-medium">{child.label}</div>
-                              {child.description && (
-                                <div className="text-xs text-muted-foreground mt-0.5">
-                                  {child.description}
-                                </div>
-                              )}
-                            </Link>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-                ) : (
-                  <Link
-                    className="block w-full py-3 px-2 text-base font-medium hover:bg-muted rounded-md transition-colors"
-                    href={item.href}
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    {item.label}
-                  </Link>
-                )}
-              </li>
-            ))}
-          </ul>
-
-          <div className="border-t border-border mt-4 pt-4 space-y-3 px-2">
-            <a
-              className="flex items-center text-primary py-2"
-              href="tel:+33254975323"
-            >
-              <Phone className="h-5 w-5 mr-3" />
-              <span className="font-medium text-lg">{config.phone}</span>
-            </a>
-            <ContactButton
-              className="w-full"
-              onClick={() => {
-                setMobileMenuOpen(false);
-                setMobileServicesOpen(false);
-              }}
-              size="lg"
-            >
-              Devis gratuit
-            </ContactButton>
-          </div>
-        </nav>
-      )}
-    </div>
+    </>
   );
 }
