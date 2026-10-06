@@ -77,6 +77,7 @@ export default function HeroSection({ config }: { config: Config1 }) {
                 </div>
                 <ModalMultiStepForm
                   link={(config.main_button.guide_pdf as Media).url || ""}
+                  phone={config.phone}
                 />
               </DialogContent>
             </Dialog>
@@ -103,6 +104,7 @@ export default function HeroSection({ config }: { config: Config1 }) {
                 </div>
                 <ModalMultiStepForm
                   link={(config.main_button.doc_pdf as Media).url || ""}
+                  phone={config.phone}
                 />
               </DialogContent>
             </Dialog>

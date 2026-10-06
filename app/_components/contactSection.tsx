@@ -1,89 +1,50 @@
-/** biome-ignore-all lint/suspicious/noConsole: ok*/
 "use client";
-import { load } from "@fingerprintjs/botd";
 import { Clock, Mail, MapPin, Phone } from "lucide-react";
-import type React from "react";
-import { useEffect, useState } from "react";
+import { type ChangeEvent, type FormEvent, useId, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import type { Config1 } from "@/payload-types";
+import { errorProps, FieldError, FormError } from "./contactFeedback";
+import { useContactSubmission } from "./useContactSubmission";
+
+const emptyForm = {
+  name: "",
+  phone: "",
+  email: "",
+  message: "",
+  adress: "",
+  website: "",
+};
 
 export function ContactSection({ config }: { config: Config1 }) {
-  const [formData, setFormData] = useState({
-    name: "",
-    phone: "",
-    email: "",
-    message: "",
-    adress: "",
-    website: "",
-  });
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const id = useId();
+  const [formData, setFormData] = useState(emptyForm);
+  const [isSent, setIsSent] = useState(false);
+  const { formRef, errors, formError, isPending, turnstileWidget, ...form } =
+    useContactSubmission();
 
-  const [isBot, setIsBot] = useState(false);
-  useEffect(() => {
-    (async () => {
-      const botd = await load();
-      const resBotd = botd.detect();
-      setIsBot(resBotd.bot);
-    })();
-  }, []);
+  const handleSubmit = async (event: FormEvent) => {
+    event.preventDefault();
+    setIsSent(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (formData.website?.trim().length > 0) return;
-    try {
-      if (isBot) {
-        alert("Message envoyé ✅");
-        return;
-      }
-    } catch (err) {
-      console.error(
-        "[BotD] Erreur de détection, on laisse passer la requête",
-        err,
-      );
+    if (!(await form.submit(formData))) {
+      return;
     }
 
-    setIsSubmitting(true);
-    try {
-      const res = await fetch("/api/contact", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
-
-      if (res.ok) {
-        alert("Message envoyé ✅");
-        setFormData({
-          name: "",
-          phone: "",
-          email: "",
-          message: "",
-          adress: "",
-          website: "",
-        });
-      } else {
-        alert("Erreur lors de l'envoi ❌");
-      }
-    } catch (_e) {
-      alert("Erreur lors de l'envoi ❌");
-    } finally {
-      setIsSubmitting(false);
-    }
+    setFormData(emptyForm);
+    setIsSent(true);
   };
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
-    setFormData((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
+    const { name, value } = event.target;
+
+    setFormData((previous) => ({ ...previous, [name]: value }));
+    form.clearError(name);
   };
 
   return (
@@ -102,7 +63,6 @@ export function ContactSection({ config }: { config: Config1 }) {
       </div>
 
       <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
-        {/* Contact Form */}
         <Card>
           <CardHeader className="pb-4">
             <CardTitle className="text-xl sm:text-2xl">
@@ -110,12 +70,17 @@ export function ContactSection({ config }: { config: Config1 }) {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <form className="space-y-4" onSubmit={handleSubmit}>
+            <form
+              className="space-y-4"
+              noValidate
+              onSubmit={handleSubmit}
+              ref={formRef}
+            >
               <div className="hidden">
-                <Label htmlFor="website">website</Label>
+                <Label htmlFor={`${id}-website`}>website</Label>
                 <Input
                   autoComplete="off"
-                  id="website"
+                  id={`${id}-website`}
                   name="website"
                   onChange={handleChange}
                   tabIndex={-1}
@@ -124,27 +89,31 @@ export function ContactSection({ config }: { config: Config1 }) {
               </div>
 
               <div>
-                <Label className="text-base sm:text-lg" htmlFor="name">
+                <Label className="text-base sm:text-lg" htmlFor={`${id}-name`}>
                   Nom complet *
                 </Label>
                 <Input
+                  {...errorProps(`${id}-name`, errors.name)}
+                  autoComplete="name"
                   className="mt-1"
-                  id="name"
                   name="name"
                   onChange={handleChange}
                   placeholder="Votre nom et prénom"
                   required
                   value={formData.name}
                 />
+                <FieldError error={errors.name} id={`${id}-name`} />
               </div>
 
               <div>
-                <Label className="text-base sm:text-lg" htmlFor="phone">
+                <Label className="text-base sm:text-lg" htmlFor={`${id}-phone`}>
                   Téléphone *
                 </Label>
                 <Input
+                  {...errorProps(`${id}-phone`, errors.phone)}
+                  autoComplete="tel"
                   className="mt-1"
-                  id="phone"
+                  inputMode="tel"
                   name="phone"
                   onChange={handleChange}
                   placeholder="01 23 45 67 89"
@@ -152,15 +121,18 @@ export function ContactSection({ config }: { config: Config1 }) {
                   type="tel"
                   value={formData.phone}
                 />
+                <FieldError error={errors.phone} id={`${id}-phone`} />
               </div>
 
               <div>
-                <Label className="text-base sm:text-lg" htmlFor="email">
+                <Label className="text-base sm:text-lg" htmlFor={`${id}-email`}>
                   Email *
                 </Label>
                 <Input
+                  {...errorProps(`${id}-email`, errors.email)}
+                  autoComplete="email"
                   className="mt-1"
-                  id="email"
+                  inputMode="email"
                   name="email"
                   onChange={handleChange}
                   placeholder="votre@email.fr"
@@ -168,15 +140,20 @@ export function ContactSection({ config }: { config: Config1 }) {
                   type="email"
                   value={formData.email}
                 />
+                <FieldError error={errors.email} id={`${id}-email`} />
               </div>
 
               <div>
-                <Label className="text-base sm:text-lg" htmlFor="adress">
+                <Label
+                  className="text-base sm:text-lg"
+                  htmlFor={`${id}-adress`}
+                >
                   Adresse *
                 </Label>
                 <Input
+                  {...errorProps(`${id}-adress`, errors.adress)}
+                  autoComplete="street-address"
                   className="mt-1"
-                  id="adress"
                   name="adress"
                   onChange={handleChange}
                   placeholder="ville - département"
@@ -184,36 +161,46 @@ export function ContactSection({ config }: { config: Config1 }) {
                   type="text"
                   value={formData.adress}
                 />
+                <FieldError error={errors.adress} id={`${id}-adress`} />
               </div>
 
               <div>
-                <Label className="text-base sm:text-lg" htmlFor="message">
+                <Label
+                  className="text-base sm:text-lg"
+                  htmlFor={`${id}-message`}
+                >
                   Votre projet
                 </Label>
                 <Textarea
+                  {...errorProps(`${id}-message`, errors.message)}
                   className="mt-1"
-                  id="message"
                   name="message"
                   onChange={handleChange}
                   placeholder="Décrivez-nous votre projet d'adaptation de salle de bain..."
                   rows={4}
                   value={formData.message}
                 />
+                <FieldError error={errors.message} id={`${id}-message`} />
               </div>
 
+              {turnstileWidget}
+
+              <FormError message={formError} phone={config.phone} />
+
+              {isSent && (
+                <output className="block p-3 bg-primary/10 border border-primary rounded-md font-semibold">
+                  Votre demande a bien été envoyée.
+                </output>
+              )}
+
               <Button
+                aria-busy={isPending}
                 className="w-full"
-                disabled={
-                  isSubmitting ||
-                  !formData.name ||
-                  !formData.email ||
-                  !formData.adress ||
-                  !formData.phone
-                }
+                disabled={isPending}
                 size="lg"
                 type="submit"
               >
-                {isSubmitting ? "Envoi en cours..." : "Envoyer ma demande"}
+                {isPending ? "Envoi en cours..." : "Envoyer ma demande"}
               </Button>
 
               <p className="text-sm sm:text-base text-muted-foreground text-center">
@@ -223,7 +210,6 @@ export function ContactSection({ config }: { config: Config1 }) {
           </CardContent>
         </Card>
 
-        {/* Contact Information */}
         <div className="space-y-4 sm:space-y-6">
           <Card>
             <CardContent className="pt-4 sm:pt-6">

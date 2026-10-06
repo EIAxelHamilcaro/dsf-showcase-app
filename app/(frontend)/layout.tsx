@@ -75,7 +75,7 @@ export default async function RootLayout({
         <NavBar config={config} />
         <main id="main-content">{children}</main>
         <Footer config={config} />
-        <ContactModal />
+        <ContactModal phone={config.phone} />
       </body>
     </html>
   );

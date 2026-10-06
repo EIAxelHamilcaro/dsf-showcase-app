@@ -15,24 +15,18 @@ interface WindowWithModal extends Window {
 
 declare const window: WindowWithModal;
 
-export function ContactModal() {
+export function ContactModal({ phone }: { phone?: string | null }) {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    // Définir la fonction globale
     window.openContactModal = () => {
       setOpen(true);
     };
 
-    // Nettoyer au démontage
     return () => {
       delete window.openContactModal;
     };
   }, []);
-
-  const handleSuccess = () => {
-    setOpen(false);
-  };
 
   return (
     <Dialog modal onOpenChange={setOpen} open={open}>
@@ -44,7 +38,7 @@ export function ContactModal() {
           Intervention rapide dans votre région. Étude personnalisée de vos
           besoins.
         </DialogDescription>
-        <ContactForm onSuccess={handleSuccess} />
+        <ContactForm phone={phone} />
       </DialogContent>
     </Dialog>
   );
