@@ -14,6 +14,7 @@ import * as migration_20261006_131307_content_review_fixes from './20261006_1313
 import * as migration_20261006_151441_home_seo_and_aid_conditions from './20261006_151441_home_seo_and_aid_conditions';
 import * as migration_20261006_154237_city_pages_from_template from './20261006_154237_city_pages_from_template';
 import * as migration_20261006_155640_city_pages_share_one_model from './20261006_155640_city_pages_share_one_model';
+import * as migration_20261006_161434_city_descriptions_from_the_client from './20261006_161434_city_descriptions_from_the_client';
 
 export const migrations = [
   {
@@ -94,6 +95,11 @@ export const migrations = [
   {
     up: migration_20261006_155640_city_pages_share_one_model.up,
     down: migration_20261006_155640_city_pages_share_one_model.down,
-    name: '20261006_155640_city_pages_share_one_model'
+    name: '20261006_155640_city_pages_share_one_model',
+  },
+  {
+    up: migration_20261006_161434_city_descriptions_from_the_client.up,
+    down: migration_20261006_161434_city_descriptions_from_the_client.down,
+    name: '20261006_161434_city_descriptions_from_the_client'
   },
 ];

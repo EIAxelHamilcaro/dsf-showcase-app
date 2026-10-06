@@ -45,9 +45,9 @@ fi
 
 baseline="$(basename "${baselines[0]}" .ts)"
 
-city_migrations=("${root}"/migrations/*_city_pages_from_template.ts "${root}"/migrations/*_city_pages_share_one_model.ts)
-if [ "${#city_migrations[@]}" -ne 2 ] || [ ! -f "${city_migrations[0]}" ] || [ ! -f "${city_migrations[1]}" ]; then
-  echo "expected exactly one migrations/*_city_pages_from_template.ts and one migrations/*_city_pages_share_one_model.ts file" >&2
+city_migrations=("${root}"/migrations/*_city_pages_from_template.ts "${root}"/migrations/*_city_pages_share_one_model.ts "${root}"/migrations/*_city_descriptions_from_the_client.ts)
+if [ "${#city_migrations[@]}" -ne 3 ] || [ ! -f "${city_migrations[0]}" ] || [ ! -f "${city_migrations[1]}" ] || [ ! -f "${city_migrations[2]}" ]; then
+  echo "expected exactly one migrations/*_city_pages_from_template.ts, one migrations/*_city_pages_share_one_model.ts and one migrations/*_city_descriptions_from_the_client.ts file" >&2
   exit 1
 fi
 
@@ -160,19 +160,29 @@ if [ -n "${unexpected}" ]; then
 fi
 
 dump_content() {
-  docker exec -i dsf-local-pg pg_dump -U postgres -d "${replay}" --data-only --column-inserts --exclude-table='payload_migrations*' 2>/dev/null \
+  docker exec -i dsf-local-pg pg_dump -U postgres -d "${replay}" --data-only --column-inserts --exclude-table='payload_migrations*' "$@" 2>/dev/null \
     | grep -v -E '^\\(un)?restrict '
 }
 
+city_content() {
+  run_psql -d "${replay}" -v ON_ERROR_STOP=1 -At -f - < "${root}/scripts/sql/cityContent.sql"
+}
+
 replay_twice() {
-  dump_content > "${work}/replay-before.sql"
+  local failure="$1"
+  shift
+
+  dump_content "$@" > "${work}/replay-before.sql"
+  city_content > "${work}/replay-cities-before.txt"
 
   DSF_DB="${replay}" "${root}/scripts/local.sh" pnpm exec payload migrate
 
-  dump_content > "${work}/replay-after.sql"
+  dump_content "$@" > "${work}/replay-after.sql"
+  city_content > "${work}/replay-cities-after.txt"
 
-  if ! diff -u "${work}/replay-before.sql" "${work}/replay-after.sql"; then
-    echo "FAIL: $1" >&2
+  if ! diff -u "${work}/replay-before.sql" "${work}/replay-after.sql" \
+    || ! diff -u "${work}/replay-cities-before.txt" "${work}/replay-cities-after.txt"; then
+    echo "FAIL: ${failure}" >&2
     exit 1
   fi
 
@@ -192,10 +202,10 @@ run_psql -d "${replay}" -v ON_ERROR_STOP=1 -At -f - < "${root}/scripts/sql/edito
 replay_twice "running the content migrations a second time changed data or overwrote an editor change"
 echo "replay 1: second run changed nothing, editor changes kept"
 
-echo "--- replay 2: city_pages_from_template and city_pages_share_one_model run again on their own result, after editor changes"
+echo "--- replay 2: city_pages_from_template, city_pages_share_one_model and city_descriptions_from_the_client run again on their own result, after editor changes"
 run_psql -c "create database ${replay} template ${target}" >/dev/null
 run_psql -d "${replay}" -v ON_ERROR_STOP=1 -At -f - < "${root}/scripts/sql/cityEditorEdits.sql"
-replay_twice "running the city migrations a second time changed data, overwrote an editor change or brought back a deleted city"
-echo "replay 2: second run changed nothing, editor changes kept, deleted city not recreated"
+replay_twice "running the city migrations a second time changed content, overwrote an editor change or brought back a deleted city" --exclude-table='cities*' --exclude-table='city_template*'
+echo "replay 2: second run left every city and template value as it was (rows rewritten with the same content), editor changes kept, deleted city not recreated, other tables untouched"
 
 echo "OK: no existing row lost or altered beyond scripts/sql/expectedCellChanges.txt (work files in ${work})"
