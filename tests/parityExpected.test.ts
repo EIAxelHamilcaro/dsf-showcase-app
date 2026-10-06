@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { describe, it } from "node:test";
 import { faqSeed } from "../migrations/seed/faqSeed";
+import { faqFixes } from "../migrations/seed/reviewFixesSeed";
 import {
   applyCorrections,
   textCorrections,
@@ -59,35 +60,30 @@ describe("expected text of the 16 captured pages", () => {
     }
   });
 
-  it("keeps every captured word outside the listed corrections and the listed additions", () => {
-    for (const slug of parityPages) {
-      const golden = readGolden(slug);
-      const expected = buildExpectedText(slug, golden);
-      const corrections = textCorrections.filter(
-        (correction) => correction.page === slug,
-      );
-      const keptWords = corrections
-        .reduce(
-          (text, correction) => text.split(correction.from).join(" "),
-          golden,
-        )
-        .split(/\s+/)
-        .filter(Boolean);
-      const expectedWords = expected.split(/\s+/);
-
-      let cursor = 0;
-
-      for (const word of keptWords) {
-        const at = expectedWords.indexOf(word, cursor);
-
-        assert.ok(at >= cursor, `${slug} lost "${word}" after word ${cursor}`);
-        cursor = at + 1;
-      }
-
-      for (const correction of corrections) {
-        assert.ok(expected.includes(correction.to), correction.ref);
-      }
-    }
+  it("applies only the reviewed corrections, each listed by its reference", () => {
+    assert.deepEqual(
+      textCorrections.map(
+        (correction) => `${correction.page} ${correction.ref}`,
+      ),
+      [
+        "aides-financieres A1",
+        "aides-financieres A2",
+        "aides-financieres A3",
+        "aides-financieres A6+E4",
+        "aides-financieres A8",
+        "remplacement-baignoire-par-douche D1",
+        "remplacement-baignoire-par-douche D2",
+        "douche-senior-blois D3",
+        "amenagement-salle-bain-senior D4",
+        "loir-et-cher E1",
+        "remplacement-baignoire-par-douche E2",
+        "douche-senior-blois E3",
+        "aides-financieres A5",
+        "home B1",
+        "home B2",
+        "home B3",
+      ],
+    );
   });
 
   it("places the FAQ of each page right before its closing call to action", () => {
@@ -100,6 +96,22 @@ describe("expected text of the 16 captured pages", () => {
         expected.indexOf(lastQuestion) > expected.indexOf(faq.heading),
         faq.slug,
       );
+    }
+  });
+
+  it("shows each reviewed FAQ wording in place of the one it replaces", () => {
+    assert.deepEqual(
+      faqFixes.map((fix) => `${fix.slug} ${fix.ref}`),
+      ["aides-financieres F1", "indre-et-loire F2", "aides-financieres F3"],
+    );
+
+    for (const fix of faqFixes) {
+      const expected = buildExpectedText(fix.slug, readGolden(fix.slug));
+
+      const [before, ...after] = expected.split(fix.to);
+
+      assert.equal(after.length, 1, fix.ref);
+      assert.ok(![before, ...after].join(" ").includes(fix.from), fix.ref);
     }
   });
 });

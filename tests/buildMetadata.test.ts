@@ -35,4 +35,13 @@ describe("buildMetadata", () => {
       assert.equal(metadata.alternates?.canonical, "/cher");
     }
   });
+
+  it("keeps the home title and description within the search result limits, without the unsupported 100% aid", () => {
+    assert.ok(homeSeo.title.length <= 60, String(homeSeo.title.length));
+    assert.ok(
+      homeSeo.description.length <= 160,
+      String(homeSeo.description.length),
+    );
+    assert.ok(!`${homeSeo.title} ${homeSeo.description}`.includes("100"));
+  });
 });

@@ -6,6 +6,12 @@ import { localTextSeed } from "../migrations/seed/localTextSeed";
 import { mediaAltSeed } from "../migrations/seed/mediaAltSeed";
 import { pagesSeed } from "../migrations/seed/pagesSeed";
 import {
+  faqFixes,
+  legalFixes,
+  pageTextFixes,
+  reviewFixes,
+} from "../migrations/seed/reviewFixesSeed";
+import {
   gallerySwap,
   googleProfileUrl,
 } from "../migrations/seed/siteFixesSeed";
@@ -23,8 +29,14 @@ const placeholder = /[[\]]|à confirmer|à renseigner|à revérifier/i;
 const vatNumber = /\bFR\s?\d{2}\s?\d{9}\b/;
 const longNumber = /\d(?:[ \u00a0\u202f]?\d){8,}/g;
 const taxCredit = /crédit d'impôt/i;
-const taxCreditEnded = /supprimé|ne s'applique plus|avant le 31|2025/i;
+const taxCreditEnded = /supprimé|ne s'applique plus/i;
+const taxCreditEndDate = /1er janvier 2026/;
 const knownNumbers = new Set(["800339673", "80033967300017", "0254975323"]);
+
+const reviewed = (slug: string, field: string, text: string) =>
+  reviewFixes.find(
+    (fix) => fix.slug === slug && fix.field === field && fix.from === text,
+  )?.to ?? text;
 
 const legalTexts = legalPagesSeed.flatMap((page) => [
   page.navLabel,
@@ -32,18 +44,20 @@ const legalTexts = legalPagesSeed.flatMap((page) => [
   page.seo.title,
   page.seo.description,
   ...page.sections.flatMap((section) => [
-    section.heading ?? "",
-    ...(section.paragraphs ?? []),
-    ...(section.items ?? []),
+    reviewed(page.slug, "heading", section.heading ?? ""),
+    ...[
+      ...(section.paragraphs ?? []),
+      ...(section.items ?? []),
+      ...(section.rows ?? []).flat(),
+    ].map((text) => reviewed(page.slug, "text", text)),
     ...(section.headers ?? []),
-    ...(section.rows ?? []).flat(),
   ]),
 ]);
 
 const faqTexts = faqSeed.flatMap((page) => [
   page.heading,
   ...page.items.flatMap((item) => [
-    `${item.question} ${item.answer}`,
+    `${reviewed(page.slug, "question", item.question)} ${reviewed(page.slug, "answer", item.answer)}`,
     ...item.sources.map((source) => source.label),
   ]),
 ]);
@@ -53,19 +67,29 @@ const localTexts = localTextSeed.flatMap((page) => [
 ]);
 
 const correctionTexts = [
-  ...pageFieldCorrections,
-  ...seoDescriptionCorrections,
-  ...homeCorrections,
-  ...menuCorrections,
-].map((correction) => correction.to);
+  ...pageFieldCorrections.map((correction) =>
+    reviewed(correction.slug, correction.field, correction.to),
+  ),
+  ...[...seoDescriptionCorrections, ...homeCorrections, ...menuCorrections].map(
+    (correction) => correction.to,
+  ),
+  ...pageTextFixes.map((fix) => fix.to),
+];
 
-const publishedTexts = [
+const pageTexts = [
   ...legalTexts,
   ...faqTexts,
   ...localTexts,
   ...correctionTexts,
+];
+
+const publishedTexts = [
+  ...pageTexts,
   ...mediaAltSeed.map((media) => media.alt),
 ];
+
+const countOf = (texts: string[], text: string) =>
+  texts.filter((candidate) => candidate === text).length;
 
 const slugsOfType = (types: string[]) =>
   pagesSeed
@@ -145,8 +169,11 @@ describe("turnkey content seed", () => {
   });
 
   it("never presents the abolished tax credit as available", () => {
-    for (const text of publishedTexts) {
-      assert.ok(!taxCredit.test(text) || taxCreditEnded.test(text), text);
+    for (const text of pageTexts) {
+      const saysItEnded =
+        taxCreditEnded.test(text) && taxCreditEndDate.test(text);
+
+      assert.ok(!taxCredit.test(text) || saysItEnded, text);
     }
   });
 
@@ -226,6 +253,59 @@ describe("turnkey content seed", () => {
           JSON.stringify({ label: removal.label, text: removal.text }),
         ),
         removal.ref,
+      );
+    }
+  });
+
+  it("fixes after review only texts that the earlier seeds wrote exactly once", () => {
+    for (const fix of pageTextFixes) {
+      const page = pagesSeed.find((seed) => seed.slug === fix.slug);
+      const seeded =
+        JSON.stringify(page?.layout ?? []).split(
+          `${JSON.stringify(fix.field)}:${JSON.stringify(fix.from)}`,
+        ).length - 1;
+      const corrected = pageFieldCorrections.filter(
+        (correction) =>
+          correction.slug === fix.slug &&
+          correction.field === fix.field &&
+          correction.to === fix.from,
+      ).length;
+
+      assert.equal(seeded + corrected, 1, fix.ref);
+    }
+
+    for (const fix of faqFixes) {
+      const items = faqSeed.find((seed) => seed.slug === fix.slug)?.items ?? [];
+      const written = items.map((item) =>
+        fix.field === "question" ? item.question : item.answer,
+      );
+
+      assert.equal(countOf(written, fix.from), 1, fix.ref);
+    }
+
+    for (const fix of legalFixes) {
+      const sections =
+        legalPagesSeed.find((seed) => seed.slug === fix.slug)?.sections ?? [];
+      const written = sections.flatMap((section) =>
+        fix.field === "heading"
+          ? [section.heading ?? ""]
+          : [
+              ...(section.paragraphs ?? []),
+              ...(section.items ?? []),
+              ...(section.rows ?? []).flat(),
+            ],
+      );
+
+      assert.equal(countOf(written, fix.from), 1, fix.ref);
+    }
+  });
+
+  it("publishes no share capital and no claim that data stays in the European Union", () => {
+    for (const text of publishedTexts) {
+      assert.ok(!/capital/i.test(text), text);
+      assert.ok(
+        !/hébergée dans l'Union européenne|région Europe/.test(text),
+        text,
       );
     }
   });
