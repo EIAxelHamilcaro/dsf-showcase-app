@@ -136,7 +136,7 @@ export function ContactFields({
         value={values.email}
       />
       <TextField
-        autoComplete="street-address"
+        autoComplete="address-level2"
         error={errors.adress}
         hint="La ville et le code postal suffisent."
         id={`${id}-adress`}

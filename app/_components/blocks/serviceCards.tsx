@@ -56,12 +56,6 @@ export function ServiceCards({ block }: ServiceCardsProps) {
                 ))}
               </ul>
             ) : null}
-            {card.linkHref && card.linkLabel ? (
-              <Link className="link" href={card.linkHref}>
-                {card.linkLabel}
-                <span className="sr-only"> : {card.title}</span>
-              </Link>
-            ) : null}
           </li>
         ))}
       </ul>

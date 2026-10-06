@@ -1,12 +1,10 @@
 import Link from "next/link";
-import { Fragment } from "react";
 import {
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbPage,
-  BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import type { PageLink } from "@/lib/pages/pageLinks";
 
@@ -22,14 +20,11 @@ export function PageBreadcrumb({ trail }: PageBreadcrumbProps) {
     <Breadcrumb aria-label="Fil d'Ariane">
       <BreadcrumbList>
         {ancestors.map((link) => (
-          <Fragment key={link.href}>
-            <BreadcrumbItem>
-              <BreadcrumbLink asChild>
-                <Link href={link.href}>{link.label}</Link>
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-          </Fragment>
+          <BreadcrumbItem key={link.href}>
+            <BreadcrumbLink asChild>
+              <Link href={link.href}>{link.label}</Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
         ))}
         {current ? (
           <BreadcrumbItem>
