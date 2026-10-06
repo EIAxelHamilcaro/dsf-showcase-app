@@ -13,7 +13,7 @@ Les pages `/mentions-legales` et `/politique-de-confidentialite` sont en ligne. 
 - [ ] Assurance décennale : assureur, adresse, numéro de contrat, zone couverte. Mention obligatoire pour une entreprise du bâtiment, et le site affiche « Garantie décennale ».
 - [ ] Médiateur de la consommation : nom, adresse, site internet. En attendant, la page indique que ses coordonnées sont communiquées sur demande au 02 54 97 53 23.
 - [ ] Labels Handibat et Silverbat : validité en cours, numéros éventuels.
-- [ ] Partenaires : le formulaire par étapes propose une case facultative pour accepter la transmission des données « aux partenaires ». Qui sont-ils ? S'il n'y en a pas, la case doit disparaître. S'il y en a, ils doivent être nommés. Point bloquant pour le RGPD.
+- [ ] Partenaires : le formulaire par étapes propose une case facultative pour accepter la transmission des données « aux partenaires ». Qui sont-ils ? S'il n'y en a pas, la case doit disparaître. S'il y en a, ils doivent être nommés dans la politique de confidentialité. Point bloquant pour le RGPD.
 - [ ] Capital social : montant à fournir d'après les statuts à jour. Il a été retiré des deux pages faute de source vérifiée.
 - [ ] Téléphone de l'hébergeur à ajouter aux mentions légales.
 
@@ -23,7 +23,7 @@ Les pages `/mentions-legales` et `/politique-de-confidentialite` sont en ligne. 
 - [ ] Dominique Bertone, président, directeur de la publication.
 - [ ] Email `douche.senior.france@gmail.com` comme adresse officielle et comme contact RGPD (une adresse dédiée est préférable). Compte Gmail de l'entreprise ou Google Workspace ?
 - [ ] Aucun délégué à la protection des données désigné.
-- [ ] Conservation des demandes sans suite : 3 ans après le dernier contact (aucune suppression automatique n'existe, à appliquer à la main).
+- [ ] Conservation des demandes sans suite : la politique de confidentialité annonce 3 ans au plus après le dernier contact. Cette durée doit être réellement appliquée par le client : aucune suppression automatique n'existe, les demandes plus anciennes sont à supprimer à la main dans l'admin.
 - [ ] Durées de conservation après contrat, à valider avec le comptable.
 - [ ] Qui lit les demandes dans l'entreprise et qui a un compte d'administration.
 - [ ] Sous-traitants : Vercel (États-Unis), Neon (société et pays exacts à relever dans la console, la page indique « Communiquée sur demande » faute de source vérifiée), Google, Cloudflare. Garanties de transfert hors UE à vérifier pour chacun.
@@ -47,9 +47,10 @@ Corrigé d'office (crédit d'impôt supprimé depuis le 1er janvier 2026, source
 
 Corrigé d'office aussi (la fiche officielle F37501 donne 50 % ou 70 %) : « jusqu'à 100% de prise en charge possible » (Loir-et-Cher) devient « prise en charge importante possible » comme sur les 4 autres départements, et « Aide 100% » disparaît du titre et de la description de l'accueil dans Google.
 
+Corrigé d'office aussi (fiche officielle F37501) : la carte MaPrimeAdapt de la page aides financières disait « Propriétaire occupant ou locataire, + 60 ans ou situation handicap », elle dit désormais « Propriétaire occupant de 70 ans ou plus, sans condition de perte d'autonomie (autres cas sur la fiche officielle) », comme la FAQ de la même page.
+
 Contraire aux sources officielles :
 
-- [ ] « Conditions : Propriétaire occupant ou locataire, + 60 ans ou situation handicap » (aides financières). La fiche officielle donne 70 ans ou plus sans condition de perte d'autonomie.
 - [ ] « ⚠️ Artisan certifié Handibat OBLIGATOIRE (nous le sommes !) » (aides financières) et « Certification obligatoire pour certaines aides (MaPrimeAdapt) » (douche PMR). Absent des sources officielles.
 - [ ] « Éligible aides financières maximales » (Blois), « Éligibilité aux aides maximales » (douche PMR). Sans source.
 - [ ] « PrimAdapt », « L'ANAH », « MaPrimeAdapt ». Le nom officiel est « MaPrimeAdapt' ».
