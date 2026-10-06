@@ -1,12 +1,7 @@
-import { Phone } from "lucide-react";
 import { ContactButton } from "@/app/_components/contactButton";
 import { PageSection } from "@/app/_components/pageSection";
-import { Button } from "@/components/ui/button";
-import { toTelHref } from "@/lib/seo/phone";
 import type { CtaBlock } from "@/payload-types";
-
-const inverseButtonClass =
-  "bg-white text-primary hover:bg-primary hover:text-white border-white";
+import { inverseButtonClass, PhoneButton } from "./phoneButton";
 
 interface PageCtaProps {
   block: CtaBlock;
@@ -22,12 +17,7 @@ export function PageCta({ block, phone }: PageCtaProps) {
         <ContactButton className={inverseButtonClass} size="lg">
           {block.ctaLabel}
         </ContactButton>
-        <Button asChild className={inverseButtonClass} size="lg">
-          <a href={toTelHref(phone)}>
-            <Phone className="mr-2 h-5 w-5" />
-            {block.phoneLabel || phone}
-          </a>
-        </Button>
+        <PhoneButton label={block.phoneLabel} phone={phone} />
       </div>
     </PageSection>
   );

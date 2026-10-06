@@ -1,9 +1,10 @@
-import { MapPin, Phone } from "lucide-react";
+import { MapPin } from "lucide-react";
 import { ContactButton } from "@/app/_components/contactButton";
 import { PageSection } from "@/app/_components/pageSection";
-import { Button } from "@/components/ui/button";
-import { toTelHref } from "@/lib/seo/phone";
 import type { HeroBlock } from "@/payload-types";
+import { PhoneButton } from "./phoneButton";
+
+const elisionPattern = /['’]$/;
 
 interface PageHeroProps {
   block: HeroBlock;
@@ -11,7 +12,7 @@ interface PageHeroProps {
 }
 
 export function PageHero({ block, phone }: PageHeroProps) {
-  const gapAfterBefore = block.titleBefore.endsWith("'") ? "" : " ";
+  const gapAfterBefore = elisionPattern.test(block.titleBefore) ? "" : " ";
 
   return (
     <PageSection tone="hero">
@@ -33,12 +34,7 @@ export function PageHero({ block, phone }: PageHeroProps) {
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <ContactButton size="lg">{block.ctaLabel}</ContactButton>
-          <Button asChild size="lg" variant="outline">
-            <a href={toTelHref(phone)}>
-              <Phone className="mr-2 h-5 w-5" />
-              {phone}
-            </a>
-          </Button>
+          <PhoneButton phone={phone} />
         </div>
       </div>
     </PageSection>

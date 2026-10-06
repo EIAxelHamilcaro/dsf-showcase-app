@@ -1,6 +1,12 @@
 import { MapPin } from "lucide-react";
 import { PageSection } from "@/app/_components/pageSection";
+import { cn } from "@/lib/utils";
 import type { ZoneListBlock } from "@/payload-types";
+
+const gridClasses: Record<NonNullable<ZoneListBlock["columns"]>, string> = {
+  "4": "grid grid-cols-2 md:grid-cols-4 gap-4",
+  "5": "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4",
+};
 
 interface ZoneListProps {
   block: ZoneListBlock;
@@ -27,10 +33,13 @@ export function ZoneList({ block }: ZoneListProps) {
             {block.intro}
           </p>
         ) : null}
-        <ul className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+        <ul className={gridClasses[block.columns ?? "5"]}>
           {block.items.map((item) => (
             <li
-              className="bg-background p-4 rounded-lg text-center font-semibold text-sm"
+              className={cn(
+                "bg-background p-4 rounded-lg text-center font-semibold",
+                !block.showMapIcon && "text-sm",
+              )}
               key={item.id ?? item.name}
             >
               {item.name}
