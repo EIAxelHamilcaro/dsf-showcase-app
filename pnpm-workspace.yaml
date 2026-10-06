@@ -4,3 +4,14 @@ onlyBuiltDependencies:
   - '@vercel/speed-insights'
   - esbuild
   - sharp
+
+overrides:
+  '@types/react': 19.2.7
+  '@types/react-dom': 19.2.3
+
+allowBuilds:
+  '@swc/core': true
+  '@tailwindcss/oxide': true
+  '@vercel/speed-insights': true
+  esbuild: true
+  sharp: false
