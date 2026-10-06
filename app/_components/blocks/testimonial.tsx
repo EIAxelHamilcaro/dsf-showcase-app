@@ -21,8 +21,9 @@ export function Testimonial({ block }: TestimonialProps) {
             className="flex gap-1 text-2xl text-star"
             role="img"
           >
+            <span className="sr-only">{"★".repeat(rating)}</span>
             {Array.from({ length: rating }, (_, index) => (
-              <span key={index.toString()}>★</span>
+              <span className="before:content-['★']" key={index.toString()} />
             ))}
           </div>
         ) : null}
