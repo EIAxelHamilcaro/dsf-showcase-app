@@ -18,6 +18,7 @@ import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { RadioGroup } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
+import { consentRequired } from "@/lib/contact/contactSchema";
 import {
   errorProps,
   FieldError,
@@ -94,7 +95,6 @@ const questions: Question[] = [
 const contactStep = questions.length + 1;
 const consentStep = contactStep + 1;
 const contactFields = ["name", "phone", "email", "adress", "message"];
-const consentRequired = "Cochez cette case pour envoyer votre demande.";
 const inputClassName =
   "mt-1 h-12 sm:h-14 text-base sm:text-lg md:text-xl px-3 sm:px-4";
 

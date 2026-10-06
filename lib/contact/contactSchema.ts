@@ -6,6 +6,8 @@ const lineBreak = /[\r\n]/;
 const invalidValue = "Cette valeur n'est pas valide";
 const singleLineOnly = "Ce champ doit tenir sur une seule ligne";
 
+export const consentRequired = "Cochez cette case pour envoyer votre demande.";
+
 const hasNoLineBreak = (value: string) => !lineBreak.test(value);
 
 const optionalText = (max: number, tooLong: string) =>
@@ -36,6 +38,7 @@ export const contactFieldsSchema = z.object({
     .trim()
     .min(1, { error: "Le téléphone est requis" })
     .refine(hasNoLineBreak, { error: singleLineOnly })
+    .max(30, { error: "Le téléphone est trop long (30 caractères maximum)" })
     .regex(phonePattern, { error: "Le format du téléphone est invalide" }),
   email: z
     .string({ error: "L'email est requis" })
@@ -64,14 +67,32 @@ export const contactFieldsSchema = z.object({
   consentPartners: optionalFlag,
 });
 
-export const contactSchema = contactFieldsSchema.extend({
-  turnstileToken: z
-    .string({ error: "Veuillez valider la vérification anti-robot" })
-    .min(1, { error: "Veuillez valider la vérification anti-robot" })
-    .max(2048, { error: "Veuillez valider la vérification anti-robot" }),
-});
+const guideAnswers = ["step1", "step2", "step3", "step4"] as const;
 
-export type ContactFields = z.infer<typeof contactFieldsSchema>;
+export const contactSchema = contactFieldsSchema
+  .extend({
+    turnstileToken: z
+      .string({ error: "Veuillez valider la vérification anti-robot" })
+      .min(1, { error: "Veuillez valider la vérification anti-robot" })
+      .max(2048, { error: "Veuillez valider la vérification anti-robot" }),
+  })
+  .superRefine((request, context) => {
+    const comesFromGuideForm =
+      request.consentPartners !== undefined ||
+      guideAnswers.some((answer) => request[answer] !== undefined);
+    const isRefused =
+      request.consentMain === false ||
+      (request.consentMain === undefined && comesFromGuideForm);
+
+    if (isRefused) {
+      context.addIssue({
+        code: "custom",
+        path: ["consentMain"],
+        message: consentRequired,
+      });
+    }
+  });
+
 export type ContactInput = z.infer<typeof contactSchema>;
 export type FieldErrors = Partial<Record<keyof ContactInput, string>>;
 

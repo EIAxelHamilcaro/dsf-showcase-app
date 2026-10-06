@@ -15,6 +15,7 @@ const request = {
   adress: "12 rue des Lilas, 41000 Blois",
   message: "Bonjour",
   step3: "baignoire",
+  consentMain: true,
   turnstileToken: "token",
 };
 
@@ -62,6 +63,7 @@ describe("handleContact", () => {
       adress: "12 rue des Lilas, 41000 Blois",
       message: "Bonjour",
       step3: "baignoire",
+      consentMain: true,
     });
     assert.equal(mail?.subject, "Nouveau contact : Marie Dupont");
     assert.match(mail?.text ?? "", /Téléphone : 06\.12\.34\.56\.78/);
@@ -207,6 +209,23 @@ describe("handleContact", () => {
 
     assert.equal(result.status, 200);
     assert.equal("website" in saved, false);
+  });
+
+  it("saves and sends nothing when the guide form comes without the main consent", async () => {
+    const deps = makeDeps();
+
+    const result = await handleContact(
+      { ...request, consentMain: false },
+      deps,
+    );
+
+    assert.equal(result.status, 400);
+    assert.deepEqual(result.body.success === false && result.body.fieldErrors, {
+      consentMain: "Cochez cette case pour envoyer votre demande.",
+    });
+    assert.equal(deps.verifyToken.mock.callCount(), 0);
+    assert.equal(deps.saveLead.mock.callCount(), 0);
+    assert.equal(deps.sendMail.mock.callCount(), 0);
   });
 
   it("answers 400 in French, without parser internals, to a body that is not an object or carries wrong types", async () => {

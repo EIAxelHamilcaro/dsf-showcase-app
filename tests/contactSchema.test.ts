@@ -85,6 +85,49 @@ describe("contactSchema", () => {
     assert.equal(parse({ name: "a".repeat(121) }).success, false);
   });
 
+  it("bounds the phone field to 30 characters", () => {
+    assert.equal(
+      parse({ phone: `06 12 34 56 78${" ".repeat(16)}` }).success,
+      true,
+    );
+    assert.equal(
+      firstMessage({ phone: `06 12 34 56 78 ${"(".repeat(16)}` }),
+      "Le téléphone est trop long (30 caractères maximum)",
+    );
+  });
+
+  it("refuses the guide form without the main consent, and leaves the two forms that have no such box alone", () => {
+    const guide = { step1: "Baignoire", consentPartners: false };
+    const refusal = "Cochez cette case pour envoyer votre demande.";
+
+    assert.equal(parse({}).success, true);
+    assert.equal(parse({ message: "Bonjour" }).success, true);
+    assert.equal(parse({ ...guide, consentMain: true }).success, true);
+    assert.equal(parse({ consentMain: true }).success, true);
+
+    for (const request of [
+      { ...guide, consentMain: false },
+      guide,
+      { consentPartners: true },
+      { step4: "Plus de 70 ans" },
+      { consentMain: false },
+    ]) {
+      const result = parse(request);
+
+      assert.equal(result.success, false, JSON.stringify(request));
+      assert.deepEqual(result.error && fieldErrorsOf(result.error), {
+        consentMain: refusal,
+      });
+    }
+  });
+
+  it("checks the consent on the server only, so the guide form can validate its contact step first", () => {
+    assert.equal(
+      contactFieldsSchema.safeParse({ ...valid, consentMain: false }).success,
+      true,
+    );
+  });
+
   it("refuses a line break inside every single-line field, and allows it in the message", () => {
     for (const field of ["name", "phone", "email", "adress", "step1"]) {
       const result = parse({ [field]: "06 12 34 56 78\nBcc: x@example.test" });
