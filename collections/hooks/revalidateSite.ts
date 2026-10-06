@@ -2,38 +2,32 @@ import { revalidatePath } from "next/cache";
 import type {
   CollectionAfterChangeHook,
   CollectionAfterDeleteHook,
+  PayloadRequest,
 } from "payload";
 
-const revalidateSite = () => {
-  revalidatePath("/", "layout");
-  revalidatePath("/sitemap.xml");
-  revalidatePath("/llms.txt");
-};
+interface ContentChange<TDoc> {
+  doc: TDoc;
+  req: PayloadRequest;
+}
 
-export const revalidateSiteAfterChange: CollectionAfterChangeHook = ({
+const revalidateSite = <TDoc>({
   doc,
   req: { context, payload },
-}) => {
+}: ContentChange<TDoc>): TDoc => {
   if (context.disableRevalidate) {
     return doc;
   }
 
-  revalidateSite();
+  revalidatePath("/", "layout");
+  revalidatePath("/sitemap.xml");
+  revalidatePath("/llms.txt");
   payload.logger.info("Revalidated the site after a content change");
 
   return doc;
 };
 
-export const revalidateSiteAfterDelete: CollectionAfterDeleteHook = ({
-  doc,
-  req: { context, payload },
-}) => {
-  if (context.disableRevalidate) {
-    return doc;
-  }
+export const revalidateSiteAfterChange: CollectionAfterChangeHook =
+  revalidateSite;
 
-  revalidateSite();
-  payload.logger.info("Revalidated the site after a page deletion");
-
-  return doc;
-};
+export const revalidateSiteAfterDelete: CollectionAfterDeleteHook =
+  revalidateSite;

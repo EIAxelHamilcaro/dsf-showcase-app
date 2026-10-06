@@ -4,6 +4,7 @@ import {
   validateHttpsUrl,
   validateInternalPath,
   validateRequiredInternalPath,
+  validateReviewCount,
   validateReviewRating,
   validateSiren,
   validateSlug,
@@ -55,6 +56,8 @@ describe("validateInternalPath", () => {
       "loiret",
       "https://example.com",
       "//evil.example",
+      "/\\evil.example",
+      "/a\\b",
       "/a b",
     ]) {
       assert.notEqual(validateInternalPath(value), true, value);
@@ -84,6 +87,20 @@ describe("validateReviewRating", () => {
   it("refuses everything else", () => {
     for (const value of [0, 6, 4.5, -1, Number.NaN]) {
       assert.notEqual(validateReviewRating(value), true, String(value));
+    }
+  });
+});
+
+describe("validateReviewCount", () => {
+  it("accepts a whole number of reviews, zero or nothing", () => {
+    for (const value of [0, 1, 128, null, undefined]) {
+      assert.equal(validateReviewCount(value), true, String(value));
+    }
+  });
+
+  it("refuses decimals and negative numbers", () => {
+    for (const value of [12.5, -1, Number.NaN]) {
+      assert.notEqual(validateReviewCount(value), true, String(value));
     }
   });
 });

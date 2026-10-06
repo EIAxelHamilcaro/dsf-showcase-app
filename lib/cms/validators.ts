@@ -2,7 +2,7 @@ import { reservedSlugs } from "../site";
 
 const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const sirenPattern = /^\d{9}$/;
-const internalPathPattern = /^\/(?!\/)\S*$/;
+const internalPathPattern = /^\/(?![/\\])[^\s\\]*$/;
 
 export function validateSlug(value: string | null | undefined): true | string {
   if (!value) {
@@ -53,6 +53,20 @@ export function validateReviewRating(
 
   if (!Number.isInteger(value) || value < 1 || value > 5) {
     return "La note est un nombre entier de 1 à 5";
+  }
+
+  return true;
+}
+
+export function validateReviewCount(
+  value: number | null | undefined,
+): true | string {
+  if (value === null || value === undefined) {
+    return true;
+  }
+
+  if (!Number.isInteger(value) || value < 0) {
+    return "Le nombre d'avis est un nombre entier, 0 ou plus";
   }
 
   return true;

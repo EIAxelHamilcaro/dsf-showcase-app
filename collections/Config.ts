@@ -3,6 +3,7 @@ import type { CollectionConfig } from "payload";
 import {
   validateHttpsUrl,
   validateRequiredInternalPath,
+  validateReviewCount,
   validateReviewRating,
   validateSiren,
 } from "../lib/cms/validators";
@@ -1101,6 +1102,7 @@ const Config: CollectionConfig = {
       label: "Nombre d'avis Google",
       type: "number",
       min: 0,
+      validate: validateReviewCount,
       admin: {
         description:
           "Nombre d'avis de la fiche Google, tel qu'affiché sur Google.",

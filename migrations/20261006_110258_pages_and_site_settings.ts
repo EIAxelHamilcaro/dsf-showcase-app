@@ -306,75 +306,8 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE INDEX "payload_locked_documents_rels_pages_id_idx" ON "payload_locked_documents_rels" USING btree ("pages_id");`)
 }
 
-export async function down({ db, payload, req }: MigrateDownArgs): Promise<void> {
-  await db.execute(sql`
-   ALTER TABLE "config_menu_services" DISABLE ROW LEVEL SECURITY;
-  ALTER TABLE "pages_blocks_hero" DISABLE ROW LEVEL SECURITY;
-  ALTER TABLE "pages_blocks_feature_cards_cards" DISABLE ROW LEVEL SECURITY;
-  ALTER TABLE "pages_blocks_feature_cards" DISABLE ROW LEVEL SECURITY;
-  ALTER TABLE "pages_blocks_zone_list_items" DISABLE ROW LEVEL SECURITY;
-  ALTER TABLE "pages_blocks_zone_list" DISABLE ROW LEVEL SECURITY;
-  ALTER TABLE "pages_blocks_testimonial" DISABLE ROW LEVEL SECURITY;
-  ALTER TABLE "pages_blocks_service_cards_cards_bullets" DISABLE ROW LEVEL SECURITY;
-  ALTER TABLE "pages_blocks_service_cards_cards" DISABLE ROW LEVEL SECURITY;
-  ALTER TABLE "pages_blocks_service_cards" DISABLE ROW LEVEL SECURITY;
-  ALTER TABLE "pages_blocks_aid_cards_cards_details" DISABLE ROW LEVEL SECURITY;
-  ALTER TABLE "pages_blocks_aid_cards_cards" DISABLE ROW LEVEL SECURITY;
-  ALTER TABLE "pages_blocks_aid_cards" DISABLE ROW LEVEL SECURITY;
-  ALTER TABLE "pages_blocks_steps_items" DISABLE ROW LEVEL SECURITY;
-  ALTER TABLE "pages_blocks_steps" DISABLE ROW LEVEL SECURITY;
-  ALTER TABLE "pages_blocks_link_cards_links" DISABLE ROW LEVEL SECURITY;
-  ALTER TABLE "pages_blocks_link_cards" DISABLE ROW LEVEL SECURITY;
-  ALTER TABLE "pages_blocks_cta" DISABLE ROW LEVEL SECURITY;
-  ALTER TABLE "pages" DISABLE ROW LEVEL SECURITY;
-  DROP TABLE "config_menu_services" CASCADE;
-  DROP TABLE "pages_blocks_hero" CASCADE;
-  DROP TABLE "pages_blocks_feature_cards_cards" CASCADE;
-  DROP TABLE "pages_blocks_feature_cards" CASCADE;
-  DROP TABLE "pages_blocks_zone_list_items" CASCADE;
-  DROP TABLE "pages_blocks_zone_list" CASCADE;
-  DROP TABLE "pages_blocks_testimonial" CASCADE;
-  DROP TABLE "pages_blocks_service_cards_cards_bullets" CASCADE;
-  DROP TABLE "pages_blocks_service_cards_cards" CASCADE;
-  DROP TABLE "pages_blocks_service_cards" CASCADE;
-  DROP TABLE "pages_blocks_aid_cards_cards_details" CASCADE;
-  DROP TABLE "pages_blocks_aid_cards_cards" CASCADE;
-  DROP TABLE "pages_blocks_aid_cards" CASCADE;
-  DROP TABLE "pages_blocks_steps_items" CASCADE;
-  DROP TABLE "pages_blocks_steps" CASCADE;
-  DROP TABLE "pages_blocks_link_cards_links" CASCADE;
-  DROP TABLE "pages_blocks_link_cards" CASCADE;
-  DROP TABLE "pages_blocks_cta" CASCADE;
-  DROP TABLE "pages" CASCADE;
-  ALTER TABLE "payload_locked_documents_rels" DROP CONSTRAINT "payload_locked_documents_rels_pages_fk";
-  
-  DROP INDEX "payload_locked_documents_rels_pages_id_idx";
-  ALTER TABLE "config_testimonials_section" DROP COLUMN "rating";
-  ALTER TABLE "config_testimonials_section" DROP COLUMN "date";
-  ALTER TABLE "config_testimonials_section" DROP COLUMN "source";
-  ALTER TABLE "config" DROP COLUMN "legal_section_legal_name";
-  ALTER TABLE "config" DROP COLUMN "legal_section_legal_form";
-  ALTER TABLE "config" DROP COLUMN "legal_section_siren";
-  ALTER TABLE "config" DROP COLUMN "legal_section_street_address";
-  ALTER TABLE "config" DROP COLUMN "legal_section_postal_code";
-  ALTER TABLE "config" DROP COLUMN "legal_section_locality";
-  ALTER TABLE "config" DROP COLUMN "google_rating";
-  ALTER TABLE "config" DROP COLUMN "google_review_count";
-  ALTER TABLE "config" DROP COLUMN "google_profile_url";
-  ALTER TABLE "media" DROP COLUMN "alt";
-  ALTER TABLE "payload_locked_documents_rels" DROP COLUMN "pages_id";
-  DROP TYPE "public"."enum_config_testimonials_section_source";
-  DROP TYPE "public"."enum_pages_blocks_feature_cards_cards_icon";
-  DROP TYPE "public"."enum_pages_blocks_feature_cards_background";
-  DROP TYPE "public"."enum_pages_blocks_feature_cards_layout";
-  DROP TYPE "public"."enum_pages_blocks_feature_cards_columns";
-  DROP TYPE "public"."enum_pages_blocks_zone_list_background";
-  DROP TYPE "public"."enum_pages_blocks_testimonial_background";
-  DROP TYPE "public"."enum_pages_blocks_service_cards_background";
-  DROP TYPE "public"."enum_pages_blocks_service_cards_columns";
-  DROP TYPE "public"."enum_pages_blocks_aid_cards_cards_icon";
-  DROP TYPE "public"."enum_pages_blocks_aid_cards_background";
-  DROP TYPE "public"."enum_pages_blocks_steps_background";
-  DROP TYPE "public"."enum_pages_blocks_link_cards_background";
-  DROP TYPE "public"."enum_pages_page_type";`)
+export async function down(_args: MigrateDownArgs): Promise<void> {
+  throw new Error(
+    "The pages_and_site_settings migration cannot be reverted: it would erase the pages, the legal identity, the review fields and the media alt texts. Restore the database from a backup instead",
+  );
 }
