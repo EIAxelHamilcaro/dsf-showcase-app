@@ -45,6 +45,14 @@ fi
 
 baseline="$(basename "${baselines[0]}" .ts)"
 
+city_migrations=("${root}"/migrations/*_city_pages_from_template.ts)
+if [ "${#city_migrations[@]}" -ne 1 ] || [ ! -f "${city_migrations[0]}" ]; then
+  echo "expected exactly one migrations/*_city_pages_from_template.ts file" >&2
+  exit 1
+fi
+
+city_migration="$(basename "${city_migrations[0]}" .ts)"
+
 run_psql -c "drop database if exists ${target} with (force)" >/dev/null
 run_psql -c "create database ${target}" >/dev/null
 docker exec -i dsf-local-pg pg_restore -U postgres -d "${target}" --no-owner --no-privileges < "${backup}"
@@ -90,6 +98,14 @@ migrated="$(fingerprint "${target}")"
 deploy "${target}" production
 expect_untouched "${target}" "${migrated}" "a second production build changed the database"
 echo "(d) OK: schema and data untouched"
+
+echo "--- city pages: one template, one record per city, no city page document left"
+city_state="$(run_psql -d "${target}" -v ON_ERROR_STOP=1 -Atc "select (select count(*) from cities) || ' city records, ' || (select count(*) from city_template) || ' template, ' || (select count(*) from pages where page_type = 'city') || ' city page documents'")"
+if [ "${city_state}" != "6 city records, 1 template, 0 city page documents" ]; then
+  echo "FAIL: ${city_state}" >&2
+  exit 1
+fi
+echo "(e) OK: ${city_state}"
 
 run_psql -d "${target}" -v ON_ERROR_STOP=1 -At -f - < "${root}/scripts/sql/rowCounts.sql" > "${work}/rows-after.txt"
 run_psql -d "${target}" -v ON_ERROR_STOP=1 -At -f - < "${root}/scripts/sql/dataChecksums.sql" > "${work}/checksums-after.txt"
@@ -150,22 +166,36 @@ dump_content() {
     | grep -v -E '^\\(un)?restrict '
 }
 
-echo "--- replay: turnkey_content, content_review_fixes and home_seo_and_aid_conditions run again on their own result, after editor changes"
+replay_twice() {
+  dump_content > "${work}/replay-before.sql"
+
+  DSF_DB="${replay}" "${root}/scripts/local.sh" pnpm exec payload migrate
+
+  dump_content > "${work}/replay-after.sql"
+
+  if ! diff -u "${work}/replay-before.sql" "${work}/replay-after.sql"; then
+    echo "FAIL: $1" >&2
+    exit 1
+  fi
+
+  run_psql -c "drop database ${replay} with (force)" >/dev/null
+}
+
+echo "--- replay 1: turnkey_content, content_review_fixes and home_seo_and_aid_conditions run again on their own result, after editor changes, on the state that precedes the city records"
 run_psql -c "drop database if exists ${replay} with (force)" >/dev/null
-run_psql -c "create database ${replay} template ${target}" >/dev/null
+run_psql -c "create database ${replay}" >/dev/null
+docker exec -i dsf-local-pg pg_restore -U postgres -d "${replay}" --no-owner --no-privileges < "${backup}"
+run_psql -d "${replay}" -v ON_ERROR_STOP=1 -v baseline="${baseline}" -f - < "${root}/scripts/sql/markBaselineApplied.sql" >/dev/null
+run_psql -d "${replay}" -v ON_ERROR_STOP=1 -c "insert into payload_migrations (name, batch) values ('${city_migration}', 1)" >/dev/null
+DSF_DB="${replay}" "${root}/scripts/local.sh" pnpm exec payload migrate >/dev/null
 run_psql -d "${replay}" -v ON_ERROR_STOP=1 -At -f - < "${root}/scripts/sql/editorEdits.sql"
-dump_content > "${work}/replay-before.sql"
+replay_twice "running the content migrations a second time changed data or overwrote an editor change"
+echo "replay 1: second run changed nothing, editor changes kept"
 
-DSF_DB="${replay}" "${root}/scripts/local.sh" pnpm exec payload migrate
-
-dump_content > "${work}/replay-after.sql"
-
-if ! diff -u "${work}/replay-before.sql" "${work}/replay-after.sql"; then
-  echo "FAIL: running the content migrations a second time changed data or overwrote an editor change" >&2
-  exit 1
-fi
-
-run_psql -c "drop database ${replay} with (force)" >/dev/null
-echo "replay: second run changed nothing, editor changes kept"
+echo "--- replay 2: city_pages_from_template runs again on its own result, after editor changes"
+run_psql -c "create database ${replay} template ${target}" >/dev/null
+run_psql -d "${replay}" -v ON_ERROR_STOP=1 -At -f - < "${root}/scripts/sql/cityEditorEdits.sql"
+replay_twice "running city_pages_from_template a second time changed data, overwrote an editor change or brought back a deleted city"
+echo "replay 2: second run changed nothing, editor changes kept, deleted city not recreated"
 
 echo "OK: no existing row lost or altered beyond scripts/sql/expectedCellChanges.txt (work files in ${work})"

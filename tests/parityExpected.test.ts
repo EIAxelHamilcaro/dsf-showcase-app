@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import { describe, it } from "node:test";
 import { faqSeed } from "../migrations/seed/faqSeed";
 import { faqFixes } from "../migrations/seed/reviewFixesSeed";
+import { cityWordingCorrections } from "../scripts/parityCityWording";
 import {
   applyCorrections,
   removeRepeatedBlocks,
@@ -128,6 +129,41 @@ describe("expected text of the 16 captured pages", () => {
         "home G1",
       ],
     );
+  });
+
+  it("replaces city wording by the template wording only where reviewed, each change listed by its reference", () => {
+    const countByPage = (slug: string) =>
+      cityWordingCorrections.filter((correction) => correction.page === slug)
+        .length;
+
+    assert.deepEqual(
+      cityWordingCorrections.map((correction) => correction.ref),
+      Array.from({ length: 32 }, (_, index) => `V${index + 1}`),
+    );
+    assert.deepEqual(
+      [
+        "douche-senior-blois",
+        "douche-senior-bourges",
+        "douche-senior-chateauroux",
+        "douche-senior-orleans",
+        "douche-senior-romorantin",
+        "douche-senior-tours",
+      ].map(countByPage),
+      [9, 3, 5, 3, 4, 8],
+    );
+
+    for (const correction of cityWordingCorrections) {
+      const expected = buildExpectedText(
+        correction.page,
+        readGolden(correction.page),
+      );
+
+      assert.ok(!expected.includes(correction.from), correction.ref);
+      assert.ok(
+        correction.to === "" || expected.includes(correction.to),
+        correction.ref,
+      );
+    }
   });
 
   it("places the FAQ of each page right before its closing call to action", () => {

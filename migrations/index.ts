@@ -11,6 +11,7 @@ import * as migration_20261006_120701_blois_testimonial_rating from './20261006_
 import * as migration_20261006_123847_turnkey_content from './20261006_123847_turnkey_content';
 import * as migration_20261006_131307_content_review_fixes from './20261006_131307_content_review_fixes';
 import * as migration_20261006_151441_home_seo_and_aid_conditions from './20261006_151441_home_seo_and_aid_conditions';
+import * as migration_20261006_154237_city_pages_from_template from './20261006_154237_city_pages_from_template';
 
 export const migrations = [
   {
@@ -76,6 +77,11 @@ export const migrations = [
   {
     up: migration_20261006_151441_home_seo_and_aid_conditions.up,
     down: migration_20261006_151441_home_seo_and_aid_conditions.down,
-    name: '20261006_151441_home_seo_and_aid_conditions'
+    name: '20261006_151441_home_seo_and_aid_conditions',
+  },
+  {
+    up: migration_20261006_154237_city_pages_from_template.up,
+    down: migration_20261006_154237_city_pages_from_template.down,
+    name: '20261006_154237_city_pages_from_template'
   },
 ];
