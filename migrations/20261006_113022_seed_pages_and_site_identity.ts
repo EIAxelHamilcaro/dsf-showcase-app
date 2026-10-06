@@ -55,6 +55,15 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
     pageIds.set(seed.slug, created.id);
   }
 
+  const configRows = await db.execute(sql`select id from config order by id`);
+
+  if (configRows.rows.length !== 1) {
+    throw new Error(
+      `Expected exactly one config row to receive the legal identity and the Services menu, found ${configRows.rows.length}. Nothing was written: fix the config collection, then run the migration again`,
+    );
+  }
+
+  const configId = Number(configRows.rows[0]?.id);
   const identity = siteIdentitySeed;
 
   await db.execute(sql`
@@ -65,26 +74,22 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
       legal_section_street_address = case when coalesce(btrim(legal_section_street_address), '') = '' then ${identity.streetAddress} else legal_section_street_address end,
       legal_section_postal_code = case when coalesce(btrim(legal_section_postal_code), '') = '' then ${identity.postalCode} else legal_section_postal_code end,
       legal_section_locality = case when coalesce(btrim(legal_section_locality), '') = '' then ${identity.locality} else legal_section_locality end
-    where id = 1
+    where id = ${configId}
   `);
 
-  const configRows = await db.execute(
-    sql`select count(*)::int as total from config where id = 1`,
-  );
   const menuRows = await db.execute(
-    sql`select count(*)::int as total from config_menu_services where _parent_id = 1`,
+    sql`select count(*)::int as total from config_menu_services where _parent_id = ${configId}`,
   );
-  const hasConfig = Number(configRows.rows[0]?.total ?? 0) > 0;
   const hasMenu = Number(menuRows.rows[0]?.total ?? 0) > 0;
 
-  if (!hasConfig || hasMenu) {
+  if (hasMenu) {
     return;
   }
 
   for (const [index, item] of menuServicesSeed.entries()) {
     await db.execute(sql`
       insert into config_menu_services (_order, _parent_id, id, label, href, description)
-      values (${index + 1}, 1, substr(md5(random()::text || clock_timestamp()::text), 1, 24), ${item.label}, ${item.href}, ${item.description})
+      values (${index + 1}, ${configId}, substr(md5(random()::text || clock_timestamp()::text), 1, 24), ${item.label}, ${item.href}, ${item.description})
     `);
   }
 }

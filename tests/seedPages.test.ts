@@ -1,10 +1,62 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { describe, it } from "node:test";
 import { pagesSeed } from "../migrations/seed/pagesSeed";
 
 const slugs = new Set(pagesSeed.map((page) => page.slug));
 const emoji = /\p{Extended_Pictographic}/u;
 const dashes = /[\u2013\u2014]/;
+
+const hiddenKeys = new Set([
+  "id",
+  "blockName",
+  "blockType",
+  "background",
+  "layout",
+  "columns",
+  "spacing",
+  "variant",
+  "icon",
+  "href",
+  "linkHref",
+  "buttonHref",
+]);
+
+function collectVisibleTexts(value: unknown, texts: string[] = []): string[] {
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      collectVisibleTexts(item, texts);
+    }
+
+    return texts;
+  }
+
+  if (typeof value !== "object" || value === null) {
+    return texts;
+  }
+
+  for (const [key, child] of Object.entries(value)) {
+    if (hiddenKeys.has(key)) {
+      continue;
+    }
+
+    if (typeof child === "string") {
+      texts.push(child);
+      continue;
+    }
+
+    collectVisibleTexts(child, texts);
+  }
+
+  return texts;
+}
+
+function readGoldenText(slug: string): string {
+  return readFileSync(
+    new URL(`./fixtures/mainText/${slug}.txt`, import.meta.url),
+    "utf8",
+  );
+}
 
 function collectHrefs(value: unknown, hrefs: string[] = []): string[] {
   if (Array.isArray(value)) {
@@ -97,6 +149,19 @@ describe("pagesSeed", () => {
           slugs.has(href.replace(/^\//, "")),
           `${page.slug} links to ${href}`,
         );
+      }
+    }
+  });
+
+  it("only holds texts that appear in the captured text of the page", () => {
+    for (const page of pagesSeed) {
+      const golden = readGoldenText(page.slug);
+      const texts = collectVisibleTexts(page.layout);
+
+      assert.ok(texts.length > 0, page.slug);
+
+      for (const text of texts) {
+        assert.ok(golden.includes(text), `${page.slug} seeds "${text}"`);
       }
     }
   });
