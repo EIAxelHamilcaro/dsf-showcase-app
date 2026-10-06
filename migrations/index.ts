@@ -7,11 +7,13 @@ import * as migration_20261006_113018_faq_text_and_legal_blocks from './20261006
 import * as migration_20261006_113020_home_seo_and_information_pages from './20261006_113020_home_seo_and_information_pages';
 import * as migration_20261006_113021_cities_and_city_template from './20261006_113021_cities_and_city_template';
 import * as migration_20261006_113022_seed_pages_and_site_identity from './20261006_113022_seed_pages_and_site_identity';
+import * as migration_20261006_113023_city_template_service_and_aid_sections from './20261006_113023_city_template_service_and_aid_sections';
 import * as migration_20261006_120701_blois_testimonial_rating from './20261006_120701_blois_testimonial_rating';
 import * as migration_20261006_123847_turnkey_content from './20261006_123847_turnkey_content';
 import * as migration_20261006_131307_content_review_fixes from './20261006_131307_content_review_fixes';
 import * as migration_20261006_151441_home_seo_and_aid_conditions from './20261006_151441_home_seo_and_aid_conditions';
 import * as migration_20261006_154237_city_pages_from_template from './20261006_154237_city_pages_from_template';
+import * as migration_20261006_155640_city_pages_share_one_model from './20261006_155640_city_pages_share_one_model';
 
 export const migrations = [
   {
@@ -60,6 +62,11 @@ export const migrations = [
     name: '20261006_113022_seed_pages_and_site_identity',
   },
   {
+    up: migration_20261006_113023_city_template_service_and_aid_sections.up,
+    down: migration_20261006_113023_city_template_service_and_aid_sections.down,
+    name: '20261006_113023_city_template_service_and_aid_sections',
+  },
+  {
     up: migration_20261006_120701_blois_testimonial_rating.up,
     down: migration_20261006_120701_blois_testimonial_rating.down,
     name: '20261006_120701_blois_testimonial_rating',
@@ -82,6 +89,11 @@ export const migrations = [
   {
     up: migration_20261006_154237_city_pages_from_template.up,
     down: migration_20261006_154237_city_pages_from_template.down,
-    name: '20261006_154237_city_pages_from_template'
+    name: '20261006_154237_city_pages_from_template',
+  },
+  {
+    up: migration_20261006_155640_city_pages_share_one_model.up,
+    down: migration_20261006_155640_city_pages_share_one_model.down,
+    name: '20261006_155640_city_pages_share_one_model'
   },
 ];

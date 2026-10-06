@@ -1068,7 +1068,7 @@ export interface CtaBlock {
   blockType: 'cta';
 }
 /**
- * Une fiche par ville. La page est générée à partir du modèle des pages ville et de cette fiche
+ * Une fiche par ville. Toutes les pages ville suivent le modèle des pages ville, seul le contenu de cette fiche change
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "cities".
@@ -1091,20 +1091,17 @@ export interface City {
    * À remplir seulement s'il diffère du nom de la ville (Romorantin-Lanthenay). Repris dans les données structurées
    */
   areaName?: string | null;
-  /**
-   * Laisser vide pour utiliser celle du modèle (ville, agglomération, département)
-   */
   locationLine?: string | null;
-  /**
-   * Laisser vide pour utiliser celui du modèle
-   */
   zonesHeading?: string | null;
+  /**
+   * La ville en première ligne. Les 2e et 3e lignes remplacent {communes} dans le modèle
+   */
   zones: {
     name: string;
     id?: string | null;
   }[];
   /**
-   * Facultatif. Affichées entre la liste des communes et le texte local
+   * Facultatif. Affiché entre la liste des communes et les prestations
    */
   extraSections?: (TestimonialBlock | ServiceCardsBlock | AidCardsBlock)[] | null;
   localSection: {
@@ -1945,7 +1942,7 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   createdAt?: T;
 }
 /**
- * Texte commun à toutes les pages ville. {ville}, {departement}, {code} sont remplacés par le nom de la ville, le nom et le numéro de son département
+ * Texte commun à toutes les pages ville. {ville}, {departement}, {code}, {communes} sont remplacés par le nom de la ville, le nom et le numéro de son département, et les 2e et 3e lignes de sa liste de communes
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "cityTemplate".
@@ -1994,6 +1991,57 @@ export interface CityTemplate {
     showMapIcon?: boolean | null;
     intro?: string | null;
     outro?: string | null;
+  };
+  /**
+   * Section affichée si elle a un titre et des cartes
+   */
+  serviceCards?: {
+    background?: ('default' | 'muted') | null;
+    heading?: string | null;
+    columns?: ('2' | '3') | null;
+    cards?:
+      | {
+          title: string;
+          description?: string | null;
+          bullets?:
+            | {
+                text: string;
+                id?: string | null;
+              }[]
+            | null;
+          linkLabel?: string | null;
+          linkHref?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  /**
+   * Section affichée si elle a un titre
+   */
+  aidCards?: {
+    background?: ('default' | 'muted') | null;
+    variant?: ('compact' | 'detailed') | null;
+    heading?: string | null;
+    intro?: string | null;
+    cards?:
+      | {
+          icon: 'none' | 'mapPin' | 'clock' | 'shield' | 'euro' | 'checkCircle' | 'fileText';
+          title: string;
+          text: string;
+          highlight?: string | null;
+          details?:
+            | {
+                label: string;
+                text: string;
+                id?: string | null;
+              }[]
+            | null;
+          note?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+    buttonLabel?: string | null;
+    buttonHref?: string | null;
   };
   cta: {
     heading: string;
@@ -2055,6 +2103,55 @@ export interface CityTemplateSelect<T extends boolean = true> {
         showMapIcon?: T;
         intro?: T;
         outro?: T;
+      };
+  serviceCards?:
+    | T
+    | {
+        background?: T;
+        heading?: T;
+        columns?: T;
+        cards?:
+          | T
+          | {
+              title?: T;
+              description?: T;
+              bullets?:
+                | T
+                | {
+                    text?: T;
+                    id?: T;
+                  };
+              linkLabel?: T;
+              linkHref?: T;
+              id?: T;
+            };
+      };
+  aidCards?:
+    | T
+    | {
+        background?: T;
+        variant?: T;
+        heading?: T;
+        intro?: T;
+        cards?:
+          | T
+          | {
+              icon?: T;
+              title?: T;
+              text?: T;
+              highlight?: T;
+              details?:
+                | T
+                | {
+                    label?: T;
+                    text?: T;
+                    id?: T;
+                  };
+              note?: T;
+              id?: T;
+            };
+        buttonLabel?: T;
+        buttonHref?: T;
       };
   cta?:
     | T

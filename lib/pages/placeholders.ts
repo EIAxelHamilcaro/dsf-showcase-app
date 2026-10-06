@@ -1,8 +1,16 @@
-export const placeholderNames = ["ville", "departement", "code"] as const;
+export const placeholderNames = [
+  "ville",
+  "departement",
+  "code",
+  "communes",
+] as const;
 
 export type PlaceholderName = (typeof placeholderNames)[number];
 
-export type PlaceholderValues = Record<PlaceholderName, string>;
+export type PlaceholderValues = Record<
+  Exclude<PlaceholderName, "communes">,
+  string
+> & { communes?: string };
 
 const placeholderPattern = /\{([^{}]*)\}/g;
 
@@ -22,7 +30,7 @@ export function fillPlaceholders(
   values: PlaceholderValues,
 ): string {
   return text.replace(placeholderPattern, (match, name: string) =>
-    isPlaceholderName(name) ? values[name] : match,
+    isPlaceholderName(name) ? (values[name] ?? "") : match,
   );
 }
 

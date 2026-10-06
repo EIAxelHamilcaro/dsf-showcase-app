@@ -3,7 +3,10 @@ import { readFileSync } from "node:fs";
 import { describe, it } from "node:test";
 import { faqSeed } from "../migrations/seed/faqSeed";
 import { faqFixes } from "../migrations/seed/reviewFixesSeed";
-import { cityWordingCorrections } from "../scripts/parityCityWording";
+import {
+  citySectionAdditions,
+  cityWordingCorrections,
+} from "../scripts/parityCityWording";
 import {
   applyCorrections,
   removeRepeatedBlocks,
@@ -138,7 +141,7 @@ describe("expected text of the 16 captured pages", () => {
 
     assert.deepEqual(
       cityWordingCorrections.map((correction) => correction.ref),
-      Array.from({ length: 32 }, (_, index) => `V${index + 1}`),
+      Array.from({ length: 36 }, (_, index) => `V${index + 1}`),
     );
     assert.deepEqual(
       [
@@ -149,8 +152,25 @@ describe("expected text of the 16 captured pages", () => {
         "douche-senior-romorantin",
         "douche-senior-tours",
       ].map(countByPage),
-      [9, 3, 5, 3, 4, 8],
+      [7, 7, 7, 7, 8, 0],
     );
+    assert.deepEqual(Object.keys(citySectionAdditions), [
+      "douche-senior-bourges",
+      "douche-senior-chateauroux",
+      "douche-senior-orleans",
+      "douche-senior-romorantin",
+      "douche-senior-tours",
+    ]);
+
+    for (const slug of Object.keys(citySectionAdditions)) {
+      const expected = buildExpectedText(slug, readGolden(slug));
+
+      assert.ok(
+        expected.indexOf("Tout savoir sur les aides →") >
+          expected.indexOf("Nos prestations à"),
+        slug,
+      );
+    }
 
     for (const correction of cityWordingCorrections) {
       const expected = buildExpectedText(
@@ -158,9 +178,10 @@ describe("expected text of the 16 captured pages", () => {
         readGolden(correction.page),
       );
 
-      assert.ok(!expected.includes(correction.from), correction.ref);
+      assert.ok(expected.includes(correction.to), correction.ref);
       assert.ok(
-        correction.to === "" || expected.includes(correction.to),
+        correction.to.includes(correction.from) ||
+          !expected.includes(correction.from),
         correction.ref,
       );
     }

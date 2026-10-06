@@ -3,10 +3,12 @@ import {
   listPlaceholderProblems,
   placeholderNames,
 } from "../lib/pages/placeholders";
+import { AidCardsBlock } from "./blocks/AidCardsBlock";
 import { CtaBlock } from "./blocks/CtaBlock";
 import { FeatureCardsBlock } from "./blocks/FeatureCardsBlock";
 import { HeroBlock } from "./blocks/HeroBlock";
-import { fieldsOf } from "./blocks/shared";
+import { ServiceCardsBlock } from "./blocks/ServiceCardsBlock";
+import { fieldsOf, optionalFieldsOf } from "./blocks/shared";
 import { ZoneListBlock } from "./blocks/ZoneListBlock";
 import { revalidateSiteAfterGlobalChange } from "./hooks/revalidateSite";
 
@@ -20,7 +22,7 @@ const CityTemplate: GlobalConfig = {
     update: ({ req }) => Boolean(req.user),
   },
   admin: {
-    description: `Texte commun à toutes les pages ville. ${placeholderList} sont remplacés par le nom de la ville, le nom et le numéro de son département`,
+    description: `Texte commun à toutes les pages ville. ${placeholderList} sont remplacés par le nom de la ville, le nom et le numéro de son département, et les 2e et 3e lignes de sa liste de communes`,
   },
   hooks: {
     beforeValidate: [
@@ -96,6 +98,22 @@ const CityTemplate: GlobalConfig = {
         description: "Les communes elles-mêmes se saisissent dans chaque ville",
       },
       fields: fieldsOf(ZoneListBlock, ["items", "columns"]),
+    },
+    {
+      name: "serviceCards",
+      type: "group",
+      label: "Prestations",
+      admin: {
+        description: "Section affichée si elle a un titre et des cartes",
+      },
+      fields: optionalFieldsOf(ServiceCardsBlock),
+    },
+    {
+      name: "aidCards",
+      type: "group",
+      label: "Aides financières",
+      admin: { description: "Section affichée si elle a un titre" },
+      fields: optionalFieldsOf(AidCardsBlock),
     },
     {
       name: "cta",

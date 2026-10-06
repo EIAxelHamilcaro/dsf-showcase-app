@@ -24,7 +24,7 @@ const Cities: CollectionConfig = {
     useAsTitle: "name",
     defaultColumns: ["name", "slug", "department", "updatedAt"],
     description:
-      "Une fiche par ville. La page est générée à partir du modèle des pages ville et de cette fiche",
+      "Une fiche par ville. Toutes les pages ville suivent le modèle des pages ville, seul le contenu de cette fiche change",
     livePreview: {
       url: ({ data }) =>
         `${process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000"}/${data?.slug ?? ""}`,
@@ -85,21 +85,22 @@ const Cities: CollectionConfig = {
       name: "locationLine",
       type: "text",
       label: "Ligne de localisation propre à la ville",
-      admin: {
-        description:
-          "Laisser vide pour utiliser celle du modèle (ville, agglomération, département)",
-      },
+      admin: { hidden: true },
     },
     {
       name: "zonesHeading",
       type: "text",
       label: "Titre de la liste des communes propre à la ville",
-      admin: { description: "Laisser vide pour utiliser celui du modèle" },
+      admin: { hidden: true },
     },
     {
       name: "zones",
       type: "array",
       label: "Communes et quartiers desservis",
+      admin: {
+        description:
+          "La ville en première ligne. Les 2e et 3e lignes remplacent {communes} dans le modèle",
+      },
       required: true,
       minRows: 1,
       fields: [{ name: "name", type: "text", label: "Nom", required: true }],
@@ -107,12 +108,13 @@ const Cities: CollectionConfig = {
     {
       name: "extraSections",
       type: "blocks",
-      label: "Sections supplémentaires",
+      label: "Témoignage",
       admin: {
         description:
-          "Facultatif. Affichées entre la liste des communes et le texte local",
+          "Facultatif. Affiché entre la liste des communes et les prestations",
       },
       blocks: [TestimonialBlock, ServiceCardsBlock, AidCardsBlock],
+      filterOptions: ({ req }) => (req.user ? ["testimonial"] : true),
     },
     {
       name: "localSection",

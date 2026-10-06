@@ -11,6 +11,21 @@ import type { City, CityTemplate, Config1, Page } from "../payload-types";
 const template: CityTemplate = {
   id: 1,
   ...cityTemplateSeed,
+  seo: {
+    title: cityTemplateSeed.seo.title,
+    description: "Douche à {ville} et agglo ({communes}).",
+  },
+  serviceCards: {
+    background: "muted",
+    heading: "Nos prestations à {ville}",
+    columns: "2",
+    cards: [{ title: "Douche PMR sur-mesure" }],
+  },
+  aidCards: {
+    background: "default",
+    heading: "Aides financières disponibles à {ville}",
+    cards: [{ icon: "none", title: "MaPrimeAdapt", text: "Aide de l'État" }],
+  },
   updatedAt: "2026-05-01T10:00:00.000Z",
 };
 
@@ -32,7 +47,12 @@ const tours: City = {
   name: "Tours",
   slug: "douche-senior-tours",
   department: 7,
-  zones: [{ name: "Centre-ville Tours" }, { name: "Joué-lès-Tours" }],
+  zones: [
+    { name: "Centre-ville Tours" },
+    { name: "Joué-lès-Tours" },
+    { name: "Saint-Cyr-sur-Loire" },
+    { name: "La Riche" },
+  ],
   localSection: {
     background: "default",
     heading: "Comment se passe une installation à Tours",
@@ -67,11 +87,24 @@ const blockTypes = (page: Page) =>
 describe("composeCityPage", () => {
   it("builds a standard city page from the template and the city record", () => {
     const page = compose(tours);
-    const [hero, , zoneList, , , cta] = page.layout;
+    const [hero, , zoneList, services, aids] = page.layout;
+    const cta = page.layout.at(-1);
 
     assert.equal(
       blockTypes(page),
-      "hero featureCards zoneList textSection faq cta",
+      "hero featureCards zoneList serviceCards aidCards textSection faq cta",
+    );
+    assert.equal(
+      services?.blockType === "serviceCards" && services.heading,
+      "Nos prestations à Tours",
+    );
+    assert.equal(
+      aids?.blockType === "aidCards" && aids.heading,
+      "Aides financières disponibles à Tours",
+    );
+    assert.equal(
+      page.seo.description,
+      "Douche à Tours et agglo (Joué-lès-Tours, Saint-Cyr-sur-Loire).",
     );
     assert.equal(page.slug, "douche-senior-tours");
     assert.equal(page.navLabel, "Douche Senior Tours");
@@ -95,10 +128,10 @@ describe("composeCityPage", () => {
       cta?.blockType === "cta" && cta.heading,
       "Vous habitez Tours ?",
     );
-    assert.doesNotMatch(JSON.stringify(page), /\{(ville|departement|code)\}/);
+    assert.doesNotMatch(JSON.stringify(page), /\{[a-z]*\}/);
   });
 
-  it("places the optional sections of a city between its communes and its local text", () => {
+  it("places the testimonial of a city between its communes and the shared sections", () => {
     const page = compose({
       ...tours,
       extraSections: [
@@ -109,18 +142,6 @@ describe("composeCityPage", () => {
           author: "Client",
           rating: 5,
         },
-        {
-          blockType: "serviceCards",
-          background: "muted",
-          heading: "Nos prestations",
-          columns: "2",
-          cards: [{ title: "Prestation" }],
-        },
-        {
-          blockType: "aidCards",
-          background: "default",
-          heading: "Aides",
-        },
       ],
     });
 
@@ -130,7 +151,24 @@ describe("composeCityPage", () => {
     );
   });
 
-  it("lets a city keep its own location line, zone heading, official name and search texts", () => {
+  it("leaves out a shared section the template does not fill", () => {
+    const page = composeCityPage({
+      template: {
+        ...template,
+        serviceCards: { heading: "Sans carte" },
+        aidCards: {},
+      },
+      city: tours,
+      department,
+    });
+
+    assert.equal(
+      page && blockTypes(page),
+      "hero featureCards zoneList textSection faq cta",
+    );
+  });
+
+  it("lets a city keep its official name and search texts, never its own wording", () => {
     const page = compose({
       ...tours,
       areaName: "Tours Métropole",
@@ -144,15 +182,15 @@ describe("composeCityPage", () => {
     assert.equal(page.seo.title, "Titre propre");
     assert.equal(
       page.seo.description,
-      "Installation douche sécurisée à Tours et agglo. Artisan certifié. Installation 1 jour.",
+      "Douche à Tours et agglo (Joué-lès-Tours, Saint-Cyr-sur-Loire).",
     );
     assert.equal(
       hero?.blockType === "hero" && hero.location,
-      "Tours et Val de Loire - Indre-et-Loire (37)",
+      "Tours et agglomération - Indre-et-Loire (37)",
     );
     assert.equal(
       zoneList?.blockType === "zoneList" && zoneList.heading,
-      "Zones d'intervention en Touraine",
+      "Zones d'intervention à Tours",
     );
   });
 
@@ -230,7 +268,7 @@ describe("a composed city page in the site lists", () => {
   it("lists the city in llms.txt under its h1 and description", () => {
     assert.ok(
       buildLlmsTxt({ pages: all, config }).includes(
-        "## Villes\n\n- [Installation Douche Sécurisée pour Seniors à Tours](https://www.douche-senior-france.com/douche-senior-tours): Installation douche sécurisée à Tours et agglo. Artisan certifié. Installation 1 jour.",
+        "## Villes\n\n- [Installation Douche Sécurisée pour Seniors à Tours](https://www.douche-senior-france.com/douche-senior-tours): Douche à Tours et agglo (Joué-lès-Tours, Saint-Cyr-sur-Loire).",
       ),
     );
   });

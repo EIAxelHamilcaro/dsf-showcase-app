@@ -24,12 +24,17 @@ export function composeCityPage({
     return undefined;
   }
 
-  const { navLabel, seo, hero, featureCards, zoneList, cta } =
+  const { navLabel, seo, hero, featureCards, zoneList, cta, ...sections } =
     fillAllPlaceholders(template, {
       ville: city.name,
       departement: department.areaName ?? "",
       code: department.departmentCode ?? "",
+      communes: city.zones
+        .slice(1, 3)
+        .map((zone) => zone.name)
+        .join(", "),
     });
+  const { serviceCards, aidCards } = sections;
 
   return {
     id: city.id,
@@ -43,19 +48,32 @@ export function composeCityPage({
       description: filled(city.seo?.description) ?? seo.description,
     },
     layout: [
-      {
-        ...hero,
-        location: filled(city.locationLine) ?? hero.location,
-        blockType: "hero",
-      },
+      { ...hero, blockType: "hero" },
       { ...featureCards, blockType: "featureCards" },
-      {
-        ...zoneList,
-        heading: filled(city.zonesHeading) ?? zoneList.heading,
-        items: city.zones,
-        blockType: "zoneList",
-      },
+      { ...zoneList, items: city.zones, blockType: "zoneList" },
       ...(city.extraSections ?? []),
+      ...(serviceCards?.heading && serviceCards.cards?.length
+        ? [
+            {
+              ...serviceCards,
+              background: serviceCards.background ?? "default",
+              columns: serviceCards.columns ?? "2",
+              heading: serviceCards.heading,
+              cards: serviceCards.cards,
+              blockType: "serviceCards" as const,
+            },
+          ]
+        : []),
+      ...(aidCards?.heading
+        ? [
+            {
+              ...aidCards,
+              background: aidCards.background ?? "default",
+              heading: aidCards.heading,
+              blockType: "aidCards" as const,
+            },
+          ]
+        : []),
       { ...city.localSection, blockType: "textSection" },
       { ...city.faq, blockType: "faq" },
       { ...cta, blockType: "cta" },

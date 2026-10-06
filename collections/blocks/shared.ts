@@ -22,6 +22,13 @@ export const iconOptions = [
   { label: "Document", value: "fileText" },
 ];
 
+export const optionalFieldsOf = (block: Block): Field[] =>
+  fieldsOf(block).map((field) =>
+    field.type === "text" || field.type === "select" || field.type === "array"
+      ? { ...field, required: false }
+      : field,
+  );
+
 export const backgroundField: Field = {
   name: "background",
   type: "select",

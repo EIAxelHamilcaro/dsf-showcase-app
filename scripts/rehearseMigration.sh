@@ -45,13 +45,11 @@ fi
 
 baseline="$(basename "${baselines[0]}" .ts)"
 
-city_migrations=("${root}"/migrations/*_city_pages_from_template.ts)
-if [ "${#city_migrations[@]}" -ne 1 ] || [ ! -f "${city_migrations[0]}" ]; then
-  echo "expected exactly one migrations/*_city_pages_from_template.ts file" >&2
+city_migrations=("${root}"/migrations/*_city_pages_from_template.ts "${root}"/migrations/*_city_pages_share_one_model.ts)
+if [ "${#city_migrations[@]}" -ne 2 ] || [ ! -f "${city_migrations[0]}" ] || [ ! -f "${city_migrations[1]}" ]; then
+  echo "expected exactly one migrations/*_city_pages_from_template.ts and one migrations/*_city_pages_share_one_model.ts file" >&2
   exit 1
 fi
-
-city_migration="$(basename "${city_migrations[0]}" .ts)"
 
 run_psql -c "drop database if exists ${target} with (force)" >/dev/null
 run_psql -c "create database ${target}" >/dev/null
@@ -186,16 +184,18 @@ run_psql -c "drop database if exists ${replay} with (force)" >/dev/null
 run_psql -c "create database ${replay}" >/dev/null
 docker exec -i dsf-local-pg pg_restore -U postgres -d "${replay}" --no-owner --no-privileges < "${backup}"
 run_psql -d "${replay}" -v ON_ERROR_STOP=1 -v baseline="${baseline}" -f - < "${root}/scripts/sql/markBaselineApplied.sql" >/dev/null
-run_psql -d "${replay}" -v ON_ERROR_STOP=1 -c "insert into payload_migrations (name, batch) values ('${city_migration}', 1)" >/dev/null
+for city_migration in "${city_migrations[@]}"; do
+  run_psql -d "${replay}" -v ON_ERROR_STOP=1 -c "insert into payload_migrations (name, batch) values ('$(basename "${city_migration}" .ts)', 1)" >/dev/null
+done
 DSF_DB="${replay}" "${root}/scripts/local.sh" pnpm exec payload migrate >/dev/null
 run_psql -d "${replay}" -v ON_ERROR_STOP=1 -At -f - < "${root}/scripts/sql/editorEdits.sql"
 replay_twice "running the content migrations a second time changed data or overwrote an editor change"
 echo "replay 1: second run changed nothing, editor changes kept"
 
-echo "--- replay 2: city_pages_from_template runs again on its own result, after editor changes"
+echo "--- replay 2: city_pages_from_template and city_pages_share_one_model run again on their own result, after editor changes"
 run_psql -c "create database ${replay} template ${target}" >/dev/null
 run_psql -d "${replay}" -v ON_ERROR_STOP=1 -At -f - < "${root}/scripts/sql/cityEditorEdits.sql"
-replay_twice "running city_pages_from_template a second time changed data, overwrote an editor change or brought back a deleted city"
+replay_twice "running the city migrations a second time changed data, overwrote an editor change or brought back a deleted city"
 echo "replay 2: second run changed nothing, editor changes kept, deleted city not recreated"
 
 echo "OK: no existing row lost or altered beyond scripts/sql/expectedCellChanges.txt (work files in ${work})"

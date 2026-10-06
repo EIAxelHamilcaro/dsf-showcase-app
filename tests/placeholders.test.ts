@@ -6,18 +6,24 @@ import {
   findUnknownPlaceholders,
   listPlaceholderProblems,
 } from "../lib/pages/placeholders";
+import { templateWording } from "../migrations/seed/cityModelSeed";
 import { cityTemplateSeed } from "../migrations/seed/cityTemplateSeed";
 
-const tours = { ville: "Tours", departement: "Indre-et-Loire", code: "37" };
+const tours = {
+  ville: "Tours",
+  departement: "Indre-et-Loire",
+  code: "37",
+  communes: "Joué-lès-Tours, Saint-Cyr-sur-Loire",
+};
 
 describe("city template placeholders", () => {
   it("replaces every known placeholder, as often as it appears", () => {
     assert.equal(
       fillPlaceholders(
-        "{ville} et agglomération - {departement} ({code}), {ville}",
+        "{ville} et agglo ({communes}) - {departement} ({code}), {ville}",
         tours,
       ),
-      "Tours et agglomération - Indre-et-Loire (37), Tours",
+      "Tours et agglo (Joué-lès-Tours, Saint-Cyr-sur-Loire) - Indre-et-Loire (37), Tours",
     );
   });
 
@@ -66,5 +72,6 @@ describe("city template placeholders", () => {
 
   it("ships a template that only uses known placeholders", () => {
     assert.deepEqual(listPlaceholderProblems(cityTemplateSeed), []);
+    assert.deepEqual(listPlaceholderProblems(templateWording), []);
   });
 });

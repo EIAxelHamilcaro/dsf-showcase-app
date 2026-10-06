@@ -138,6 +138,10 @@ export const enum_city_template_feature_cards_cards_icon = pgEnum(
   "enum_city_template_feature_cards_cards_icon",
   ["none", "mapPin", "clock", "shield", "euro", "checkCircle", "fileText"],
 );
+export const enum_city_template_aid_cards_cards_icon = pgEnum(
+  "enum_city_template_aid_cards_cards_icon",
+  ["none", "mapPin", "clock", "shield", "euro", "checkCircle", "fileText"],
+);
 export const enum_city_template_feature_cards_background = pgEnum(
   "enum_city_template_feature_cards_background",
   ["default", "muted"],
@@ -157,6 +161,22 @@ export const enum_city_template_feature_cards_spacing = pgEnum(
 export const enum_city_template_zone_list_background = pgEnum(
   "enum_city_template_zone_list_background",
   ["default", "muted"],
+);
+export const enum_city_template_service_cards_background = pgEnum(
+  "enum_city_template_service_cards_background",
+  ["default", "muted"],
+);
+export const enum_city_template_service_cards_columns = pgEnum(
+  "enum_city_template_service_cards_columns",
+  ["2", "3"],
+);
+export const enum_city_template_aid_cards_background = pgEnum(
+  "enum_city_template_aid_cards_background",
+  ["default", "muted"],
+);
+export const enum_city_template_aid_cards_variant = pgEnum(
+  "enum_city_template_aid_cards_variant",
+  ["compact", "detailed"],
 );
 
 export const leads = pgTable(
@@ -1875,6 +1895,100 @@ export const city_template_feature_cards_cards = pgTable(
   ],
 );
 
+export const city_template_service_cards_cards_bullets = pgTable(
+  "city_template_service_cards_cards_bullets",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: varchar("_parent_id").notNull(),
+    id: varchar("id").primaryKey(),
+    text: varchar("text").notNull(),
+  },
+  (columns) => [
+    index("city_template_service_cards_cards_bullets_order_idx").on(
+      columns._order,
+    ),
+    index("city_template_service_cards_cards_bullets_parent_id_idx").on(
+      columns._parentID,
+    ),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [city_template_service_cards_cards.id],
+      name: "city_template_service_cards_cards_bullets_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const city_template_service_cards_cards = pgTable(
+  "city_template_service_cards_cards",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: integer("_parent_id").notNull(),
+    id: varchar("id").primaryKey(),
+    title: varchar("title").notNull(),
+    description: varchar("description"),
+    linkLabel: varchar("link_label"),
+    linkHref: varchar("link_href"),
+  },
+  (columns) => [
+    index("city_template_service_cards_cards_order_idx").on(columns._order),
+    index("city_template_service_cards_cards_parent_id_idx").on(
+      columns._parentID,
+    ),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [city_template.id],
+      name: "city_template_service_cards_cards_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const city_template_aid_cards_cards_details = pgTable(
+  "city_template_aid_cards_cards_details",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: varchar("_parent_id").notNull(),
+    id: varchar("id").primaryKey(),
+    label: varchar("label").notNull(),
+    text: varchar("text").notNull(),
+  },
+  (columns) => [
+    index("city_template_aid_cards_cards_details_order_idx").on(columns._order),
+    index("city_template_aid_cards_cards_details_parent_id_idx").on(
+      columns._parentID,
+    ),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [city_template_aid_cards_cards.id],
+      name: "city_template_aid_cards_cards_details_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const city_template_aid_cards_cards = pgTable(
+  "city_template_aid_cards_cards",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: integer("_parent_id").notNull(),
+    id: varchar("id").primaryKey(),
+    icon: enum_city_template_aid_cards_cards_icon("icon")
+      .notNull()
+      .default("none"),
+    title: varchar("title").notNull(),
+    text: varchar("text").notNull(),
+    highlight: varchar("highlight"),
+    note: varchar("note"),
+  },
+  (columns) => [
+    index("city_template_aid_cards_cards_order_idx").on(columns._order),
+    index("city_template_aid_cards_cards_parent_id_idx").on(columns._parentID),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [city_template.id],
+      name: "city_template_aid_cards_cards_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
 export const city_template = pgTable("city_template", {
   id: serial("id").primaryKey(),
   navLabel: varchar("nav_label").notNull(),
@@ -1915,6 +2029,24 @@ export const city_template = pgTable("city_template", {
   zoneList_showMapIcon: boolean("zone_list_show_map_icon").default(false),
   zoneList_intro: varchar("zone_list_intro"),
   zoneList_outro: varchar("zone_list_outro"),
+  serviceCards_background: enum_city_template_service_cards_background(
+    "service_cards_background",
+  ).default("default"),
+  serviceCards_heading: varchar("service_cards_heading"),
+  serviceCards_columns: enum_city_template_service_cards_columns(
+    "service_cards_columns",
+  ).default("2"),
+  aidCards_background: enum_city_template_aid_cards_background(
+    "aid_cards_background",
+  ).default("default"),
+  aidCards_variant:
+    enum_city_template_aid_cards_variant("aid_cards_variant").default(
+      "compact",
+    ),
+  aidCards_heading: varchar("aid_cards_heading"),
+  aidCards_intro: varchar("aid_cards_intro"),
+  aidCards_buttonLabel: varchar("aid_cards_button_label"),
+  aidCards_buttonHref: varchar("aid_cards_button_href"),
   cta_heading: varchar("cta_heading").notNull(),
   cta_text: varchar("cta_text").notNull(),
   cta_ctaLabel: varchar("cta_cta_label").notNull(),
@@ -2655,9 +2787,61 @@ export const relations_city_template_feature_cards_cards = relations(
     }),
   }),
 );
+export const relations_city_template_service_cards_cards_bullets = relations(
+  city_template_service_cards_cards_bullets,
+  ({ one }) => ({
+    _parentID: one(city_template_service_cards_cards, {
+      fields: [city_template_service_cards_cards_bullets._parentID],
+      references: [city_template_service_cards_cards.id],
+      relationName: "bullets",
+    }),
+  }),
+);
+export const relations_city_template_service_cards_cards = relations(
+  city_template_service_cards_cards,
+  ({ one, many }) => ({
+    _parentID: one(city_template, {
+      fields: [city_template_service_cards_cards._parentID],
+      references: [city_template.id],
+      relationName: "serviceCards_cards",
+    }),
+    bullets: many(city_template_service_cards_cards_bullets, {
+      relationName: "bullets",
+    }),
+  }),
+);
+export const relations_city_template_aid_cards_cards_details = relations(
+  city_template_aid_cards_cards_details,
+  ({ one }) => ({
+    _parentID: one(city_template_aid_cards_cards, {
+      fields: [city_template_aid_cards_cards_details._parentID],
+      references: [city_template_aid_cards_cards.id],
+      relationName: "details",
+    }),
+  }),
+);
+export const relations_city_template_aid_cards_cards = relations(
+  city_template_aid_cards_cards,
+  ({ one, many }) => ({
+    _parentID: one(city_template, {
+      fields: [city_template_aid_cards_cards._parentID],
+      references: [city_template.id],
+      relationName: "aidCards_cards",
+    }),
+    details: many(city_template_aid_cards_cards_details, {
+      relationName: "details",
+    }),
+  }),
+);
 export const relations_city_template = relations(city_template, ({ many }) => ({
   featureCards_cards: many(city_template_feature_cards_cards, {
     relationName: "featureCards_cards",
+  }),
+  serviceCards_cards: many(city_template_service_cards_cards, {
+    relationName: "serviceCards_cards",
+  }),
+  aidCards_cards: many(city_template_aid_cards_cards, {
+    relationName: "aidCards_cards",
   }),
 }));
 
@@ -2690,11 +2874,16 @@ type DatabaseSchema = {
   enum_cities_local_section_background: typeof enum_cities_local_section_background;
   enum_cities_faq_background: typeof enum_cities_faq_background;
   enum_city_template_feature_cards_cards_icon: typeof enum_city_template_feature_cards_cards_icon;
+  enum_city_template_aid_cards_cards_icon: typeof enum_city_template_aid_cards_cards_icon;
   enum_city_template_feature_cards_background: typeof enum_city_template_feature_cards_background;
   enum_city_template_feature_cards_layout: typeof enum_city_template_feature_cards_layout;
   enum_city_template_feature_cards_columns: typeof enum_city_template_feature_cards_columns;
   enum_city_template_feature_cards_spacing: typeof enum_city_template_feature_cards_spacing;
   enum_city_template_zone_list_background: typeof enum_city_template_zone_list_background;
+  enum_city_template_service_cards_background: typeof enum_city_template_service_cards_background;
+  enum_city_template_service_cards_columns: typeof enum_city_template_service_cards_columns;
+  enum_city_template_aid_cards_background: typeof enum_city_template_aid_cards_background;
+  enum_city_template_aid_cards_variant: typeof enum_city_template_aid_cards_variant;
   leads: typeof leads;
   config_caroussel_section: typeof config_caroussel_section;
   config_testimonials_section: typeof config_testimonials_section;
@@ -2753,6 +2942,10 @@ type DatabaseSchema = {
   payload_preferences_rels: typeof payload_preferences_rels;
   payload_migrations: typeof payload_migrations;
   city_template_feature_cards_cards: typeof city_template_feature_cards_cards;
+  city_template_service_cards_cards_bullets: typeof city_template_service_cards_cards_bullets;
+  city_template_service_cards_cards: typeof city_template_service_cards_cards;
+  city_template_aid_cards_cards_details: typeof city_template_aid_cards_cards_details;
+  city_template_aid_cards_cards: typeof city_template_aid_cards_cards;
   city_template: typeof city_template;
   relations_leads: typeof relations_leads;
   relations_config_caroussel_section: typeof relations_config_caroussel_section;
@@ -2812,6 +3005,10 @@ type DatabaseSchema = {
   relations_payload_preferences: typeof relations_payload_preferences;
   relations_payload_migrations: typeof relations_payload_migrations;
   relations_city_template_feature_cards_cards: typeof relations_city_template_feature_cards_cards;
+  relations_city_template_service_cards_cards_bullets: typeof relations_city_template_service_cards_cards_bullets;
+  relations_city_template_service_cards_cards: typeof relations_city_template_service_cards_cards;
+  relations_city_template_aid_cards_cards_details: typeof relations_city_template_aid_cards_cards_details;
+  relations_city_template_aid_cards_cards: typeof relations_city_template_aid_cards_cards;
   relations_city_template: typeof relations_city_template;
 };
 

@@ -1,5 +1,8 @@
 import { acceptedAdditions, applyAcceptedAdditions } from "./parityAdditions";
-import { cityWordingCorrections } from "./parityCityWording";
+import {
+  citySectionAdditions,
+  cityWordingCorrections,
+} from "./parityCityWording";
 import {
   applyCorrections,
   removeRepeatedBlocks,
@@ -23,8 +26,13 @@ export function buildExpectedText(slug: string, golden: string): string {
     acceptedAdditions[slug] ?? [],
   );
 
-  return applyCorrections(
+  const withSharedSections = applyAcceptedAdditions(
     completed,
+    citySectionAdditions[slug] ?? [],
+  );
+
+  return applyCorrections(
+    withSharedSections,
     cityWordingCorrections.filter((correction) => correction.page === slug),
   );
 }
