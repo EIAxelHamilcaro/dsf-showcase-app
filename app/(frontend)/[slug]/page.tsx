@@ -52,6 +52,9 @@ export default async function CmsPage({ params }: CmsPageProps) {
 
   const [config, all] = await Promise.all([getSiteConfig(), getAllPages()]);
   const trail = getBreadcrumb(page, all);
+  const isLegalPage = page.layout.some(
+    (block) => block.blockType === "legalContent",
+  );
 
   return (
     <>
@@ -63,7 +66,10 @@ export default async function CmsPage({ params }: CmsPageProps) {
         phone={config.phone ?? ""}
         updatedAt={page.updatedAt}
       />
-      <RelatedLinks links={getRelatedLinks(page, all)} />
+      <RelatedLinks
+        isReadingWidth={isLegalPage}
+        links={getRelatedLinks(page, all)}
+      />
     </>
   );
 }

@@ -1,6 +1,7 @@
 /** biome-ignore-all lint/suspicious/noArrayIndexKey: ok */
 import React from "react";
 import type { Config1 } from "@/payload-types";
+import { pageTitleClass } from "./pageSection";
 
 interface Props {
   content?: Config1["main_title"];
@@ -14,7 +15,7 @@ export function RichTextBoldOnly({ content }: Props) {
   const nodes = content.root.children;
 
   return (
-    <h1 className="text-4xl sm:text-5xl xl:text-6xl font-extrabold tracking-tight">
+    <h1 className={pageTitleClass}>
       {nodes.map((node, idx) => {
         if (!node.children || !Array.isArray(node.children)) {
           // cas rare : pas de children => juste texte ou vide

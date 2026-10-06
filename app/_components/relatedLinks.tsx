@@ -1,15 +1,19 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import type { PageLink } from "@/lib/pages/pageLinks";
+import { cn } from "@/lib/utils";
 
-export const linkChipClass =
-  "h-auto shrink py-2 border-control-border font-semibold whitespace-normal text-left";
+export const linkChipClass = "h-auto shrink py-2 whitespace-normal text-left";
 
-interface RelatedLinksProps {
+export interface RelatedLinksProps {
   links: PageLink[];
+  isReadingWidth?: boolean;
 }
 
-export function RelatedLinks({ links }: RelatedLinksProps) {
+export function RelatedLinks({
+  links,
+  isReadingWidth = false,
+}: RelatedLinksProps) {
   if (links.length === 0) {
     return null;
   }
@@ -17,18 +21,22 @@ export function RelatedLinks({ links }: RelatedLinksProps) {
   return (
     <nav
       aria-label="Pages liées"
-      className="mx-auto flex max-w-page flex-wrap gap-3 px-gutter py-10"
+      className="mx-auto max-w-page px-gutter py-10"
     >
-      {links.map((link) => (
-        <Button
-          asChild
-          className={linkChipClass}
-          key={link.href}
-          variant="outline"
-        >
-          <Link href={link.href}>{link.label}</Link>
-        </Button>
-      ))}
+      <ul
+        className={cn(
+          "flex flex-wrap gap-3",
+          isReadingWidth && "mx-auto max-w-reading",
+        )}
+      >
+        {links.map((link) => (
+          <li key={link.href}>
+            <Button asChild className={linkChipClass} variant="quiet">
+              <Link href={link.href}>{link.label}</Link>
+            </Button>
+          </li>
+        ))}
+      </ul>
     </nav>
   );
 }

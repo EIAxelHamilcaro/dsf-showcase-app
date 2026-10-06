@@ -25,8 +25,8 @@ export function BlockRenderer({
 }: BlockRendererProps) {
   return (
     <>
-      {blocks.map((block) => {
-        const key = block.id ?? block.blockType;
+      {blocks.map((block, index) => {
+        const key = block.id ?? index.toString();
 
         switch (block.blockType) {
           case "hero":

@@ -10,10 +10,14 @@ import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import type { Config1 } from "@/payload-types";
-import { PageSection, sectionLeadClass } from "./pageSection";
+import {
+  PageSection,
+  SectionHeader,
+  subsectionTitleClass,
+} from "./pageSection";
 
 const aidBadgeClass =
-  "mx-auto mb-3 flex size-28 items-center justify-center rounded-full text-xl font-extrabold text-white";
+  "mx-auto mb-3 flex size-32 items-center justify-center rounded-full text-xl font-extrabold text-primary-foreground";
 
 export function ServicesSection({ config }: { config: Config1 }) {
   const services = [
@@ -70,20 +74,16 @@ export function ServicesSection({ config }: { config: Config1 }) {
 
   return (
     <PageSection id="services">
-      <div className="mb-10 space-y-4 text-center">
-        <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold">
-          Nos services d'adaptation
-        </h2>
-        <p className={cn(sectionLeadClass, "mx-auto max-w-3xl")}>
-          Chaque installation est personnalisée selon vos besoins spécifiques.
-          Nous utilisons uniquement des équipements certifiés et de qualité
-          française.
-        </p>
-      </div>
+      <SectionHeader
+        className="mb-10"
+        heading="Nos services d'adaptation"
+        intro="Chaque installation est personnalisée selon vos besoins spécifiques. Nous utilisons uniquement des équipements certifiés et de qualité française."
+        isCentered
+      />
 
       <div className="mb-section grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {services.map((service) => (
-          <Card className="gap-4 shadow-none" key={service.title}>
+        {services.map((service, index) => (
+          <Card className="gap-4 shadow-none" key={index.toString()}>
             <CardHeader className="flex items-center gap-4">
               <service.icon
                 aria-hidden="true"
@@ -102,7 +102,7 @@ export function ServicesSection({ config }: { config: Config1 }) {
 
       <div className="space-y-8 rounded-xl bg-surface-tint p-6 md:p-10">
         <div className="space-y-4 text-center">
-          <h3 className="text-2xl md:text-3xl font-extrabold tracking-tight">
+          <h3 className={subsectionTitleClass}>
             {config.financial_section?.title}
           </h3>
           <p className="mx-auto max-w-reading text-lg">

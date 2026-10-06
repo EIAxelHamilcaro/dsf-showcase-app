@@ -11,8 +11,8 @@ export function LinkCards({ block }: LinkCardsProps) {
     <PageSection tone={block.background === "muted" ? "muted" : "default"}>
       <SectionSplit heading={block.heading} intro={block.intro}>
         <ul className="grid gap-4 sm:grid-cols-2">
-          {block.links.map((link) => (
-            <li key={link.id ?? link.href}>
+          {block.links.map((link, index) => (
+            <li key={link.id ?? index.toString()}>
               <Link
                 className="group block h-full rounded-lg border bg-background p-5 hover:border-primary"
                 href={link.href}

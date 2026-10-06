@@ -1,5 +1,11 @@
 import { toTelHref } from "@/lib/seo/phone";
 
+export const fieldClass = "mt-1 h-12 text-lg md:text-lg";
+
+export const textareaClass = "mt-1 min-h-32 text-lg md:text-lg";
+
+export const submitClass = "w-full text-xl";
+
 export const errorProps = (id: string, error: string | undefined) => ({
   id,
   "aria-invalid": Boolean(error),

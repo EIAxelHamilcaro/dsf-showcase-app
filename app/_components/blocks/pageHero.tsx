@@ -1,9 +1,9 @@
 import { MapPin } from "lucide-react";
 import { ContactButton } from "@/app/_components/contactButton";
-import { PageSection } from "@/app/_components/pageSection";
+import { PageSection, pageTitleClass } from "@/app/_components/pageSection";
 import { followsElision } from "@/lib/pages/pageHeading";
 import type { HeroBlock } from "@/payload-types";
-import { PhoneButton, primaryActionClass } from "./phoneButton";
+import { PhoneButton } from "./phoneButton";
 
 interface PageHeroProps {
   block: HeroBlock;
@@ -19,14 +19,14 @@ export function PageHero({ block, phone }: PageHeroProps) {
         aria-hidden="true"
         className="tile-motif absolute inset-y-0 right-0 hidden w-2/5 lg:block"
       />
-      <div className="relative max-w-4xl space-y-6">
+      <div className="relative max-w-4xl space-y-6 lg:w-3/5">
         {block.location ? (
           <p className="flex items-start gap-2 text-lg font-bold text-primary">
             <MapPin aria-hidden="true" className="mt-1 h-5 w-5 shrink-0" />
             <span>{block.location}</span>
           </p>
         ) : null}
-        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight">
+        <h1 className={pageTitleClass}>
           {block.titleBefore}
           {gapAfterBefore}
           <span className="text-primary">{block.titleHighlight}</span>
@@ -36,9 +36,7 @@ export function PageHero({ block, phone }: PageHeroProps) {
           {block.intro}
         </p>
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-          <ContactButton className={primaryActionClass} size="lg">
-            {block.ctaLabel}
-          </ContactButton>
+          <ContactButton size="xl">{block.ctaLabel}</ContactButton>
           <PhoneButton phone={phone} />
         </div>
       </div>

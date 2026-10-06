@@ -1,4 +1,5 @@
 import { PageSection, SectionSplit } from "@/app/_components/pageSection";
+import { cn } from "@/lib/utils";
 import type { StepsBlock } from "@/payload-types";
 
 interface StepsProps {
@@ -9,9 +10,15 @@ export function Steps({ block }: StepsProps) {
   return (
     <PageSection tone={block.background === "muted" ? "muted" : "default"}>
       <SectionSplit heading={block.heading}>
-        <ol className="space-y-8">
+        <ol className={block.withCards ? "space-y-4" : "space-y-8"}>
           {block.items.map((item, index) => (
-            <li className="flex gap-5" key={item.id ?? item.title}>
+            <li
+              className={cn(
+                "flex gap-5",
+                block.withCards && "rounded-lg border bg-background p-5",
+              )}
+              key={item.id ?? index.toString()}
+            >
               <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary text-xl font-extrabold text-primary-foreground">
                 {index + 1}
               </div>

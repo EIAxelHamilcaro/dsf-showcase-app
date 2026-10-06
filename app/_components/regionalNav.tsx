@@ -2,8 +2,7 @@ import { MapPin } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import type { PageLink } from "@/lib/pages/pageLinks";
-import { cn } from "@/lib/utils";
-import { PageSection, sectionLeadClass } from "./pageSection";
+import { PageSection, SectionHeader } from "./pageSection";
 import { linkChipClass } from "./relatedLinks";
 
 const citiesByDepartment: Record<string, string> = {
@@ -37,15 +36,12 @@ export function RegionalNavSection({
 
   return (
     <PageSection tone="muted">
-      <div className="mb-10 space-y-4 text-center">
-        <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold">
-          Toute la région Centre-Val de Loire
-        </h2>
-        <p className={cn(sectionLeadClass, "mx-auto max-w-3xl")}>
-          Artisan certifié présent dans les 5 départements. Installation rapide
-          partout en région Centre.
-        </p>
-      </div>
+      <SectionHeader
+        className="mb-10"
+        heading="Toute la région Centre-Val de Loire"
+        intro="Artisan certifié présent dans les 5 départements. Installation rapide partout en région Centre."
+        isCentered
+      />
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 md:gap-6">
         {orderedDepartments.map((dept) => (
@@ -86,7 +82,7 @@ export function RegionalNavSection({
                 asChild
                 className={linkChipClass}
                 key={city.href}
-                variant="outline"
+                variant="quiet"
               >
                 <Link href={city.href}>{city.label}</Link>
               </Button>

@@ -15,11 +15,16 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toTelHref } from "@/lib/seo/phone";
 import type { Config1 } from "@/payload-types";
-import { errorProps, FieldError, FormError } from "./contactFeedback";
-import { PageSection, sectionLeadClass } from "./pageSection";
+import {
+  errorProps,
+  FieldError,
+  FormError,
+  fieldClass,
+  submitClass,
+  textareaClass,
+} from "./contactFeedback";
+import { PageSection, SectionHeader } from "./pageSection";
 import { useContactSubmission } from "./useContactSubmission";
-
-const fieldClass = "mt-1 h-12 text-lg md:text-lg";
 
 const emptyForm = {
   name: "",
@@ -66,15 +71,12 @@ export function ContactSection({ config }: { config: Config1 }) {
 
   return (
     <PageSection id="contact" tone="muted">
-      <div className="mb-10 space-y-4 text-center">
-        <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold">
-          Demandez votre devis gratuit
-        </h2>
-        <p className={sectionLeadClass}>
-          Intervention rapide dans votre région. Étude personnalisée de vos
-          besoins.
-        </p>
-      </div>
+      <SectionHeader
+        className="mb-10"
+        heading="Demandez votre devis gratuit"
+        intro="Intervention rapide dans votre région. Étude personnalisée de vos besoins."
+        isCentered
+      />
 
       <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
         <Card className="min-w-0 bg-background shadow-none">
@@ -167,7 +169,7 @@ export function ContactSection({ config }: { config: Config1 }) {
                 </Label>
                 <Textarea
                   {...errorProps(`${id}-message`, errors.message)}
-                  className="mt-1 min-h-32 text-lg md:text-lg"
+                  className={textareaClass}
                   name="message"
                   onChange={handleChange}
                   placeholder="Décrivez-nous votre projet d'adaptation de salle de bain..."
@@ -193,9 +195,9 @@ export function ContactSection({ config }: { config: Config1 }) {
 
               <Button
                 aria-busy={isPending}
-                className="w-full"
+                className={submitClass}
                 disabled={isPending}
-                size="lg"
+                size="xl"
                 type="submit"
               >
                 {isPending ? "Envoi en cours..." : "Envoyer ma demande"}

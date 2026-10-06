@@ -49,6 +49,9 @@
   --star: oklch(0.6 0.13 75);
   --success: oklch(0.53 0.14 150);
   --focus: var(--primary);
+  --tile-base: color-mix(in oklch, var(--primary) 7%, var(--surface-tint));
+  --tile-soft: color-mix(in oklch, var(--primary) 18%, var(--surface-tint));
+  --tile-strong: color-mix(in oklch, var(--primary) 45%, var(--surface-tint));
   --gutter: 1rem;
   --section-y: 3.5rem;
 }
@@ -201,6 +204,9 @@
 .bg-muted,
 .bg-surface-tint {
   --focus: var(--primary);
+  --tile-base: color-mix(in oklch, var(--primary) 7%, var(--surface-tint));
+  --tile-soft: color-mix(in oklch, var(--primary) 18%, var(--surface-tint));
+  --tile-strong: color-mix(in oklch, var(--primary) 45%, var(--surface-tint));
 }
 
 [data-slot="input"],
@@ -209,11 +215,40 @@
 }
 
 .tile-motif {
+  --tile: 5rem;
+  --grout: 3px;
+  background-color: var(--tile-base);
   background-image:
-    linear-gradient(var(--background) 2px, transparent 2px),
-    linear-gradient(90deg, var(--background) 2px, transparent 2px);
-  background-size: 4.5rem 4.5rem;
-  mask-image: linear-gradient(90deg, transparent, black 70%);
+    linear-gradient(var(--surface-tint) var(--grout), transparent var(--grout)),
+    linear-gradient(
+      90deg,
+      var(--surface-tint) var(--grout),
+      transparent var(--grout)
+    ),
+    linear-gradient(var(--primary), var(--primary)),
+    linear-gradient(var(--tile-strong), var(--tile-strong)),
+    linear-gradient(var(--tile-strong), var(--tile-strong)),
+    linear-gradient(var(--tile-soft), var(--tile-soft)),
+    linear-gradient(var(--tile-soft), var(--tile-soft));
+  background-repeat: repeat, repeat, no-repeat, no-repeat, no-repeat, no-repeat,
+    no-repeat;
+  background-size:
+    var(--tile) var(--tile),
+    var(--tile) var(--tile),
+    var(--tile) var(--tile),
+    var(--tile) var(--tile),
+    var(--tile) var(--tile),
+    var(--tile) var(--tile),
+    var(--tile) var(--tile);
+  background-position:
+    0 0,
+    0 0,
+    calc(var(--tile) * 4) calc(var(--tile) * 2),
+    calc(var(--tile) * 3) calc(var(--tile) * 1),
+    calc(var(--tile) * 5) calc(var(--tile) * 4),
+    calc(var(--tile) * 2) calc(var(--tile) * 3),
+    calc(var(--tile) * 5) 0;
+  mask-image: linear-gradient(90deg, transparent, black 45%);
 }
 
 @media (prefers-reduced-motion: reduce) {

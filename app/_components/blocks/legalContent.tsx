@@ -1,5 +1,9 @@
 import type { ReactNode } from "react";
-import { PageSection } from "@/app/_components/pageSection";
+import {
+  PageSection,
+  subsectionTitleClass,
+} from "@/app/_components/pageSection";
+import { cn } from "@/lib/utils";
 import type { LegalContentBlock } from "@/payload-types";
 
 const urlPattern = /(https:\/\/[^\s]*[^\s.,;:)])/;
@@ -12,7 +16,7 @@ function withLinks(text: string): ReactNode[] {
   return text.split(urlPattern).map((part, index) =>
     index % 2 === 1 ? (
       <a
-        className="break-all text-primary underline hover:no-underline"
+        className="break-words text-primary underline hover:no-underline"
         href={part}
         key={`${part}-${index.toString()}`}
         rel="noopener"
@@ -35,19 +39,20 @@ function LegalSectionContent({ section }: { section: LegalSection }) {
   return (
     <>
       {section.heading ? (
-        <h2 className="pt-8 text-2xl md:text-3xl font-extrabold tracking-tight">
-          {section.heading}
-        </h2>
+        <h2 className={cn(subsectionTitleClass, "pt-8")}>{section.heading}</h2>
       ) : null}
-      {section.paragraphs?.map((paragraph) => (
-        <p className="whitespace-pre-line" key={paragraph.id ?? paragraph.text}>
+      {section.paragraphs?.map((paragraph, index) => (
+        <p
+          className="whitespace-pre-line"
+          key={paragraph.id ?? index.toString()}
+        >
           {withLinks(paragraph.text)}
         </p>
       ))}
       {section.items?.length ? (
         <ul className="list-disc space-y-2 pl-6 marker:text-primary">
-          {section.items.map((item) => (
-            <li key={item.id ?? item.text}>{withLinks(item.text)}</li>
+          {section.items.map((item, index) => (
+            <li key={item.id ?? index.toString()}>{withLinks(item.text)}</li>
           ))}
         </ul>
       ) : null}
@@ -57,10 +62,10 @@ function LegalSectionContent({ section }: { section: LegalSection }) {
             {headers.length ? (
               <thead>
                 <tr>
-                  {headers.map((header) => (
+                  {headers.map((header, index) => (
                     <th
                       className="border bg-muted p-3 font-bold"
-                      key={header.id ?? header.label}
+                      key={header.id ?? index.toString()}
                       scope="col"
                     >
                       {header.label}

@@ -1,7 +1,8 @@
 "use client";
 
+import type { VariantProps } from "class-variance-authority";
 import type { ReactNode } from "react";
-import { Button } from "@/components/ui/button";
+import { Button, type buttonVariants } from "@/components/ui/button";
 
 interface WindowWithModal extends Window {
   openContactModal?: () => void;
@@ -9,32 +10,23 @@ interface WindowWithModal extends Window {
 
 declare const window: WindowWithModal;
 
-export function ContactButton({
-  children,
-  variant = "default",
-  size = "default",
-  className,
-  onClick,
-}: {
+export interface ContactButtonProps
+  extends VariantProps<typeof buttonVariants> {
   children: ReactNode;
-  variant?:
-    | "default"
-    | "secondary"
-    | "outline"
-    | "ghost"
-    | "link"
-    | "destructive";
-  size?: "default" | "sm" | "lg" | "icon";
   className?: string;
   onClick?: () => void;
-}) {
+}
+
+export function ContactButton({
+  children,
+  variant,
+  size,
+  className,
+  onClick,
+}: ContactButtonProps) {
   const handleClick = () => {
-    if (window?.openContactModal) {
-      window.openContactModal();
-    }
-    if (onClick) {
-      onClick();
-    }
+    window.openContactModal?.();
+    onClick?.();
   };
 
   return (

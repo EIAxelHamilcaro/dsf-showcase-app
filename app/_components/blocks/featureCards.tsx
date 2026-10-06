@@ -1,13 +1,13 @@
 import {
   PageSection,
-  SectionSplit,
+  SectionStack,
   sectionLeadClass,
 } from "@/app/_components/pageSection";
 import { cn } from "@/lib/utils";
 import type { FeatureCardsBlock } from "@/payload-types";
 import { resolveIcon } from "./blockIcons";
 
-const wideGridClasses: Record<FeatureCardsBlock["columns"], string> = {
+const gridClasses: Record<FeatureCardsBlock["columns"], string> = {
   "1": "max-w-reading",
   "2": "sm:grid-cols-2",
   "3": "sm:grid-cols-2 lg:grid-cols-3",
@@ -21,18 +21,16 @@ interface FeatureCardsProps {
 export function FeatureCards({ block }: FeatureCardsProps) {
   const FeatureTitle = block.heading ? "h3" : "h2";
   const isInline = block.layout === "inline";
-  const isSingleColumn = block.columns === "1";
-  const splitGridClass = isSingleColumn ? undefined : "sm:grid-cols-2";
 
   const grid = (
     <ul
       className={cn(
         "grid gap-x-8",
         block.spacing === "spacious" ? "gap-y-10" : "gap-y-8",
-        block.heading ? splitGridClass : wideGridClasses[block.columns],
+        gridClasses[block.columns],
       )}
     >
-      {block.cards.map((card) => {
+      {block.cards.map((card, index) => {
         const Icon = resolveIcon(card.icon);
 
         return (
@@ -41,7 +39,7 @@ export function FeatureCards({ block }: FeatureCardsProps) {
               "border-t-2 border-primary pt-5",
               isInline ? "flex gap-4" : "space-y-3",
             )}
-            key={card.id ?? card.title}
+            key={card.id ?? index.toString()}
           >
             {Icon ? (
               <Icon
@@ -67,9 +65,9 @@ export function FeatureCards({ block }: FeatureCardsProps) {
   return (
     <PageSection tone={block.background === "muted" ? "muted" : "default"}>
       {block.heading ? (
-        <SectionSplit heading={block.heading} intro={block.intro}>
+        <SectionStack heading={block.heading} intro={block.intro}>
           {grid}
-        </SectionSplit>
+        </SectionStack>
       ) : (
         <div className="space-y-8">
           {block.intro ? (

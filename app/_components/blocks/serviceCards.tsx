@@ -1,8 +1,9 @@
 import { CheckCircle2 } from "lucide-react";
 import Link from "next/link";
-import { PageSection, SectionSplit } from "@/app/_components/pageSection";
+import { PageSection, SectionStack } from "@/app/_components/pageSection";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 import type { ServiceCardsBlock } from "@/payload-types";
 
 interface ServiceCardsProps {
@@ -12,12 +13,17 @@ interface ServiceCardsProps {
 export function ServiceCards({ block }: ServiceCardsProps) {
   return (
     <PageSection tone={block.background === "muted" ? "muted" : "default"}>
-      <SectionSplit heading={block.heading}>
-        <div className="grid gap-6 sm:grid-cols-2">
-          {block.cards.map((card) => (
+      <SectionStack heading={block.heading}>
+        <div
+          className={cn(
+            "grid gap-6 sm:grid-cols-2",
+            block.columns === "3" && "lg:grid-cols-3",
+          )}
+        >
+          {block.cards.map((card, cardIndex) => (
             <Card
               className="bg-background shadow-none"
-              key={card.id ?? card.title}
+              key={card.id ?? cardIndex.toString()}
             >
               <CardContent className="flex h-full flex-col gap-4">
                 <h3 className="text-xl font-bold">{card.title}</h3>
@@ -26,10 +32,10 @@ export function ServiceCards({ block }: ServiceCardsProps) {
                 ) : null}
                 {card.bullets?.length ? (
                   <ul className="space-y-3">
-                    {card.bullets.map((bullet) => (
+                    {card.bullets.map((bullet, bulletIndex) => (
                       <li
                         className="flex items-start gap-3"
-                        key={bullet.id ?? bullet.text}
+                        key={bullet.id ?? bulletIndex.toString()}
                       >
                         <CheckCircle2
                           aria-hidden="true"
@@ -53,7 +59,7 @@ export function ServiceCards({ block }: ServiceCardsProps) {
             </Card>
           ))}
         </div>
-      </SectionSplit>
+      </SectionStack>
     </PageSection>
   );
 }

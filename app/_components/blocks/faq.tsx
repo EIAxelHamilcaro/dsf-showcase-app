@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/accordion";
 import type { FaqBlock } from "@/payload-types";
 
-export interface FaqSource {
+interface FaqSource {
   id?: string | null;
   label: string;
   url: string;
@@ -29,7 +29,7 @@ export function FaqAccordion({ items }: FaqAccordionProps) {
     <Accordion className="border-t" collapsible type="single">
       {items.map((item, index) => (
         <AccordionItem
-          key={item.id ?? item.question}
+          key={item.id ?? index.toString()}
           value={item.id ?? `item-${index}`}
         >
           <AccordionTrigger className="cursor-pointer items-center py-5 text-lg md:text-xl font-bold [&>svg]:size-6 [&>svg]:translate-y-0 [&>svg]:text-primary">
@@ -40,10 +40,10 @@ export function FaqAccordion({ items }: FaqAccordionProps) {
             forceMount
           >
             <p>{item.answer}</p>
-            {item.sources?.map((source) => (
+            {item.sources?.map((source, sourceIndex) => (
               <p
                 className="text-small text-muted-foreground"
-                key={source.id ?? source.url}
+                key={source.id ?? sourceIndex.toString()}
               >
                 {"Source : "}
                 <a

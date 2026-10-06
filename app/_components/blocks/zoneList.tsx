@@ -10,11 +10,11 @@ export function ZoneList({ block }: ZoneListProps) {
   return (
     <PageSection tone={block.background === "muted" ? "muted" : "default"}>
       <SectionSplit heading={block.heading} intro={block.intro}>
-        <ul className="flex flex-wrap gap-3">
-          {block.items.map((item) => (
+        <ul className="grid gap-3 min-[360px]:grid-cols-2 sm:flex sm:flex-wrap">
+          {block.items.map((item, index) => (
             <li
               className="flex items-center gap-2 rounded-lg border bg-background px-4 py-3 font-semibold"
-              key={item.id ?? item.name}
+              key={item.id ?? index.toString()}
             >
               {block.showMapIcon ? (
                 <MapPin
