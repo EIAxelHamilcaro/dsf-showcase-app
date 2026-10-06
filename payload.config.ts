@@ -12,9 +12,12 @@ import Leads from "./collections/Leads";
 import { Media } from "./collections/Media";
 import Pages from "./collections/Pages";
 import { Users } from "./collections/Users";
+import { assertDatabaseAllowed } from "./lib/databaseGuard";
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
+
+assertDatabaseAllowed(process.env);
 
 export default buildConfig({
   admin: {
