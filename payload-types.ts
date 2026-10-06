@@ -820,6 +820,7 @@ export interface ZoneListBlock {
   background: 'default' | 'muted';
   heading: string;
   showMapIcon?: boolean | null;
+  columns?: ('4' | '5') | null;
   intro?: string | null;
   items: {
     name: string;
@@ -873,6 +874,7 @@ export interface ServiceCardsBlock {
  */
 export interface AidCardsBlock {
   background: 'default' | 'muted';
+  variant?: ('compact' | 'detailed') | null;
   heading: string;
   intro?: string | null;
   cards?:
@@ -1415,6 +1417,7 @@ export interface ZoneListBlockSelect<T extends boolean = true> {
   background?: T;
   heading?: T;
   showMapIcon?: T;
+  columns?: T;
   intro?: T;
   items?:
     | T
@@ -1469,6 +1472,7 @@ export interface ServiceCardsBlockSelect<T extends boolean = true> {
  */
 export interface AidCardsBlockSelect<T extends boolean = true> {
   background?: T;
+  variant?: T;
   heading?: T;
   intro?: T;
   cards?:

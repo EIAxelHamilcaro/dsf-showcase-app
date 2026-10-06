@@ -14,6 +14,16 @@ export const ZoneListBlock: Block = {
       label: "Repère à côté du titre",
       defaultValue: false,
     },
+    {
+      name: "columns",
+      type: "select",
+      label: "Colonnes sur grand écran",
+      defaultValue: "5",
+      options: [
+        { label: "4", value: "4" },
+        { label: "5", value: "5" },
+      ],
+    },
     { name: "intro", type: "textarea", label: "Texte avant la liste" },
     {
       name: "items",

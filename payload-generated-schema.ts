@@ -48,6 +48,10 @@ export const enum_pages_blocks_zone_list_background = pgEnum(
   "enum_pages_blocks_zone_list_background",
   ["default", "muted"],
 );
+export const enum_pages_blocks_zone_list_columns = pgEnum(
+  "enum_pages_blocks_zone_list_columns",
+  ["4", "5"],
+);
 export const enum_pages_blocks_testimonial_background = pgEnum(
   "enum_pages_blocks_testimonial_background",
   ["default", "muted"],
@@ -67,6 +71,10 @@ export const enum_pages_blocks_aid_cards_cards_icon = pgEnum(
 export const enum_pages_blocks_aid_cards_background = pgEnum(
   "enum_pages_blocks_aid_cards_background",
   ["default", "muted"],
+);
+export const enum_pages_blocks_aid_cards_variant = pgEnum(
+  "enum_pages_blocks_aid_cards_variant",
+  ["compact", "detailed"],
 );
 export const enum_pages_blocks_steps_background = pgEnum(
   "enum_pages_blocks_steps_background",
@@ -659,6 +667,7 @@ export const pages_blocks_zone_list = pgTable(
       .default("default"),
     heading: varchar("heading").notNull(),
     showMapIcon: boolean("show_map_icon").default(false),
+    columns: enum_pages_blocks_zone_list_columns("columns").default("5"),
     intro: varchar("intro"),
     outro: varchar("outro"),
     blockName: varchar("block_name"),
@@ -833,6 +842,7 @@ export const pages_blocks_aid_cards = pgTable(
     background: enum_pages_blocks_aid_cards_background("background")
       .notNull()
       .default("default"),
+    variant: enum_pages_blocks_aid_cards_variant("variant").default("compact"),
     heading: varchar("heading").notNull(),
     intro: varchar("intro"),
     buttonLabel: varchar("button_label"),
@@ -1602,11 +1612,13 @@ type DatabaseSchema = {
   enum_pages_blocks_feature_cards_layout: typeof enum_pages_blocks_feature_cards_layout;
   enum_pages_blocks_feature_cards_columns: typeof enum_pages_blocks_feature_cards_columns;
   enum_pages_blocks_zone_list_background: typeof enum_pages_blocks_zone_list_background;
+  enum_pages_blocks_zone_list_columns: typeof enum_pages_blocks_zone_list_columns;
   enum_pages_blocks_testimonial_background: typeof enum_pages_blocks_testimonial_background;
   enum_pages_blocks_service_cards_background: typeof enum_pages_blocks_service_cards_background;
   enum_pages_blocks_service_cards_columns: typeof enum_pages_blocks_service_cards_columns;
   enum_pages_blocks_aid_cards_cards_icon: typeof enum_pages_blocks_aid_cards_cards_icon;
   enum_pages_blocks_aid_cards_background: typeof enum_pages_blocks_aid_cards_background;
+  enum_pages_blocks_aid_cards_variant: typeof enum_pages_blocks_aid_cards_variant;
   enum_pages_blocks_steps_background: typeof enum_pages_blocks_steps_background;
   enum_pages_blocks_link_cards_background: typeof enum_pages_blocks_link_cards_background;
   enum_pages_page_type: typeof enum_pages_page_type;

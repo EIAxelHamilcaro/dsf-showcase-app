@@ -8,6 +8,19 @@ export const AidCardsBlock: Block = {
   labels: { singular: "Aides financières", plural: "Aides financières" },
   fields: [
     backgroundField,
+    {
+      name: "variant",
+      type: "select",
+      label: "Présentation",
+      defaultValue: "compact",
+      options: [
+        { label: "Compacte, section centrée", value: "compact" },
+        {
+          label: "Détaillée, première carte mise en avant",
+          value: "detailed",
+        },
+      ],
+    },
     { name: "heading", type: "text", label: "Titre", required: true },
     { name: "intro", type: "textarea", label: "Texte d'introduction" },
     {
