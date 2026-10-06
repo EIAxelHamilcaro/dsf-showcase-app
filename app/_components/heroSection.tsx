@@ -60,7 +60,7 @@ export default function HeroSection({ config }: { config: Config1 }) {
           </div>
         </div>
 
-        <div className="relative pb-6">
+        <div className="relative pb-3">
           <div className="relative aspect-[4/5] sm:aspect-[3/2] lg:aspect-[4/5] overflow-hidden rounded-xl">
             <Image
               alt="Douche senior sécurisée plain-pied avec barres d'appui et sol antidérapant - Installation en 1 jour"
