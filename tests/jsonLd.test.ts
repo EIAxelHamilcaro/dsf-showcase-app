@@ -496,6 +496,39 @@ describe("buildPageGraph with a FAQ block or a legal page", () => {
     assert.deepEqual(danglingReferences(graph), []);
   });
 
+  it("describes an information page with its FAQ and no service, and keeps the service of a normal service page", () => {
+    const information = {
+      ...faqPage,
+      seo: { ...faqPage.seo, informationOnly: true },
+    } as unknown as Page;
+    const graph = buildPageGraph({
+      page: information,
+      all: [...all, information],
+      config: fullConfig,
+    });
+
+    assert.equal(nodesOf(graph, "WebPage").length, 1);
+    assert.equal(nodesOf(graph, "BreadcrumbList").length, 1);
+    assert.equal(nodesOf(graph, "FAQPage").length, 1);
+    assert.equal(nodesOf(graph, "Service").length, 0);
+    assert.deepEqual(danglingReferences(graph), []);
+
+    const unchecked = {
+      ...faqPage,
+      seo: { ...faqPage.seo, informationOnly: false },
+    } as unknown as Page;
+
+    for (const page of [faqPage, unchecked]) {
+      const normal = buildPageGraph({
+        page,
+        all: [...all, page],
+        config: fullConfig,
+      });
+
+      assert.equal(nodesOf(normal, "Service").length, 1);
+    }
+  });
+
   it("adds the Google profile to the business profiles once it is entered", () => {
     const withProfile = {
       ...fullConfig,

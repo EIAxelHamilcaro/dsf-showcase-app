@@ -1,7 +1,8 @@
 import type { Config1, Page } from "../../payload-types";
 import { getPageHeading } from "../pages/pageHeading";
 import { getBreadcrumb } from "../pages/pageLinks";
-import { businessFacts, homeSeo, siteName, siteRegion, siteUrl } from "../site";
+import { businessFacts, siteName, siteRegion, siteUrl } from "../site";
+import { getHomeSeo } from "./homeSeo";
 import { toE164 } from "./phone";
 import { computeAggregateRating, getRatedReviews } from "./reviews";
 
@@ -238,6 +239,7 @@ function areaServedOf(page: Page): Node | undefined {
 
 export function buildHomeGraph({ all, config }: HomeGraphInput): JsonLdGraph {
   const url = absolute("/");
+  const seo = getHomeSeo(config);
   const latest = all
     .map((page) => page.updatedAt)
     .sort()
@@ -247,8 +249,8 @@ export function buildHomeGraph({ all, config }: HomeGraphInput): JsonLdGraph {
     "@type": "WebPage",
     "@id": `${url}#webpage`,
     url,
-    name: homeSeo.title,
-    description: homeSeo.description,
+    name: seo.title,
+    description: seo.description,
     inLanguage: language,
     isPartOf: { "@id": websiteId },
     about: { "@id": businessId },
@@ -298,19 +300,21 @@ export function buildPageGraph({
     dateModified: page.updatedAt,
   });
 
-  const service: Node | undefined =
-    page.pageType === "legal"
-      ? undefined
-      : compact({
-          "@type": "Service",
-          "@id": `${url}#service`,
-          name: clean(getPageHeading(page)),
-          serviceType: businessFacts.serviceTypeName,
-          description: clean(page.seo.description),
-          provider: { "@id": businessId },
-          areaServed: areaServedOf(page),
-          url,
-        });
+  const isSoldService =
+    page.pageType !== "legal" && page.seo.informationOnly !== true;
+
+  const service: Node | undefined = isSoldService
+    ? compact({
+        "@type": "Service",
+        "@id": `${url}#service`,
+        name: clean(getPageHeading(page)),
+        serviceType: businessFacts.serviceTypeName,
+        description: clean(page.seo.description),
+        provider: { "@id": businessId },
+        areaServed: areaServedOf(page),
+        url,
+      })
+    : undefined;
 
   const faqEntries = page.layout.flatMap((block) =>
     block.blockType === "faq" ? block.items : [],

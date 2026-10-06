@@ -150,7 +150,7 @@ dump_content() {
     | grep -v -E '^\\(un)?restrict '
 }
 
-echo "--- replay: turnkey_content and content_review_fixes run again on their own result, after editor changes"
+echo "--- replay: turnkey_content, content_review_fixes and home_seo_and_aid_conditions run again on their own result, after editor changes"
 run_psql -c "drop database if exists ${replay} with (force)" >/dev/null
 run_psql -c "create database ${replay} template ${target}" >/dev/null
 run_psql -d "${replay}" -v ON_ERROR_STOP=1 -At -f - < "${root}/scripts/sql/editorEdits.sql"

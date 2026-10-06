@@ -120,6 +120,7 @@ describe("expected text of the 16 captured pages", () => {
         "loir-et-cher E1",
         "remplacement-baignoire-par-douche E2",
         "douche-senior-blois E3",
+        "aides-financieres H1",
         "aides-financieres A5",
         "home B1",
         "home B2",

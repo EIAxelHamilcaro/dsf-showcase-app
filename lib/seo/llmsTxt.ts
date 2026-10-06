@@ -1,6 +1,7 @@
 import type { Config1, Page } from "../../payload-types";
 import { getPageHeading } from "../pages/pageHeading";
-import { businessFacts, homeSeo, siteName, siteRegion, siteUrl } from "../site";
+import { businessFacts, siteName, siteRegion, siteUrl } from "../site";
+import { getHomeSeo } from "./homeSeo";
 
 interface LlmsTxtInput {
   pages: Page[];
@@ -60,6 +61,7 @@ export function buildLlmsTxt({ pages, config }: LlmsTxtInput): string {
     return lines.length > 0 ? [`## ${title}`, "", ...lines, ""] : [];
   });
   const contact = contactLines(config);
+  const home = getHomeSeo(config);
 
   const lines = [
     `# ${siteName}`,
@@ -68,7 +70,7 @@ export function buildLlmsTxt({ pages, config }: LlmsTxtInput): string {
     "",
     "## Accueil",
     "",
-    link(homeSeo.title, siteUrl, homeSeo.description),
+    link(home.title, siteUrl, home.description),
     "",
     ...pageSections,
     ...(contact.length > 0 ? ["## Contact", "", ...contact, ""] : []),

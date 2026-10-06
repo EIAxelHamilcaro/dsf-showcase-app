@@ -1087,6 +1087,29 @@ const Config: CollectionConfig = {
       ],
     },
     {
+      name: "seo",
+      type: "group",
+      label: "Référencement",
+      admin: {
+        description:
+          "Titre et description de l'accueil dans les moteurs de recherche. Un champ laissé vide reprend la valeur par défaut du site.",
+      },
+      fields: [
+        {
+          name: "title",
+          type: "text",
+          label: "Titre (60 caractères maximum)",
+          maxLength: 60,
+        },
+        {
+          name: "description",
+          type: "textarea",
+          label: "Description (160 caractères maximum)",
+          maxLength: 160,
+        },
+      ],
+    },
+    {
       name: "google_rating",
       label: "Note Google",
       type: "number",

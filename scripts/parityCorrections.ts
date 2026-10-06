@@ -1,3 +1,4 @@
+import { aidConditionFixes } from "../migrations/seed/finalFixesSeed";
 import { pageTextFixes } from "../migrations/seed/reviewFixesSeed";
 import {
   homeCorrections,
@@ -59,7 +60,7 @@ export const textCorrections: TextCorrection[] = [
       to: followUp?.to ?? correction.to,
     };
   }),
-  ...pageTextFixes
+  ...[...pageTextFixes, ...aidConditionFixes]
     .filter((fix) => !followUps.includes(fix))
     .map(({ ref, slug, from, to }) => ({ ref, page: slug, from, to })),
   ...pageDetailRemovals.map(({ ref, slug, label, text }) => ({

@@ -657,6 +657,13 @@ export interface Config1 {
     locality?: string | null;
   };
   /**
+   * Titre et description de l'accueil dans les moteurs de recherche. Un champ laissé vide reprend la valeur par défaut du site.
+   */
+  seo?: {
+    title?: string | null;
+    description?: string | null;
+  };
+  /**
    * Note moyenne de la fiche Google, telle qu'affichée sur Google. Laisser vide si inconnue.
    */
   google_rating?: number | null;
@@ -759,6 +766,10 @@ export interface Page {
      * Image 1200 x 630, remplacée par l'image par défaut si vide
      */
     image?: (number | null) | Media;
+    /**
+     * Cochée : la page n'est pas décrite comme un service de l'entreprise dans les données structurées
+     */
+    informationOnly?: boolean | null;
   };
   layout: (
     | HeroBlock
@@ -1384,6 +1395,12 @@ export interface ConfigSelect<T extends boolean = true> {
         postal_code?: T;
         locality?: T;
       };
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+      };
   google_rating?: T;
   google_review_count?: T;
   google_profile_url?: T;
@@ -1456,6 +1473,7 @@ export interface PagesSelect<T extends boolean = true> {
         title?: T;
         description?: T;
         image?: T;
+        informationOnly?: T;
       };
   layout?:
     | T

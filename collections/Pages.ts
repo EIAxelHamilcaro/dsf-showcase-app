@@ -130,6 +130,15 @@ const Pages: CollectionConfig = {
               "Image 1200 x 630, remplacée par l'image par défaut si vide",
           },
         },
+        {
+          name: "informationOnly",
+          type: "checkbox",
+          label: "Page d'information (pas une prestation vendue)",
+          admin: {
+            description:
+              "Cochée : la page n'est pas décrite comme un service de l'entreprise dans les données structurées",
+          },
+        },
       ],
     },
     {

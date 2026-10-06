@@ -424,6 +424,8 @@ export const config = pgTable(
     legal_section_street_address: varchar("legal_section_street_address"),
     legal_section_postal_code: varchar("legal_section_postal_code"),
     legal_section_locality: varchar("legal_section_locality"),
+    seo_title: varchar("seo_title"),
+    seo_description: varchar("seo_description"),
     google_rating: numeric("google_rating", { mode: "number" }),
     google_review_count: numeric("google_review_count", { mode: "number" }),
     google_profile_url: varchar("google_profile_url"),
@@ -1279,6 +1281,7 @@ export const pages = pgTable(
     seo_image: integer("seo_image_id").references(() => media.id, {
       onDelete: "set null",
     }),
+    seo_informationOnly: boolean("seo_information_only"),
     updatedAt: timestamp("updated_at", {
       mode: "string",
       withTimezone: true,

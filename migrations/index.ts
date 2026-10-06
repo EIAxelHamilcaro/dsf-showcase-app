@@ -4,10 +4,12 @@ import * as migration_20261006_112024_block_display_options from './20261006_112
 import * as migration_20261006_113012_feature_cards_spacing from './20261006_113012_feature_cards_spacing';
 import * as migration_20261006_113015_testimonial_block_rating from './20261006_113015_testimonial_block_rating';
 import * as migration_20261006_113018_faq_text_and_legal_blocks from './20261006_113018_faq_text_and_legal_blocks';
+import * as migration_20261006_113020_home_seo_and_information_pages from './20261006_113020_home_seo_and_information_pages';
 import * as migration_20261006_113022_seed_pages_and_site_identity from './20261006_113022_seed_pages_and_site_identity';
 import * as migration_20261006_120701_blois_testimonial_rating from './20261006_120701_blois_testimonial_rating';
 import * as migration_20261006_123847_turnkey_content from './20261006_123847_turnkey_content';
 import * as migration_20261006_131307_content_review_fixes from './20261006_131307_content_review_fixes';
+import * as migration_20261006_151441_home_seo_and_aid_conditions from './20261006_151441_home_seo_and_aid_conditions';
 
 export const migrations = [
   {
@@ -41,6 +43,11 @@ export const migrations = [
     name: '20261006_113018_faq_text_and_legal_blocks',
   },
   {
+    up: migration_20261006_113020_home_seo_and_information_pages.up,
+    down: migration_20261006_113020_home_seo_and_information_pages.down,
+    name: '20261006_113020_home_seo_and_information_pages',
+  },
+  {
     up: migration_20261006_113022_seed_pages_and_site_identity.up,
     down: migration_20261006_113022_seed_pages_and_site_identity.down,
     name: '20261006_113022_seed_pages_and_site_identity',
@@ -58,6 +65,11 @@ export const migrations = [
   {
     up: migration_20261006_131307_content_review_fixes.up,
     down: migration_20261006_131307_content_review_fixes.down,
-    name: '20261006_131307_content_review_fixes'
+    name: '20261006_131307_content_review_fixes',
+  },
+  {
+    up: migration_20261006_151441_home_seo_and_aid_conditions.up,
+    down: migration_20261006_151441_home_seo_and_aid_conditions.down,
+    name: '20261006_151441_home_seo_and_aid_conditions'
   },
 ];
