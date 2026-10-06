@@ -9,6 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { CloseDialogButton } from "./closeDialogButton";
 import { ModalMultiStepForm } from "./multiStepForm";
 
 export interface DownloadDialogProps {
@@ -35,29 +36,27 @@ export function DownloadDialog({
         aria-haspopup="dialog"
         onClick={() => setIsOpen(true)}
         ref={trigger}
-        size="xl"
-        variant="quiet"
+        variant="secondary"
       >
-        <Download aria-hidden="true" className="size-5 text-primary" />
+        <Download aria-hidden="true" />
         {label}
       </Button>
       <Dialog onOpenChange={setIsOpen} open={isOpen}>
         <DialogContent
-          className="max-w-[95vw] sm:max-w-lg"
           onCloseAutoFocus={(event) => {
             event.preventDefault();
             trigger.current?.focus();
           }}
+          showCloseButton={false}
         >
-          <DialogHeader className="sm:text-center">
-            <DialogTitle className="text-xl sm:text-2xl font-bold">
-              {title}
-            </DialogTitle>
-            <DialogDescription className="text-base text-muted-foreground">
-              {description}
-            </DialogDescription>
-          </DialogHeader>
-          <ModalMultiStepForm link={link} phone={phone} />
+          <div className="dialog-body">
+            <DialogHeader>
+              <DialogTitle>{title}</DialogTitle>
+              <DialogDescription>{description}</DialogDescription>
+            </DialogHeader>
+            <ModalMultiStepForm link={link} phone={phone} />
+          </div>
+          <CloseDialogButton />
         </DialogContent>
       </Dialog>
     </>

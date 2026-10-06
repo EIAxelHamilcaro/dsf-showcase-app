@@ -1,218 +1,104 @@
 "use client";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
-import { useId, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  computeAggregateRating,
-  formatRating,
-  formatReviewDate,
-  toRatedReview,
-} from "@/lib/seo/reviews";
-import { cn } from "@/lib/utils";
-import type { Config1, Media } from "@/payload-types";
-import { PageSection, SectionHeader, sectionTitleClass } from "./pageSection";
+import type { Media } from "@/payload-types";
 
-const sourceLabels = { direct: "Avis direct", google: "Avis Google" };
-const slideImageSizes =
-  "(min-width: 1296px) 588px, (min-width: 768px) 50vw, 100vw";
-const slideFrameClass = "relative aspect-[4/5] overflow-hidden rounded-xl";
-const slideLabelClass =
-  "absolute top-3 left-3 rounded-full px-4 py-1 text-lg font-bold text-white";
-const arrowClass =
-  "size-12 rounded-full shadow-md md:absolute md:top-[calc(50%-2rem)] md:-translate-y-1/2";
+const slideImageSizes = "(min-width: 48rem) 50vw, 100vw";
 
-export function GallerySection({ config }: { config: Config1 }) {
-  const projects = config.caroussel_section || [];
-  const testimonials = config.testimonials_section || [];
-  const aggregate = computeAggregateRating(config);
-  const testimonialsTitleId = useId();
+export interface GalleryProject {
+  id?: string | null;
+  description?: string | null;
+  before?: number | Media | null;
+  after?: number | Media | null;
+}
 
-  const [currentProject, setCurrentProject] = useState(0);
+export interface GalleryCarouselProps {
+  projects: GalleryProject[];
+}
 
-  const showProject = (index: number) => {
-    setCurrentProject((index + projects.length) % projects.length);
-  };
+const urlOf = (image: GalleryProject["before"]) =>
+  typeof image === "object" && image?.url ? image.url : "";
+
+export function GalleryCarousel({ projects }: GalleryCarouselProps) {
+  const [current, setCurrent] = useState(0);
+
+  const show = (index: number) =>
+    setCurrent((index + projects.length) % projects.length);
+
+  if (projects.length === 0) {
+    return null;
+  }
 
   return (
-    <PageSection id="realisations" tone="muted">
-      <SectionHeader
-        className="mb-10"
-        heading="Nos réalisations avant / après"
-        intro="Découvrez comment nous transformons les salles de bain"
-        isCentered
-      />
+    <section
+      aria-label="Photos avant et après travaux"
+      aria-roledescription="carrousel"
+      className="grid gap-stack"
+    >
+      <ul>
+        {projects.map((project, index) => {
+          const position = `réalisation ${index + 1}`;
+          const name = project.description
+            ? `${position}, ${project.description}`
+            : position;
 
-      <div className="relative mb-section">
-        <div className="overflow-hidden">
-          <div
-            className="flex transition-transform duration-500 ease-in-out"
-            style={{ transform: `translateX(-${currentProject * 100}%)` }}
-          >
-            {projects.map((project, index) => (
-              <div
-                aria-hidden={index !== currentProject}
-                className="grid w-full shrink-0 grid-cols-1 gap-4 md:grid-cols-2 md:gap-6"
-                key={project.id ?? index.toString()}
-              >
-                <div className={slideFrameClass}>
-                  <Image
-                    alt={`Baignoire ancienne avant remplacement par douche sécurisée senior - ${project.description || `Réalisation ${index + 1}`}`}
-                    className="object-cover"
-                    fill
-                    sizes={slideImageSizes}
-                    src={(project.before as Media)?.url || "/placeholder.svg"}
-                  />
-                  <span className={cn(slideLabelClass, "bg-destructive")}>
-                    Avant
-                  </span>
-                </div>
+          return (
+            <li
+              aria-label={`${index + 1} sur ${projects.length} : ${name}`}
+              aria-roledescription="diapositive"
+              className="tile-wall md:grid-cols-2"
+              hidden={index !== current}
+              key={project.id ?? index.toString()}
+            >
+              <figure className="frame aspect-[4/5]">
+                <Image
+                  alt={`Avant travaux, ancienne salle de bain avec baignoire : ${name}`}
+                  className="object-cover"
+                  fill
+                  sizes={slideImageSizes}
+                  src={urlOf(project.before)}
+                />
+                <figcaption className="frame-label">Avant</figcaption>
+              </figure>
+              <figure className="frame aspect-[4/5]">
+                <Image
+                  alt={`Après travaux, douche sécurisée de plain-pied : ${name}`}
+                  className="object-cover"
+                  fill
+                  sizes={slideImageSizes}
+                  src={urlOf(project.after)}
+                />
+                <figcaption className="frame-label" data-tone="primary">
+                  Après
+                </figcaption>
+              </figure>
+            </li>
+          );
+        })}
+      </ul>
 
-                <div className={slideFrameClass}>
-                  <Image
-                    alt={`Douche sécurisée plain-pied pour senior après installation - ${project.description || `Réalisation ${index + 1}`}`}
-                    className="object-cover"
-                    fill
-                    sizes={slideImageSizes}
-                    src={(project.after as Media)?.url || "/placeholder.svg"}
-                  />
-                  <span className={cn(slideLabelClass, "bg-primary")}>
-                    Après
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="mt-4 flex items-center justify-center gap-6">
-          <Button
-            aria-label="Projet précédent"
-            className={cn(arrowClass, "md:left-3")}
-            onClick={() => showProject(currentProject - 1)}
-            size="icon"
-            variant="quiet"
-          >
-            <ChevronLeft aria-hidden="true" className="size-6" />
-          </Button>
-
-          <output
-            aria-label={`${currentProject + 1} / ${projects.length}`}
-            className="text-lg font-bold before:content-[attr(aria-label)] md:hidden"
-          />
-
-          <fieldset
-            aria-label="Navigation des projets"
-            className="hidden flex-wrap justify-center md:flex"
-          >
-            {projects.map((project, index) => (
-              <Button
-                aria-current={index === currentProject ? "true" : undefined}
-                aria-label={`Voir projet ${index + 1}`}
-                className="group size-11 rounded-full hover:bg-background"
-                key={project.id ?? index.toString()}
-                onClick={() => showProject(index)}
-                size="icon"
-                type="button"
-                variant="ghost"
-              >
-                <span className="size-4 rounded-full border-2 border-muted-foreground group-aria-[current=true]:border-primary group-aria-[current=true]:bg-primary" />
-              </Button>
-            ))}
-          </fieldset>
-
-          <Button
-            aria-label="Projet suivant"
-            className={cn(arrowClass, "md:right-3")}
-            onClick={() => showProject(currentProject + 1)}
-            size="icon"
-            variant="quiet"
-          >
-            <ChevronRight aria-hidden="true" className="size-6" />
-          </Button>
-        </div>
-      </div>
-
-      <div className="space-y-8">
-        <h3
-          className={cn(sectionTitleClass, "text-center")}
-          id={testimonialsTitleId}
+      <div className="flex flex-wrap items-center justify-between gap-inline">
+        <Button
+          onClick={() => show(current - 1)}
+          size="lg"
+          type="button"
+          variant="secondary"
         >
-          Témoignages clients
-        </h3>
-        {aggregate ? (
-          <p className="text-lg text-center">
-            {formatRating(aggregate.ratingValue)}/5 sur {aggregate.reviewCount}{" "}
-            {aggregate.origin === "google" ? "avis Google" : "avis"}
-            {aggregate.origin === "google" && config.google_profile_url ? (
-              <>
-                {" "}
-                <a
-                  className="inline-flex min-h-11 items-center font-bold text-primary underline"
-                  href={config.google_profile_url}
-                  rel="noopener noreferrer"
-                  target="_blank"
-                >
-                  Voir la fiche
-                </a>
-              </>
-            ) : null}
-          </p>
-        ) : null}
-        <ul
-          aria-labelledby={testimonialsTitleId}
-          className="flex snap-x snap-mandatory items-start gap-6 overflow-x-auto pb-4"
-          // biome-ignore lint/a11y/noNoninteractiveTabindex: a scrollable list must be reachable with the keyboard
-          tabIndex={0}
-        >
-          {testimonials.map((testimonial, index) => {
-            const review = toRatedReview(testimonial);
-
-            return (
-              <li
-                className="w-[85%] shrink-0 snap-start sm:w-96"
-                key={testimonial.id ?? index.toString()}
-              >
-                <Card className="bg-background shadow-none">
-                  <CardHeader>
-                    <div className="flex items-center gap-3">
-                      <div className="flex size-12 shrink-0 items-center justify-center rounded-full bg-primary text-lg font-bold text-primary-foreground">
-                        {testimonial?.title?.charAt(0)}
-                      </div>
-                      <div>
-                        <CardTitle className="text-xl leading-snug">
-                          {testimonial.title}
-                        </CardTitle>
-                        <p className="text-muted-foreground">
-                          {testimonial.age} • {testimonial.location}
-                        </p>
-                        {review ? (
-                          <p className="text-muted-foreground">
-                            {formatRating(review.rating)}/5 •{" "}
-                            {sourceLabels[review.source]}
-                            {review.date ? (
-                              <>
-                                {" • "}
-                                <time dateTime={review.date}>
-                                  {formatReviewDate(review.date)}
-                                </time>
-                              </>
-                            ) : null}
-                          </p>
-                        ) : null}
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-lg italic">"{testimonial.text}"</p>
-                  </CardContent>
-                </Card>
-              </li>
-            );
-          })}
-        </ul>
+          <ChevronLeft aria-hidden="true" />
+          Précédente
+        </Button>
+        <p aria-live="polite">
+          <strong>
+            Réalisation {current + 1} sur {projects.length}
+          </strong>
+        </p>
+        <Button onClick={() => show(current + 1)} size="lg" type="button">
+          Suivante
+          <ChevronRight aria-hidden="true" />
+        </Button>
       </div>
-    </PageSection>
+    </section>
   );
 }

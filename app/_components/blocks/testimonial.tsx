@@ -1,8 +1,8 @@
-import { PageSection } from "@/app/_components/pageSection";
+import { PageSection, toneOf } from "@/app/_components/pageSection";
 import { validateReviewRating } from "@/lib/cms/validators";
 import type { TestimonialBlock } from "@/payload-types";
 
-interface TestimonialProps {
+export interface TestimonialProps {
   block: TestimonialBlock;
 }
 
@@ -13,24 +13,20 @@ export function Testimonial({ block }: TestimonialProps) {
       : undefined;
 
   return (
-    <PageSection tone={block.background === "muted" ? "muted" : "default"}>
-      <figure className="max-w-4xl space-y-5 border-l-4 border-primary pl-6 md:pl-10">
+    <PageSection tone={toneOf(block.background)}>
+      <figure className="rule-start grid max-w-4xl gap-stack">
         {rating ? (
-          <div
-            aria-label={`Note : ${rating} sur 5`}
-            className="flex gap-1 text-2xl text-star"
-            role="img"
-          >
-            <span className="sr-only">{"★".repeat(rating)}</span>
-            {Array.from({ length: rating }, (_, index) => (
-              <span className="before:content-['★']" key={index.toString()} />
-            ))}
-          </div>
+          <p className="rating">
+            <span aria-hidden="true">{"★".repeat(rating)}</span>
+            <span className="sr-only">{`Note : ${rating} sur 5`}</span>
+          </p>
         ) : null}
-        <blockquote className="text-2xl md:text-3xl font-semibold leading-snug">
-          <p>{`"${block.quote}"`}</p>
+        <blockquote className="quote" data-size="lg">
+          <p>« {block.quote} »</p>
         </blockquote>
-        <figcaption className="text-lg font-bold">{block.author}</figcaption>
+        <figcaption>
+          <strong>{block.author}</strong>
+        </figcaption>
       </figure>
     </PageSection>
   );

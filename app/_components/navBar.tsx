@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { Config1 } from "@/payload-types";
 import Logo from "../../public/logo.png";
-import NavBarInteractive from "./navBarInteractive";
+import NavBarInteractive, { type NavItem } from "./navBarInteractive";
 
 const fallbackServices = [
   {
@@ -27,58 +27,45 @@ const fallbackServices = [
   },
 ];
 
-export default function NavBar({ config }: { config: Config1 }) {
+export interface NavBarProps {
+  config: Config1;
+}
+
+export default function NavBar({ config }: NavBarProps) {
   const configuredServices = (config.menu_services ?? []).map((item) => ({
     label: item.label,
     href: item.href,
     description: item.description ?? undefined,
   }));
 
-  const items = [
-    {
-      label: "Accueil",
-      href: "/#accueil",
-    },
-    {
-      label: "A propos",
-      href: "/#a-propos",
-    },
-    {
-      label: "Réalisation",
-      href: "/#realisations",
-    },
+  const items: NavItem[] = [
+    { label: "Accueil", href: "/#accueil" },
+    { label: "À propos", href: "/#a-propos" },
+    { label: "Réalisations", href: "/#realisations" },
     {
       label: "Services",
       href: "/#services",
       children:
         configuredServices.length > 0 ? configuredServices : fallbackServices,
     },
-    {
-      label: "Contact",
-      href: "/#contact",
-    },
-    {
-      label: "Questions",
-      href: "/#faq",
-    },
+    { label: "Contact", href: "/#contact" },
+    { label: "Questions", href: "/#faq" },
   ];
 
   return (
-    <header className="sticky top-0 z-50 border-b bg-background">
-      <div className="mx-auto flex max-w-page flex-wrap items-center justify-between gap-x-2 px-gutter py-2">
-        <Link className="flex min-h-11 shrink-0 items-center" href="/">
-          <Image
-            alt="Logo de Douche Senior France"
-            className="h-7 w-auto min-[360px]:h-8 min-[400px]:h-10 md:h-12"
-            fetchPriority="low"
-            loading="eager"
-            sizes="(min-width: 768px) 144px, (min-width: 400px) 120px, (min-width: 360px) 96px, 84px"
-            src={Logo}
-          />
-        </Link>
+    <header className="site-header flex min-h-(--header-height) flex-wrap items-center justify-between gap-x-grout">
+      <Link aria-label="Douche Senior France, accueil" href="/">
+        <Image
+          alt=""
+          className="h-8 w-auto md:h-12"
+          fetchPriority="low"
+          loading="eager"
+          sizes="144px"
+          src={Logo}
+        />
+      </Link>
 
-        <NavBarInteractive config={config} items={items} />
-      </div>
+      <NavBarInteractive items={items} phone={config.phone ?? ""} />
     </header>
   );
 }

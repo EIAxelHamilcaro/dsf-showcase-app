@@ -1,37 +1,52 @@
 import { MapPin } from "lucide-react";
-import { PageSection, SectionSplit } from "@/app/_components/pageSection";
+import Link from "next/link";
+import {
+  PageSection,
+  SectionHeader,
+  toneOf,
+} from "@/app/_components/pageSection";
 import type { ZoneListBlock } from "@/payload-types";
 
-interface ZoneListProps {
+export interface ZoneListProps {
   block: ZoneListBlock;
+  hrefOf: (name: string) => string | undefined;
 }
 
-export function ZoneList({ block }: ZoneListProps) {
+export function ZoneList({ block, hrefOf }: ZoneListProps) {
   return (
-    <PageSection tone={block.background === "muted" ? "muted" : "default"}>
-      <SectionSplit heading={block.heading} intro={block.intro}>
-        <ul className="grid gap-3 min-[360px]:grid-cols-2 sm:flex sm:flex-wrap">
-          {block.items.map((item, index) => (
-            <li
-              className="flex items-center gap-2 rounded-lg border bg-background px-3 py-3 font-semibold sm:px-4"
-              key={item.id ?? index.toString()}
-            >
-              {block.showMapIcon ? (
-                <MapPin
-                  aria-hidden="true"
-                  className="h-5 w-5 shrink-0 text-primary"
-                />
-              ) : null}
-              {item.name}
-            </li>
-          ))}
+    <PageSection layout="split" tone={toneOf(block.background)}>
+      <SectionHeader heading={block.heading} intro={block.intro} />
+      <div className="grid content-start gap-stack">
+        <ul className="tile-wall" data-fit="auto">
+          {block.items.map((item, index) => {
+            const href = hrefOf(item.name);
+
+            return (
+              <li
+                className="tile flex items-center gap-inline"
+                data-size="compact"
+                key={item.id ?? index.toString()}
+              >
+                {block.showMapIcon ? (
+                  <MapPin
+                    aria-hidden="true"
+                    className="icon-mark"
+                    data-size="sm"
+                  />
+                ) : null}
+                {href ? (
+                  <Link className="tile-title" href={href}>
+                    {item.name}
+                  </Link>
+                ) : (
+                  item.name
+                )}
+              </li>
+            );
+          })}
         </ul>
-        {block.outro ? (
-          <p className="mt-8 max-w-reading text-muted-foreground">
-            {block.outro}
-          </p>
-        ) : null}
-      </SectionSplit>
+        {block.outro ? <p className="soft">{block.outro}</p> : null}
+      </div>
     </PageSection>
   );
 }

@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/breadcrumb";
 import type { PageLink } from "@/lib/pages/pageLinks";
 
-interface PageBreadcrumbProps {
+export interface PageBreadcrumbProps {
   trail: PageLink[];
 }
 
@@ -19,18 +19,12 @@ export function PageBreadcrumb({ trail }: PageBreadcrumbProps) {
   const ancestors = trail.slice(0, -1);
 
   return (
-    <Breadcrumb
-      aria-label="Fil d'Ariane"
-      className="mx-auto max-w-page px-gutter py-2"
-    >
-      <BreadcrumbList className="text-small">
+    <Breadcrumb aria-label="Fil d'Ariane">
+      <BreadcrumbList>
         {ancestors.map((link) => (
           <Fragment key={link.href}>
             <BreadcrumbItem>
-              <BreadcrumbLink
-                asChild
-                className="inline-flex min-h-11 items-center underline hover:text-primary"
-              >
+              <BreadcrumbLink asChild>
                 <Link href={link.href}>{link.label}</Link>
               </BreadcrumbLink>
             </BreadcrumbItem>

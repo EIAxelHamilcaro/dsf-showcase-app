@@ -1,7 +1,7 @@
 import {
   PageSection,
-  SectionStack,
-  sectionLeadClass,
+  SectionHeader,
+  toneOf,
 } from "@/app/_components/pageSection";
 import { cn } from "@/lib/utils";
 import type { FeatureCardsBlock } from "@/payload-types";
@@ -14,7 +14,7 @@ const gridClasses: Record<FeatureCardsBlock["columns"], string> = {
   "4": "sm:grid-cols-2 lg:grid-cols-4",
 };
 
-interface FeatureCardsProps {
+export interface FeatureCardsProps {
   block: FeatureCardsBlock;
 }
 
@@ -22,62 +22,35 @@ export function FeatureCards({ block }: FeatureCardsProps) {
   const FeatureTitle = block.heading ? "h3" : "h2";
   const isInline = block.layout === "inline";
 
-  const grid = (
-    <ul
-      className={cn(
-        "grid gap-x-8",
-        block.spacing === "spacious" ? "gap-y-10" : "gap-y-8",
-        gridClasses[block.columns],
-      )}
-    >
-      {block.cards.map((card, index) => {
-        const Icon = resolveIcon(card.icon);
-
-        return (
-          <li
-            className={cn(
-              "border-t-2 border-primary pt-5",
-              isInline ? "flex gap-4" : "space-y-3",
-            )}
-            key={card.id ?? index.toString()}
-          >
-            {Icon ? (
-              <Icon
-                aria-hidden="true"
-                className={cn(
-                  "shrink-0 text-primary",
-                  isInline ? "mt-0.5 h-7 w-7" : "h-9 w-9",
-                )}
-              />
-            ) : null}
-            <div className="space-y-2">
-              <FeatureTitle className="text-xl font-bold">
-                {card.title}
-              </FeatureTitle>
-              <p className="text-muted-foreground">{card.text}</p>
-            </div>
-          </li>
-        );
-      })}
-    </ul>
-  );
-
   return (
-    <PageSection tone={block.background === "muted" ? "muted" : "default"}>
+    <PageSection tone={toneOf(block.background)}>
       {block.heading ? (
-        <SectionStack heading={block.heading} intro={block.intro}>
-          {grid}
-        </SectionStack>
-      ) : (
-        <div className="space-y-8">
-          {block.intro ? (
-            <p className={cn(sectionLeadClass, "max-w-reading")}>
-              {block.intro}
-            </p>
-          ) : null}
-          {grid}
-        </div>
-      )}
+        <SectionHeader heading={block.heading} intro={block.intro} />
+      ) : null}
+      {!block.heading && block.intro ? (
+        <p className="lead soft">{block.intro}</p>
+      ) : null}
+      <ul className={cn("tile-wall", gridClasses[block.columns])}>
+        {block.cards.map((card, index) => {
+          const Icon = resolveIcon(card.icon);
+
+          return (
+            <li
+              className={cn(
+                "tile gap-inline",
+                isInline ? "flex items-start" : "grid content-start",
+              )}
+              key={card.id ?? index.toString()}
+            >
+              {Icon ? <Icon aria-hidden="true" className="icon-mark" /> : null}
+              <div className="grid gap-inline">
+                <FeatureTitle>{card.title}</FeatureTitle>
+                <p className="soft">{card.text}</p>
+              </div>
+            </li>
+          );
+        })}
+      </ul>
     </PageSection>
   );
 }

@@ -1,39 +1,25 @@
 "use client";
-import { Check, Loader2 } from "lucide-react";
+import { CircleCheck, Loader2 } from "lucide-react";
 import { type ChangeEvent, type FormEvent, useId, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  errorProps,
-  FieldError,
-  FormError,
-  fieldClass,
-  PhoneFallback,
-  submitClass,
-  textareaClass,
-} from "./contactFeedback";
+import { FormError, PhoneFallback } from "./contactFeedback";
+import { ContactFields, emptyContact } from "./contactFields";
 import { useContactSubmission } from "./useContactSubmission";
 
-const emptyForm = {
-  name: "",
-  phone: "",
-  email: "",
-  message: "",
-  adress: "",
-};
+export interface ContactFormProps {
+  phone?: string | null;
+}
 
-export function ContactForm({ phone }: { phone?: string | null }) {
+export function ContactForm({ phone }: ContactFormProps) {
   const id = useId();
-  const [formData, setFormData] = useState(emptyForm);
+  const [values, setValues] = useState(emptyContact);
   const [isSent, setIsSent] = useState(false);
   const { formRef, errors, formError, isPending, turnstileWidget, ...form } =
     useContactSubmission();
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
-    setIsSent(await form.submit(formData));
+    setIsSent(await form.submit(values));
   };
 
   const handleChange = (
@@ -41,117 +27,48 @@ export function ContactForm({ phone }: { phone?: string | null }) {
   ) => {
     const { name, value } = event.target;
 
-    setFormData((previous) => ({ ...previous, [name]: value }));
+    setValues((previous) => ({ ...previous, [name]: value }));
     form.clearError(name);
+  };
+
+  const writeAnother = () => {
+    setValues(emptyContact);
+    setIsSent(false);
   };
 
   if (isSent) {
     return (
       <output
-        className="block text-center space-y-4 py-6 outline-none"
+        className="notice grid justify-items-start gap-stack"
+        data-tone="success"
         ref={(node) => node?.focus()}
         tabIndex={-1}
       >
-        <Check aria-hidden="true" className="mx-auto size-16 text-success" />
-        <p className="text-2xl font-bold">Merci pour votre demande !</p>
-        <p className="text-lg">Votre demande a bien été envoyée.</p>
+        <CircleCheck aria-hidden="true" className="icon-mark" />
+        <strong>Votre demande est envoyée.</strong>
+        <span>
+          Nous vous rappelons sous 24 heures pour préparer votre devis.
+        </span>
+        <Button onClick={writeAnother} type="button" variant="secondary">
+          Envoyer une autre demande
+        </Button>
       </output>
     );
   }
 
   return (
     <form
-      className="space-y-4"
+      className="grid gap-stack"
       noValidate
       onSubmit={handleSubmit}
       ref={formRef}
     >
-      <div>
-        <Label className="text-lg" htmlFor={`${id}-name`}>
-          Nom complet *
-        </Label>
-        <Input
-          {...errorProps(`${id}-name`, errors.name)}
-          autoComplete="name"
-          className={fieldClass}
-          name="name"
-          onChange={handleChange}
-          placeholder="Votre nom et prénom"
-          required
-          value={formData.name}
-        />
-        <FieldError error={errors.name} id={`${id}-name`} />
-      </div>
-
-      <div>
-        <Label className="text-lg" htmlFor={`${id}-phone`}>
-          Téléphone *
-        </Label>
-        <Input
-          {...errorProps(`${id}-phone`, errors.phone)}
-          autoComplete="tel"
-          className={fieldClass}
-          inputMode="tel"
-          name="phone"
-          onChange={handleChange}
-          placeholder="01 23 45 67 89"
-          required
-          type="tel"
-          value={formData.phone}
-        />
-        <FieldError error={errors.phone} id={`${id}-phone`} />
-      </div>
-
-      <div>
-        <Label className="text-lg" htmlFor={`${id}-email`}>
-          Email *
-        </Label>
-        <Input
-          {...errorProps(`${id}-email`, errors.email)}
-          autoComplete="email"
-          className={fieldClass}
-          inputMode="email"
-          name="email"
-          onChange={handleChange}
-          placeholder="votre@email.fr"
-          required
-          type="email"
-          value={formData.email}
-        />
-        <FieldError error={errors.email} id={`${id}-email`} />
-      </div>
-
-      <div>
-        <Label className="text-lg" htmlFor={`${id}-adress`}>
-          Adresse *
-        </Label>
-        <Input
-          {...errorProps(`${id}-adress`, errors.adress)}
-          autoComplete="address-line1"
-          className={fieldClass}
-          name="adress"
-          onChange={handleChange}
-          placeholder="Votre adresse complète"
-          required
-          value={formData.adress}
-        />
-        <FieldError error={errors.adress} id={`${id}-adress`} />
-      </div>
-
-      <div>
-        <Label className="text-lg" htmlFor={`${id}-message`}>
-          Message (optionnel)
-        </Label>
-        <Textarea
-          {...errorProps(`${id}-message`, errors.message)}
-          className={textareaClass}
-          name="message"
-          onChange={handleChange}
-          placeholder="Décrivez votre projet..."
-          value={formData.message}
-        />
-        <FieldError error={errors.message} id={`${id}-message`} />
-      </div>
+      <ContactFields
+        errors={errors}
+        id={id}
+        onChange={handleChange}
+        values={values}
+      />
 
       {turnstileWidget}
 
@@ -159,15 +76,15 @@ export function ContactForm({ phone }: { phone?: string | null }) {
 
       <Button
         aria-busy={isPending}
-        className={submitClass}
+        className="w-full"
         disabled={isPending}
-        size="xl"
+        size="lg"
         type="submit"
       >
         {isPending ? (
           <>
-            <Loader2 aria-hidden="true" className="size-5 animate-spin" />
-            Envoi en cours...
+            <Loader2 aria-hidden="true" className="animate-spin" />
+            Envoi en cours
           </>
         ) : (
           "Envoyer ma demande"

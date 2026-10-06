@@ -7,6 +7,10 @@ import { RefreshRouteOnSave } from "@/app/_components/refreshRouteOnSave";
 import { RelatedLinks } from "@/app/_components/relatedLinks";
 import { getAllPages, getPageBySlug } from "@/lib/pages/getPage";
 import { getSiteConfig } from "@/lib/pages/getSiteConfig";
+import {
+  createMentionLinker,
+  getMentionTargets,
+} from "@/lib/pages/mentionLinks";
 import { getBreadcrumb, getRelatedLinks } from "@/lib/pages/pageLinks";
 import { buildMetadata, seoImageUrl } from "@/lib/seo/buildMetadata";
 import { buildPageGraph } from "@/lib/seo/jsonLd";
@@ -52,10 +56,7 @@ export default async function CmsPage({ params }: CmsPageProps) {
 
   const [config, all] = await Promise.all([getSiteConfig(), getAllPages()]);
   const trail = getBreadcrumb(page, all);
-  const isLegalPage = page.layout.some(
-    (block) => block.blockType === "legalContent",
-  );
-
+  const mentions = createMentionLinker(getMentionTargets(all), `/${page.slug}`);
   return (
     <>
       <RefreshRouteOnSave />
@@ -63,13 +64,11 @@ export default async function CmsPage({ params }: CmsPageProps) {
       <PageBreadcrumb trail={trail} />
       <BlockRenderer
         blocks={page.layout}
+        mentions={mentions}
         phone={config.phone ?? ""}
         updatedAt={page.updatedAt}
       />
-      <RelatedLinks
-        isReadingWidth={isLegalPage}
-        links={getRelatedLinks(page, all)}
-      />
+      <RelatedLinks links={getRelatedLinks(page, all)} />
     </>
   );
 }

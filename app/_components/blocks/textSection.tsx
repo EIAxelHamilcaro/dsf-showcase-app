@@ -1,20 +1,36 @@
-import { PageSection, SectionSplit } from "@/app/_components/pageSection";
+import Link from "next/link";
+import {
+  PageSection,
+  SectionHeader,
+  toneOf,
+} from "@/app/_components/pageSection";
+import type { TextSegment } from "@/lib/pages/mentionLinks";
 import type { TextSectionBlock } from "@/payload-types";
 
-interface TextSectionProps {
+export interface TextSectionProps {
   block: TextSectionBlock;
+  paragraphs: TextSegment[][];
 }
 
-export function TextSection({ block }: TextSectionProps) {
+export function TextSection({ block, paragraphs }: TextSectionProps) {
   return (
-    <PageSection tone={block.background === "muted" ? "muted" : "default"}>
-      <SectionSplit heading={block.heading}>
-        <div className="max-w-reading space-y-5 text-lg leading-relaxed">
-          {block.paragraphs.map((paragraph, index) => (
-            <p key={paragraph.id ?? index.toString()}>{paragraph.text}</p>
-          ))}
-        </div>
-      </SectionSplit>
+    <PageSection layout="split" tone={toneOf(block.background)}>
+      <SectionHeader heading={block.heading} />
+      <div className="prose">
+        {paragraphs.map((segments, index) => (
+          <p key={block.paragraphs[index]?.id ?? index.toString()}>
+            {segments.map((segment) =>
+              typeof segment === "string" ? (
+                segment
+              ) : (
+                <Link href={segment.href} key={segment.href}>
+                  {segment.label}
+                </Link>
+              ),
+            )}
+          </p>
+        ))}
+      </div>
     </PageSection>
   );
 }

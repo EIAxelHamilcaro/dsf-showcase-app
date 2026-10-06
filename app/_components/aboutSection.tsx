@@ -1,121 +1,115 @@
 import { Clock, MapPin, Users, Wrench } from "lucide-react";
 import Image from "next/image";
-import { cn } from "@/lib/utils";
 import type { Config1, Media } from "@/payload-types";
-import {
-  PageSection,
-  sectionLeadClass,
-  sectionTitleClass,
-  subsectionTitleClass,
-} from "./pageSection";
+import { PageSection, SectionHeader } from "./pageSection";
 
-const certificationLogoClass = "relative h-20 w-28 md:h-24 md:w-36";
+const splitLabel = (paragraph: string) => {
+  const separator = paragraph.indexOf(":");
 
-export function AboutSection({ config }: { config: Config1 }) {
+  return separator === -1
+    ? { label: "", text: paragraph }
+    : {
+        label: paragraph.slice(0, separator).trim(),
+        text: paragraph.slice(separator + 1).trim(),
+      };
+};
+
+export interface AboutSectionProps {
+  config: Config1;
+}
+
+export function AboutSection({ config }: AboutSectionProps) {
+  const about = config.about_features;
   const features = [
     {
-      key: "local",
       icon: MapPin,
-      title: config.about_features?.about_feature_1?.about_feature_title_1,
-      description: config.about_features?.about_feature_1?.about_feature_text_1,
+      title: about?.about_feature_1?.about_feature_title_1,
+      description: about?.about_feature_1?.about_feature_text_1,
     },
     {
-      key: "experience",
       icon: Clock,
-      title: config.about_features?.about_feature_2?.about_feature_title_2,
-      description: config.about_features?.about_feature_2?.about_feature_text_2,
+      title: about?.about_feature_2?.about_feature_title_2,
+      description: about?.about_feature_2?.about_feature_text_2,
     },
     {
-      key: "seniors",
       icon: Users,
-      title: config.about_features?.about_feature_3?.about_feature_title_3,
-      description: config.about_features?.about_feature_3?.about_feature_text_3,
+      title: about?.about_feature_3?.about_feature_title_3,
+      description: about?.about_feature_3?.about_feature_text_3,
     },
     {
-      key: "works",
       icon: Wrench,
-      title: config.about_features?.about_feature_4?.about_feature_title_4,
-      description: config.about_features?.about_feature_4?.about_feature_text_4,
+      title: about?.about_feature_4?.about_feature_title_4,
+      description: about?.about_feature_4?.about_feature_text_4,
     },
   ];
 
-  const paragraphs = [
-    config.about_section.about_paragraphs?.para_1,
-    config.about_section.about_paragraphs?.para_2,
-    config.about_section.about_paragraphs?.para_3,
-  ];
+  const paragraphs = Object.values(config.about_section.about_paragraphs ?? {})
+    .filter((paragraph): paragraph is string => Boolean(paragraph))
+    .map(splitLabel);
 
   return (
-    <PageSection id="a-propos">
-      <div className="space-y-12">
-        <div className="mx-auto max-w-4xl space-y-6 text-center">
-          <div className="grid grid-cols-2 items-center justify-items-center gap-x-6 gap-y-4 md:grid-cols-[auto_1fr_auto]">
-            <div className={certificationLogoClass}>
+    <>
+      <PageSection id="a-propos">
+        <div className="grid items-end gap-block lg:grid-cols-[3fr_2fr]">
+          <SectionHeader
+            heading={config.about_title}
+            intro={config.about_text}
+          />
+          <ul className="flex items-center gap-block lg:justify-end">
+            <li>
               <Image
-                alt="Certification Handibat pour l'accessibilité PMR et adaptation du logement aux personnes âgées"
-                className="object-contain"
-                fill
-                sizes="144px"
+                alt="Marque Handibat : accessibilité et adaptation du logement"
+                height={96}
                 src="/logo-handibat.webp"
+                width={96}
               />
-            </div>
-            <h2
-              className={cn(
-                sectionTitleClass,
-                "order-last col-span-2 md:order-none md:col-span-1",
-              )}
-            >
-              {config.about_title}
-            </h2>
-            <div className={certificationLogoClass}>
+            </li>
+            <li>
               <Image
-                alt="Label Silverbat spécialiste de l'adaptation des salles de bain pour seniors et personnes âgées"
-                className="object-contain"
-                fill
-                sizes="144px"
+                alt="Label Silverbat : adaptation des salles de bain pour les seniors"
+                height={64}
                 src="/logo-silverbat.webp"
+                width={160}
               />
-            </div>
-          </div>
-
-          <p className={`${sectionLeadClass} mx-auto max-w-reading`}>
-            {config.about_text}
-          </p>
+            </li>
+          </ul>
         </div>
 
-        <div className="grid gap-x-8 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">
-          {features.map(({ key, icon: Icon, title, description }) => (
-            <div className="space-y-3 border-t-2 border-primary pt-5" key={key}>
-              <Icon aria-hidden="true" className="size-9 text-primary" />
-              <h3 className="text-xl font-bold">{title}</h3>
-              <p className="text-muted-foreground">{description}</p>
-            </div>
+        <ul className="tile-wall sm:grid-cols-2 lg:grid-cols-4">
+          {features.map(({ icon: Icon, title, description }) => (
+            <li className="tile grid content-start gap-inline" key={title}>
+              <Icon aria-hidden="true" className="icon-mark" />
+              <h3>{title}</h3>
+              <p className="soft">{description}</p>
+            </li>
           ))}
-        </div>
+        </ul>
+      </PageSection>
 
-        <div className="grid items-center gap-8 rounded-xl bg-muted p-6 md:p-10 lg:grid-cols-2 lg:gap-12">
-          <div className="space-y-4">
-            <h3 className={subsectionTitleClass}>
-              {config.about_section.about_heading}
-            </h3>
-            {paragraphs.map((paragraph, index) => (
-              <p key={index.toString()}>
-                <strong>{paragraph?.split(":")[0]} :</strong>
-                {paragraph?.split(":")[1]}
-              </p>
+      <PageSection className="items-center lg:grid-cols-2" tone="muted">
+        <div className="grid gap-stack">
+          <h2>{config.about_section.about_heading}</h2>
+          <dl className="grid gap-stack">
+            {paragraphs.map(({ label, text }) => (
+              <div className="rule-start" key={label || text}>
+                <dt>
+                  <strong>{label}</strong>
+                </dt>
+                <dd>{text}</dd>
+              </div>
             ))}
-          </div>
-          <div className="relative aspect-[4/3] overflow-hidden rounded-lg">
-            <Image
-              alt="Artisan français au travail dans une salle de bain"
-              className="object-cover"
-              fill
-              sizes="(min-width: 1024px) 540px, 100vw"
-              src={(config.about_image as Media).url || ""}
-            />
-          </div>
+          </dl>
         </div>
-      </div>
-    </PageSection>
+        <div className="frame aspect-[4/3]">
+          <Image
+            alt="Salle de bain adaptée par Douche Senior France : douche de plain-pied, siège et barre d'appui"
+            className="object-cover"
+            fill
+            sizes="(min-width: 64rem) 540px, 100vw"
+            src={(config.about_image as Media).url || ""}
+          />
+        </div>
+      </PageSection>
+    </>
   );
 }

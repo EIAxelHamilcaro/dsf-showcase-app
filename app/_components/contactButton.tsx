@@ -25,12 +25,13 @@ export function ContactButton({
   onClick,
 }: ContactButtonProps) {
   const handleClick = () => {
-    window.openContactModal?.();
     onClick?.();
+    window.openContactModal?.();
   };
 
   return (
     <Button
+      aria-haspopup="dialog"
       className={className}
       onClick={handleClick}
       size={size}

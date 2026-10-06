@@ -1,3 +1,4 @@
+import type { MentionLinker } from "@/lib/pages/mentionLinks";
 import type { Page } from "@/payload-types";
 import { AidCards } from "./aidCards";
 import { Faq } from "./faq";
@@ -12,16 +13,18 @@ import { Testimonial } from "./testimonial";
 import { TextSection } from "./textSection";
 import { ZoneList } from "./zoneList";
 
-interface BlockRendererProps {
+export interface BlockRendererProps {
   blocks: Page["layout"];
   phone: string;
   updatedAt: string;
+  mentions: MentionLinker;
 }
 
 export function BlockRenderer({
   blocks,
   phone,
   updatedAt,
+  mentions,
 }: BlockRendererProps) {
   return (
     <>
@@ -34,7 +37,9 @@ export function BlockRenderer({
           case "featureCards":
             return <FeatureCards block={block} key={key} />;
           case "zoneList":
-            return <ZoneList block={block} key={key} />;
+            return (
+              <ZoneList block={block} hrefOf={mentions.hrefOf} key={key} />
+            );
           case "testimonial":
             return <Testimonial block={block} key={key} />;
           case "serviceCards":
@@ -46,7 +51,15 @@ export function BlockRenderer({
           case "linkCards":
             return <LinkCards block={block} key={key} />;
           case "textSection":
-            return <TextSection block={block} key={key} />;
+            return (
+              <TextSection
+                block={block}
+                key={key}
+                paragraphs={block.paragraphs.map((paragraph) =>
+                  mentions.link(paragraph.text),
+                )}
+              />
+            );
           case "faq":
             return <Faq block={block} key={key} />;
           case "legalContent":

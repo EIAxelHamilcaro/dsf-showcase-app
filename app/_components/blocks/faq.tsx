@@ -1,4 +1,9 @@
-import { PageSection, SectionSplit } from "@/app/_components/pageSection";
+import { NewTabHint } from "@/app/_components/newTabHint";
+import {
+  PageSection,
+  SectionHeader,
+  toneOf,
+} from "@/app/_components/pageSection";
 import {
   Accordion,
   AccordionContent,
@@ -26,33 +31,29 @@ export interface FaqAccordionProps {
 
 export function FaqAccordion({ items }: FaqAccordionProps) {
   return (
-    <Accordion className="border-t" collapsible type="single">
+    <Accordion collapsible type="single">
       {items.map((item, index) => (
         <AccordionItem
           key={item.id ?? index.toString()}
           value={item.id ?? `item-${index}`}
         >
-          <AccordionTrigger className="cursor-pointer items-center py-5 text-lg md:text-xl font-bold [&>svg]:size-6 [&>svg]:translate-y-0 [&>svg]:text-primary">
-            {item.question}
-          </AccordionTrigger>
-          <AccordionContent
-            className="max-w-reading space-y-2 pb-6 text-lg leading-relaxed"
-            forceMount
-          >
+          <AccordionTrigger>{item.question}</AccordionTrigger>
+          <AccordionContent forceMount>
             <p>{item.answer}</p>
             {item.sources?.map((source, sourceIndex) => (
               <p
-                className="text-small text-muted-foreground"
+                className="small soft"
                 key={source.id ?? sourceIndex.toString()}
               >
                 {"Source : "}
                 <a
-                  className="inline-flex min-h-11 items-center underline hover:text-primary"
+                  className="link"
                   href={source.url}
                   rel="noopener"
                   target="_blank"
                 >
                   {source.label}
+                  <NewTabHint />
                 </a>
               </p>
             ))}
@@ -63,16 +64,15 @@ export function FaqAccordion({ items }: FaqAccordionProps) {
   );
 }
 
-interface FaqProps {
+export interface FaqProps {
   block: FaqBlock;
 }
 
 export function Faq({ block }: FaqProps) {
   return (
-    <PageSection tone={block.background === "muted" ? "muted" : "default"}>
-      <SectionSplit heading={block.heading}>
-        <FaqAccordion items={block.items} />
-      </SectionSplit>
+    <PageSection layout="split" tone={toneOf(block.background)}>
+      <SectionHeader heading={block.heading} />
+      <FaqAccordion items={block.items} />
     </PageSection>
   );
 }

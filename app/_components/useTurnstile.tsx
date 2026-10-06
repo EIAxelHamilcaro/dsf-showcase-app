@@ -10,7 +10,7 @@ import {
 import { isTestKey, testSiteKey } from "@/lib/contact/turnstileKeys";
 
 const tokenWaitInMs = 10_000;
-const flexibleWidgetQuery = "(min-width: 22.5rem)";
+const flexibleWidgetQuery = "(min-width: 24rem)";
 const isDeployed = Boolean(process.env.NEXT_PUBLIC_VERCEL_ENV);
 const configuredSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 const fallbackSiteKey =

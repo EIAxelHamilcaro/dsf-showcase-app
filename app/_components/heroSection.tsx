@@ -1,57 +1,82 @@
-import { Award, Heart, Shield } from "lucide-react";
+import { Check, Phone } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { toTelHref } from "@/lib/seo/phone";
 import type { Config1, Media } from "@/payload-types";
 import { DownloadDialog } from "./downloadDialog";
 import { PageSection } from "./pageSection";
-import { RichTextBoldOnly } from "./richText";
+import { HighlightedTitle } from "./richText";
 
-export default function HeroSection({ config }: { config: Config1 }) {
+export interface HeroSectionProps {
+  config: Config1;
+}
+
+export default function HeroSection({ config }: HeroSectionProps) {
   const heroImage = config.hero_image as Media;
   const tags = [
-    { key: "shield", icon: Shield, label: config.main_tags?.main_tag_1 },
-    { key: "heart", icon: Heart, label: config.main_tags?.main_tag_2 },
-    { key: "award", icon: Award, label: config.main_tags?.main_tag_3 },
-  ];
+    config.main_tags?.main_tag_1,
+    config.main_tags?.main_tag_2,
+    config.main_tags?.main_tag_3,
+  ].filter(Boolean);
 
   return (
-    <PageSection id="accueil" tone="hero">
-      <div className="grid items-center gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:gap-14">
-        <div className="min-w-0 space-y-8">
-          <RichTextBoldOnly content={config.main_title} />
+    <PageSection
+      className="items-center lg:grid-cols-[1.1fr_0.9fr]"
+      id="accueil"
+      tone="tint"
+    >
+      <div className="grid gap-block">
+        <div className="grid gap-stack">
+          <HighlightedTitle content={config.main_title} />
+          <p className="lead">{config.sub_main_title}</p>
+        </div>
 
-          <p className="max-w-reading text-xl md:text-2xl">
-            {config.sub_main_title}
-          </p>
+        <ul className="flex flex-wrap gap-x-block gap-y-inline">
+          {tags.map((tag) => (
+            <li className="flex items-center gap-inline" key={tag}>
+              <Check aria-hidden="true" className="icon-mark" data-size="sm" />
+              <strong>{tag}</strong>
+            </li>
+          ))}
+        </ul>
 
-          <div className="flex flex-wrap gap-x-6 gap-y-3 text-lg font-bold">
-            {tags.map(({ key, icon: Icon, label }) => (
-              <div className="flex items-center gap-2" key={key}>
-                <Icon aria-hidden="true" className="size-6 text-primary" />
-                <span>{label}</span>
-              </div>
-            ))}
-          </div>
-
-          <div className="grid max-w-xl auto-rows-fr gap-3 sm:grid-cols-2">
-            <Button asChild size="xl">
+        <div className="grid gap-stack">
+          <div className="flex flex-wrap gap-inline">
+            <Button asChild size="lg">
               <Link href="#contact">{config.main_button?.main_button_1}</Link>
             </Button>
-            <Button asChild size="xl" variant="outlinePrimary">
+            <Button asChild size="lg" variant="outline">
               <Link href="#realisations">
                 {config.main_button?.main_button_2}
               </Link>
             </Button>
+          </div>
+
+          {config.phone ? (
+            <p>
+              Ou appelez-nous, nous répondons à vos questions :{" "}
+              <a className="link" data-size="lg" href={toTelHref(config.phone)}>
+                <Phone
+                  aria-hidden="true"
+                  className="icon-mark"
+                  data-size="sm"
+                />
+                {config.phone}
+              </a>
+            </p>
+          ) : null}
+
+          <div className="rule-top flex flex-wrap gap-inline">
             <DownloadDialog
-              description="Répondez à quelques questions pour personnaliser votre guide"
+              description="Répondez à quelques questions pour personnaliser votre guide."
               label="Télécharger le guide"
               link={(config.main_button.guide_pdf as Media).url || ""}
               phone={config.phone}
               title="Recevez votre guide gratuit"
             />
             <DownloadDialog
-              description="Répondez à quelques questions pour accéder à la documentation complète"
+              description="Répondez à quelques questions pour accéder à la documentation complète."
               label="Télécharger la documentation"
               link={(config.main_button.doc_pdf as Media).url || ""}
               phone={config.phone}
@@ -59,30 +84,25 @@ export default function HeroSection({ config }: { config: Config1 }) {
             />
           </div>
         </div>
-
-        <div className="relative pb-3">
-          <div className="relative aspect-[4/5] sm:aspect-[3/2] lg:aspect-[4/5] overflow-hidden rounded-xl">
-            <Image
-              alt="Douche senior sécurisée plain-pied avec barres d'appui et sol antidérapant - Installation en 1 jour"
-              className="object-cover"
-              fetchPriority="high"
-              fill
-              preload
-              sizes="(min-width: 1024px) 540px, 100vw"
-              src={heroImage.url || ""}
-            />
-          </div>
-
-          <div className="absolute bottom-0 left-3 right-3 sm:right-auto sm:max-w-md rounded-lg bg-primary px-4 py-3 text-primary-foreground shadow-lg">
-            <p className="text-base sm:text-lg font-bold">
-              {config.hero_image_label?.hero_image_label_1}
-            </p>
-            <p className="text-small">
-              {config.hero_image_label?.hero_image_label_2}
-            </p>
-          </div>
-        </div>
       </div>
+
+      <figure className="grid gap-grout">
+        <div className="frame aspect-[4/5] sm:aspect-[3/2] lg:aspect-[4/5]">
+          <Image
+            alt="Douche senior de plain-pied avec barres d'appui et sol antidérapant, installée en une journée"
+            className="object-cover"
+            fetchPriority="high"
+            fill
+            preload
+            sizes="(min-width: 64rem) 540px, 100vw"
+            src={heroImage.url || ""}
+          />
+        </div>
+        <figcaption className="frame-caption">
+          <strong>{config.hero_image_label?.hero_image_label_1}</strong>
+          <p className="small">{config.hero_image_label?.hero_image_label_2}</p>
+        </figcaption>
+      </figure>
     </PageSection>
   );
 }

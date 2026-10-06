@@ -4,82 +4,110 @@ import type { PageLink } from "@/lib/pages/pageLinks";
 import { toTelHref } from "@/lib/seo/phone";
 import type { Config1 } from "@/payload-types";
 
-interface FooterProps {
+interface FooterLinksProps {
+  heading: string;
+  links: PageLink[];
+}
+
+function FooterLinks({ heading, links }: FooterLinksProps) {
+  if (links.length === 0) {
+    return null;
+  }
+
+  return (
+    <nav aria-label={heading}>
+      <h3>{heading}</h3>
+      <ul>
+        {links.map((link) => (
+          <li key={link.href}>
+            <Link className="footer-link" href={link.href}>
+              {link.label}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  );
+}
+
+export interface FooterProps {
   config: Config1;
+  serviceLinks: PageLink[];
+  departmentLinks: PageLink[];
+  cityLinks: PageLink[];
   legalLinks: PageLink[];
 }
 
-const contactLinkClass =
-  "flex min-h-11 items-center gap-3 underline hover:no-underline";
-
-export function Footer({ config, legalLinks }: FooterProps) {
+export function Footer({
+  config,
+  serviceLinks,
+  departmentLinks,
+  cityLinks,
+  legalLinks,
+}: FooterProps) {
   return (
-    <footer className="bg-foreground text-background">
-      <div className="mx-auto max-w-page px-gutter pt-12">
-        <div className="grid gap-8 md:grid-cols-2">
-          <div className="space-y-3">
-            <h2 className="text-xl font-extrabold">
-              {config?.footer_section?.title}
-            </h2>
-            <p className="max-w-reading text-background/80">
-              {config?.footer_section?.description}
-            </p>
-          </div>
-
-          <div>
-            <h3 className="mb-2 text-lg font-bold">Contact</h3>
-            {config?.phone ? (
-              <a className={contactLinkClass} href={toTelHref(config.phone)}>
-                <Phone aria-hidden="true" className="size-5 shrink-0" />
-                <span>{config.phone}</span>
+    <footer className="site-footer">
+      <div className="grid gap-block sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
+        <div className="grid content-start gap-stack">
+          <h2>{config.footer_section?.title}</h2>
+          <p className="soft">{config.footer_section?.description}</p>
+          <address>
+            {config.phone ? (
+              <a className="footer-link" href={toTelHref(config.phone)}>
+                <Phone
+                  aria-hidden="true"
+                  className="icon-mark"
+                  data-size="sm"
+                />
+                {config.phone}
               </a>
             ) : null}
-            <a className={contactLinkClass} href={`mailto:${config?.email}`}>
-              <Mail aria-hidden="true" className="size-5 shrink-0" />
-              <span className="break-all">{config?.email}</span>
-            </a>
-            <div className="flex min-h-11 items-center gap-3">
-              <MapPin aria-hidden="true" className="size-5 shrink-0" />
-              <span>{config?.footer_section?.region}</span>
-            </div>
-          </div>
+            {config.email ? (
+              <a className="footer-link" href={`mailto:${config.email}`}>
+                <Mail aria-hidden="true" className="icon-mark" data-size="sm" />
+                {config.email}
+              </a>
+            ) : null}
+            <p className="flex min-h-target items-center gap-inline">
+              <MapPin aria-hidden="true" className="icon-mark" data-size="sm" />
+              {config.footer_section?.region}
+            </p>
+          </address>
         </div>
 
-        <div className="mt-8 space-y-2 border-t border-background/30 py-6 text-center text-small">
-          <p className="text-background/80">
-            ©{new Date().getFullYear()} Douche Senior France. Tous droits
-            réservés. | Artisan français certifié | Devis gratuit
-          </p>
+        <FooterLinks heading="Nos services" links={serviceLinks} />
+        <FooterLinks heading="Départements" links={departmentLinks} />
+        <FooterLinks heading="Villes" links={cityLinks} />
+      </div>
 
-          {legalLinks.length > 0 ? (
-            <nav
-              aria-label="Informations légales"
-              className="flex flex-wrap justify-center gap-x-6"
-            >
+      <div className="rule-top flex flex-wrap items-center justify-between gap-x-block">
+        <p className="small soft">
+          © {new Date().getFullYear()} Douche Senior France. Artisan français
+          certifié, devis gratuit.
+        </p>
+
+        {legalLinks.length > 0 ? (
+          <nav aria-label="Informations légales">
+            <ul className="flex flex-wrap gap-x-block">
               {legalLinks.map((link) => (
-                <Link
-                  className="inline-flex min-h-11 items-center underline hover:no-underline"
-                  href={link.href}
-                  key={link.href}
-                >
-                  {link.label}
-                </Link>
+                <li key={link.href}>
+                  <Link className="footer-link small" href={link.href}>
+                    {link.label}
+                  </Link>
+                </li>
               ))}
-            </nav>
-          ) : null}
+            </ul>
+          </nav>
+        ) : null}
 
-          <p className="text-background/80">
-            Site conçu par{" "}
-            <Link
-              className="inline-flex min-h-11 items-center font-semibold underline hover:no-underline"
-              href="https://axelhamilcaro.com/"
-              rel="noopener noreferrer"
-              target="_blank"
-            >
-              Axel Hamilcaro - Developpeur Web
-            </Link>
-          </p>
-        </div>
+        <a
+          className="footer-link small"
+          href="https://axelhamilcaro.com/"
+          rel="noopener noreferrer"
+          target="_blank"
+        >
+          Site conçu par Axel Hamilcaro, développeur web
+        </a>
       </div>
     </footer>
   );

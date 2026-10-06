@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Nunito } from "next/font/google";
+import { Lexend } from "next/font/google";
 import "../globals.css";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
@@ -9,14 +9,17 @@ import { Footer } from "@/app/_components/footer";
 import NavBar from "@/app/_components/navBar";
 import { getAllPages } from "@/lib/pages/getPage";
 import { getSiteConfig } from "@/lib/pages/getSiteConfig";
-import { getLegalLinks } from "@/lib/pages/pageLinks";
+import {
+  getCityLinks,
+  getDepartmentLinks,
+  getLegalLinks,
+  getServiceLinks,
+} from "@/lib/pages/pageLinks";
 import { homeSeo, siteName, siteUrl } from "@/lib/site";
-import { cn } from "@/lib/utils";
 
-const nunito = Nunito({
-  variable: "--font-nunito",
+const lexend = Lexend({
+  variable: "--font-lexend",
   subsets: ["latin"],
-  weight: ["400", "600", "700", "800"],
   display: "swap",
 });
 
@@ -48,10 +51,9 @@ export default async function RootLayout({
   children: ReactNode;
 }>) {
   const [config, pages] = await Promise.all([getSiteConfig(), getAllPages()]);
-  const legalLinks = getLegalLinks(pages);
 
   return (
-    <html className="scroll-smooth" lang="fr" suppressHydrationWarning>
+    <html lang="fr" suppressHydrationWarning>
       <head>
         <meta
           content="Douche Senior France"
@@ -60,18 +62,23 @@ export default async function RootLayout({
         <meta content="yes" name="mobile-web-app-capable" />
         <meta content="yes" name="apple-mobile-web-app-capable" />
       </head>
-      <body className={cn(nunito.variable, "antialiased size-full font-sans")}>
+      <body className={lexend.variable}>
         <SpeedInsights />
         <Analytics />
-        <a
-          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-md focus:font-semibold"
-          href="#main-content"
-        >
+        <a className="skip-link" href="#main-content">
           Aller au contenu principal
         </a>
         <NavBar config={config} />
-        <main id="main-content">{children}</main>
-        <Footer config={config} legalLinks={legalLinks} />
+        <main id="main-content" tabIndex={-1}>
+          {children}
+        </main>
+        <Footer
+          cityLinks={getCityLinks(pages)}
+          config={config}
+          departmentLinks={getDepartmentLinks(pages)}
+          legalLinks={getLegalLinks(pages)}
+          serviceLinks={getServiceLinks(pages)}
+        />
         <ContactModal phone={config.phone} />
       </body>
     </html>
