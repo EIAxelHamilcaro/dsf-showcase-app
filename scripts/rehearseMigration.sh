@@ -5,9 +5,32 @@ root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 backup="${DSF_BACKUP:-$HOME/.local/share/dsf-backups/dsf-before-cms-refresh.dump}"
 target="dsf_rehearsal"
 replay="dsf_rehearsal_replay"
+unrecorded="dsf_rehearsal_unrecorded"
 work="$(mktemp -d)"
 
 run_psql() { docker exec -i dsf-local-pg psql -U postgres "$@"; }
+
+deploy() {
+  DSF_DB="$1" "${root}/scripts/local.sh" env VERCEL_ENV="$2" "${root}/scripts/vercelBuild.sh" --migrate-only
+}
+
+fingerprint() {
+  docker exec -i dsf-local-pg pg_dump -U postgres -d "$1" | grep -v -E '^\\(un)?restrict ' | sha256sum
+}
+
+expect_untouched() {
+  if [ "$(fingerprint "$1")" != "$2" ]; then
+    echo "FAIL: $3" >&2
+    exit 1
+  fi
+}
+
+expect_refusal() {
+  if deploy "$1" production; then
+    echo "FAIL: $2" >&2
+    exit 1
+  fi
+}
 
 if [ ! -f "${backup}" ]; then
   echo "missing backup ${backup}" >&2
@@ -29,9 +52,44 @@ docker exec -i dsf-local-pg pg_restore -U postgres -d "${target}" --no-owner --n
 run_psql -d "${target}" -v ON_ERROR_STOP=1 -At -f - < "${root}/scripts/sql/rowCounts.sql" > "${work}/rows-before.txt"
 run_psql -d "${target}" -v ON_ERROR_STOP=1 -At -f - < "${root}/scripts/sql/dataChecksums.sql" > "${work}/checksums-before.txt"
 run_psql -d "${target}" -v ON_ERROR_STOP=1 -At -f - < "${root}/scripts/sql/cellDump.sql" > "${work}/cells-before.txt"
-run_psql -d "${target}" -v ON_ERROR_STOP=1 -v baseline="${baseline}" -f - < "${root}/scripts/sql/markBaselineApplied.sql"
 
-DSF_DB="${target}" "${root}/scripts/local.sh" pnpm exec payload migrate
+restored="$(fingerprint "${target}")"
+
+echo "--- deploy path (a): a preview build does not migrate"
+deploy "${target}" preview
+expect_untouched "${target}" "${restored}" "a preview build changed the database"
+echo "(a) OK: schema and data untouched"
+
+echo "--- deploy path (b): a production build refuses a database that is not bootstrapped"
+expect_refusal "${target}" "the guard accepted a database that still has its dev mode row"
+expect_untouched "${target}" "${restored}" "a refused production build changed the database"
+
+run_psql -c "drop database if exists ${unrecorded} with (force)" >/dev/null
+run_psql -c "create database ${unrecorded} template ${target}" >/dev/null
+run_psql -d "${unrecorded}" -v ON_ERROR_STOP=1 -c "delete from payload_migrations where batch = -1" >/dev/null
+without_dev_row="$(fingerprint "${unrecorded}")"
+expect_refusal "${unrecorded}" "the guard accepted a database whose baseline is not recorded"
+expect_untouched "${unrecorded}" "${without_dev_row}" "a refused production build changed the database"
+run_psql -c "drop database ${unrecorded} with (force)" >/dev/null
+echo "(b) OK: refused with the dev mode row, refused with an unrecorded baseline, nothing written"
+
+echo "--- deploy path (c): bootstrap, then a production build applies every migration"
+run_psql -d "${target}" -v ON_ERROR_STOP=1 -v baseline="${baseline}" -f - < "${root}/scripts/sql/markBaselineApplied.sql"
+deploy "${target}" production
+
+migration_files=("${root}"/migrations/[0-9]*.ts)
+recorded="$(run_psql -d "${target}" -v ON_ERROR_STOP=1 -Atc "select count(*) from payload_migrations where batch > 0")"
+if [ "${recorded}" -ne "${#migration_files[@]}" ]; then
+  echo "FAIL: ${recorded} migration(s) recorded, ${#migration_files[@]} expected" >&2
+  exit 1
+fi
+echo "(c) OK: ${recorded} of ${#migration_files[@]} migrations recorded"
+
+echo "--- deploy path (d): a second production build is a no-op"
+migrated="$(fingerprint "${target}")"
+deploy "${target}" production
+expect_untouched "${target}" "${migrated}" "a second production build changed the database"
+echo "(d) OK: schema and data untouched"
 
 run_psql -d "${target}" -v ON_ERROR_STOP=1 -At -f - < "${root}/scripts/sql/rowCounts.sql" > "${work}/rows-after.txt"
 run_psql -d "${target}" -v ON_ERROR_STOP=1 -At -f - < "${root}/scripts/sql/dataChecksums.sql" > "${work}/checksums-after.txt"
