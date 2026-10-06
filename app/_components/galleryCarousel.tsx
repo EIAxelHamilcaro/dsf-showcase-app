@@ -5,7 +5,8 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import type { Media } from "@/payload-types";
 
-const slideImageSizes = "(min-width: 48rem) 50vw, 100vw";
+const slideImageSizes =
+  "(min-width: 80rem) 640px, (min-width: 48rem) 50vw, 100vw";
 
 export interface GalleryProject {
   id?: string | null;
@@ -24,8 +25,9 @@ const urlOf = (image: GalleryProject["before"]) =>
 export function GalleryCarousel({ projects }: GalleryCarouselProps) {
   const [current, setCurrent] = useState(0);
 
-  const show = (index: number) =>
-    setCurrent((index + projects.length) % projects.length);
+  const wrap = (index: number) => (index + projects.length) % projects.length;
+  const show = (index: number) => setCurrent(wrap(index));
+  const neighbours = [current, wrap(current + 1), wrap(current - 1)];
 
   if (projects.length === 0) {
     return null;
@@ -43,6 +45,7 @@ export function GalleryCarousel({ projects }: GalleryCarouselProps) {
           const name = project.description
             ? `${position}, ${project.description}`
             : position;
+          const loading = neighbours.includes(index) ? "eager" : "lazy";
 
           return (
             <li
@@ -56,7 +59,9 @@ export function GalleryCarousel({ projects }: GalleryCarouselProps) {
                 <Image
                   alt={`Avant travaux, ancienne salle de bain avec baignoire : ${name}`}
                   className="object-cover"
+                  fetchPriority="low"
                   fill
+                  loading={loading}
                   sizes={slideImageSizes}
                   src={urlOf(project.before)}
                 />
@@ -66,7 +71,9 @@ export function GalleryCarousel({ projects }: GalleryCarouselProps) {
                 <Image
                   alt={`Après travaux, douche sécurisée de plain-pied : ${name}`}
                   className="object-cover"
+                  fetchPriority="low"
                   fill
+                  loading={loading}
                   sizes={slideImageSizes}
                   src={urlOf(project.after)}
                 />
