@@ -11,13 +11,14 @@ Les pages `/mentions-legales` et `/politique-de-confidentialite` sont en ligne. 
 - [ ] Ville du greffe du RCS (extrait Kbis).
 - [ ] Numéro de TVA intracommunautaire (facture ou Kbis).
 - [ ] Assurance décennale : assureur, adresse, numéro de contrat, zone couverte. Mention obligatoire pour une entreprise du bâtiment, et le site affiche « Garantie décennale ».
-- [ ] Médiateur de la consommation : nom, adresse, site internet. Sans lui, la section médiation reste incomplète.
+- [ ] Médiateur de la consommation : nom, adresse, site internet. En attendant, la page indique que ses coordonnées sont communiquées sur demande au 02 54 97 53 23.
 - [ ] Labels Handibat et Silverbat : validité en cours, numéros éventuels.
-- [ ] Partenaires : le formulaire par étapes oblige à accepter la transmission des données « aux partenaires ». Qui sont-ils ? S'il n'y en a pas, la case doit disparaître. S'il y en a, elle doit devenir facultative et les partenaires être nommés. Point bloquant pour le RGPD.
+- [ ] Partenaires : le formulaire par étapes propose une case facultative pour accepter la transmission des données « aux partenaires ». Qui sont-ils ? S'il n'y en a pas, la case doit disparaître. S'il y en a, ils doivent être nommés. Point bloquant pour le RGPD.
+- [ ] Capital social : montant à fournir d'après les statuts à jour. Il a été retiré des deux pages faute de source vérifiée.
+- [ ] Téléphone de l'hébergeur à ajouter aux mentions légales.
 
 À confirmer (valeurs publiées par défaut) :
 
-- [ ] Capital social de 4 000 € (statuts à jour).
 - [ ] SIREN 800 339 673, SIRET 800 339 673 00017, siège 147 rue de Romorantin, 41130 Selles-sur-Cher.
 - [ ] Dominique Bertone, président, directeur de la publication.
 - [ ] Email `douche.senior.france@gmail.com` comme adresse officielle et comme contact RGPD (une adresse dédiée est préférable). Compte Gmail de l'entreprise ou Google Workspace ?
@@ -25,9 +26,9 @@ Les pages `/mentions-legales` et `/politique-de-confidentialite` sont en ligne. 
 - [ ] Conservation des demandes sans suite : 3 ans après le dernier contact (aucune suppression automatique n'existe, à appliquer à la main).
 - [ ] Durées de conservation après contrat, à valider avec le comptable.
 - [ ] Qui lit les demandes dans l'entreprise et qui a un compte d'administration.
-- [ ] Sous-traitants : Vercel (États-Unis), Neon (Union européenne, société et pays exacts à relever dans la console), Google, Cloudflare. Garanties de transfert hors UE à vérifier pour chacun.
+- [ ] Sous-traitants : Vercel (États-Unis), Neon (société et pays exacts à relever dans la console, la page indique « Communiquée sur demande » faute de source vérifiée), Google, Cloudflare. Garanties de transfert hors UE à vérifier pour chacun.
 - [ ] Adresse de l'hébergeur Vercel, à revérifier sur vercel.com.
-- [ ] Cookies : tableau à revérifier dans le navigateur une fois Turnstile actif en production. Absence de bandeau à faire valider par le conseil du client.
+- [ ] Cookies : tableau à revérifier dans le navigateur une fois Turnstile actif en production. La page ne dit plus qu'aucun bandeau n'est nécessaire : besoin d'un bandeau à faire valider par le conseil du client.
 - [ ] Démarchage téléphonique au-delà de la demande : mentions à faire valider si c'est le cas.
 - [ ] Données de santé ou de handicap notées pour les dossiers d'aides : traitement à décrire si c'est le cas.
 - [ ] Crédit de réalisation du site (facultatif).
@@ -44,11 +45,12 @@ Les pages `/mentions-legales` et `/politique-de-confidentialite` sont en ligne. 
 
 Corrigé d'office (crédit d'impôt supprimé depuis le 1er janvier 2026, source service-public.gouv.fr, fiche F10752) : accueil, menu, pages aides financières, remplacement de baignoire, aménagement, Blois.
 
+Corrigé d'office aussi (la fiche officielle F37501 donne 50 % ou 70 %) : « jusqu'à 100% de prise en charge possible » (Loir-et-Cher) devient « prise en charge importante possible » comme sur les 4 autres départements, et « Aide 100% » disparaît du titre et de la description de l'accueil dans Google.
+
 Contraire aux sources officielles :
 
 - [ ] « Conditions : Propriétaire occupant ou locataire, + 60 ans ou situation handicap » (aides financières). La fiche officielle donne 70 ans ou plus sans condition de perte d'autonomie.
 - [ ] « ⚠️ Artisan certifié Handibat OBLIGATOIRE (nous le sommes !) » (aides financières) et « Certification obligatoire pour certaines aides (MaPrimeAdapt) » (douche PMR). Absent des sources officielles.
-- [ ] « jusqu'à 100% de prise en charge possible » (Loir-et-Cher) et « Aide 100% » (titre de l'accueil). La fiche officielle donne 50 % ou 70 %.
 - [ ] « Éligible aides financières maximales » (Blois), « Éligibilité aux aides maximales » (douche PMR). Sans source.
 - [ ] « PrimAdapt », « L'ANAH », « MaPrimeAdapt ». Le nom officiel est « MaPrimeAdapt' ».
 - [ ] « Simuler mes aides gratuitement » (bouton, aides financières). Aucun simulateur : le bouton ouvre la demande de devis.
