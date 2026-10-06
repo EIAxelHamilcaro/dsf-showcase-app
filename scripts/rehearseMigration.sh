@@ -13,20 +13,26 @@ if [ ! -f "${backup}" ]; then
   exit 1
 fi
 
-baseline="$(basename "$(ls "${root}"/migrations/*_baseline.ts)" .ts)"
+baselines=("${root}"/migrations/*_baseline.ts)
+if [ "${#baselines[@]}" -ne 1 ] || [ ! -f "${baselines[0]}" ]; then
+  echo "expected exactly one migrations/*_baseline.ts file" >&2
+  exit 1
+fi
+
+baseline="$(basename "${baselines[0]}" .ts)"
 
 run_psql -c "drop database if exists ${target} with (force)" >/dev/null
 run_psql -c "create database ${target}" >/dev/null
 docker exec -i dsf-local-pg pg_restore -U postgres -d "${target}" --no-owner --no-privileges < "${backup}"
 
-run_psql -d "${target}" -At -f - < "${root}/scripts/sql/rowCounts.sql" > "${work}/rows-before.txt"
-run_psql -d "${target}" -At -f - < "${root}/scripts/sql/dataChecksums.sql" > "${work}/checksums-before.txt"
-run_psql -d "${target}" -v baseline="${baseline}" -f - < "${root}/scripts/sql/markBaselineApplied.sql"
+run_psql -d "${target}" -v ON_ERROR_STOP=1 -At -f - < "${root}/scripts/sql/rowCounts.sql" > "${work}/rows-before.txt"
+run_psql -d "${target}" -v ON_ERROR_STOP=1 -At -f - < "${root}/scripts/sql/dataChecksums.sql" > "${work}/checksums-before.txt"
+run_psql -d "${target}" -v ON_ERROR_STOP=1 -v baseline="${baseline}" -f - < "${root}/scripts/sql/markBaselineApplied.sql"
 
 DSF_DB="${target}" "${root}/scripts/local.sh" pnpm exec payload migrate
 
-run_psql -d "${target}" -At -f - < "${root}/scripts/sql/rowCounts.sql" > "${work}/rows-after.txt"
-run_psql -d "${target}" -At -f - < "${root}/scripts/sql/dataChecksums.sql" > "${work}/checksums-after.txt"
+run_psql -d "${target}" -v ON_ERROR_STOP=1 -At -f - < "${root}/scripts/sql/rowCounts.sql" > "${work}/rows-after.txt"
+run_psql -d "${target}" -v ON_ERROR_STOP=1 -At -f - < "${root}/scripts/sql/dataChecksums.sql" > "${work}/checksums-after.txt"
 
 echo "--- row counts (lines starting with < are old tables whose count changed or vanished)"
 diff "${work}/rows-before.txt" "${work}/rows-after.txt" || true

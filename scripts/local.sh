@@ -3,12 +3,26 @@ set -euo pipefail
 
 root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 database="${DSF_DB:-dsf}"
+working_copy="dsf"
+name_pattern='^[a-z_][a-z0-9_]*$'
+
+if [[ ! "${database}" =~ ${name_pattern} ]]; then
+  echo "refused: DSF_DB must match ${name_pattern}" >&2
+  exit 1
+fi
 
 export DATABASE_URI="${DSF_LOCAL_DB_URI:-postgresql://postgres:dsf@127.0.0.1:5544/${database}}"
 export NEXT_PUBLIC_SERVER_URL="http://localhost:3100"
 export GMAIL_PASS=""
 export NEXT_PUBLIC_TURNSTILE_SITE_KEY="1x00000000000000000000AA"
 export TURNSTILE_SECRET_KEY="1x0000000000000000000000000000000AA"
+
+case "${DATABASE_URI}" in
+  *\?*|*\#*)
+    echo "refused: DATABASE_URI carries a query string or a fragment, which can override the host" >&2
+    exit 1
+    ;;
+esac
 
 host="$(node -e 'process.stdout.write(new URL(process.env.DATABASE_URI).host)')"
 case "${host}" in
@@ -18,6 +32,23 @@ case "${host}" in
     exit 1
     ;;
 esac
+
+target="$(node -e 'process.stdout.write(decodeURIComponent(new URL(process.env.DATABASE_URI).pathname.slice(1)))')"
+if [[ ! "${target}" =~ ${name_pattern} ]]; then
+  echo "refused: the database name in DATABASE_URI must match ${name_pattern}" >&2
+  exit 1
+fi
+
+if [ "${target}" = "${working_copy}" ]; then
+  for argument in "$@"; do
+    case "${argument}" in
+      migrate:fresh|migrate:reset|migrate:refresh|migrate:down)
+        echo "refused: ${argument} destroys data and is not allowed on the ${working_copy} database, set DSF_DB to a scratch database" >&2
+        exit 1
+        ;;
+    esac
+  done
+fi
 
 token_line="$(grep -E '^BLOB_READ_WRITE_TOKEN=' "${root}/.env" || true)"
 token="${token_line#BLOB_READ_WRITE_TOKEN=}"
@@ -29,5 +60,5 @@ if [ -z "${store_id}" ]; then
 fi
 export BLOB_READ_WRITE_TOKEN="vercel_blob_rw_${store_id}_localonlynosecret"
 
-echo "local stack: database ${host}/${DATABASE_URI##*/}, blob store ${store_id}, blob writes disabled" >&2
+echo "local stack: database ${host}/${target}, blob store ${store_id}, blob writes disabled" >&2
 exec "$@"
