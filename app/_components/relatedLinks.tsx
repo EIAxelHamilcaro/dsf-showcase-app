@@ -2,6 +2,9 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import type { PageLink } from "@/lib/pages/pageLinks";
 
+export const linkChipClass =
+  "h-auto shrink py-2 border-control-border font-semibold whitespace-normal text-left";
+
 interface RelatedLinksProps {
   links: PageLink[];
 }
@@ -14,10 +17,15 @@ export function RelatedLinks({ links }: RelatedLinksProps) {
   return (
     <nav
       aria-label="Pages liées"
-      className="container mx-auto px-4 sm:px-10 md:px-16 lg:px-32 py-8 flex flex-wrap gap-2 justify-center"
+      className="mx-auto flex max-w-page flex-wrap gap-3 px-gutter py-10"
     >
       {links.map((link) => (
-        <Button asChild key={link.href} variant="outline">
+        <Button
+          asChild
+          className={linkChipClass}
+          key={link.href}
+          variant="outline"
+        >
           <Link href={link.href}>{link.label}</Link>
         </Button>
       ))}

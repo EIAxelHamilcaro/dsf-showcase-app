@@ -1,46 +1,44 @@
 import Link from "next/link";
-import { PageSection } from "@/app/_components/pageSection";
+import {
+  PageSection,
+  SectionSplit,
+  sectionLeadClass,
+  sectionTitleClass,
+} from "@/app/_components/pageSection";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import type { AidCardsBlock } from "@/payload-types";
 import { resolveIcon } from "./blockIcons";
+import { primaryActionClass } from "./phoneButton";
 
 type AidCard = NonNullable<AidCardsBlock["cards"]>[number];
 
 interface AidCardItemProps {
   card: AidCard;
-  isDetailed: boolean;
   isFeatured: boolean;
 }
 
-function AidCardItem({ card, isDetailed, isFeatured }: AidCardItemProps) {
+function AidCardItem({ card, isFeatured }: AidCardItemProps) {
   const Icon = resolveIcon(card.icon);
-  const hasDetails = Boolean(card.details?.length);
-  const hasFollowUp = hasDetails || Boolean(card.highlight || card.note);
-  const textGap = isDetailed ? "mb-4" : "mb-2";
 
   return (
-    <Card className={isFeatured ? "border-primary" : undefined}>
-      <CardContent className="pt-6">
-        {Icon ? <Icon className="h-12 w-12 text-primary mb-4" /> : null}
-        <h3
-          className={isDetailed ? "text-2xl font-bold mb-3" : "font-bold mb-2"}
-        >
-          {card.title}
-        </h3>
-        <p
-          className={cn(
-            "text-sm text-muted-foreground",
-            hasFollowUp && textGap,
-          )}
-        >
-          {card.text}
-        </p>
+    <Card
+      className={cn(
+        "bg-background shadow-none",
+        isFeatured && "border-2 border-primary",
+      )}
+    >
+      <CardContent className="space-y-4">
+        {Icon ? (
+          <Icon aria-hidden="true" className="h-10 w-10 text-primary" />
+        ) : null}
+        <h3 className="text-xl md:text-2xl font-bold">{card.title}</h3>
+        <p className="text-muted-foreground">{card.text}</p>
         {card.details?.length ? (
-          <div className="space-y-2 mb-4">
+          <div className="space-y-2 border-t pt-4">
             {card.details.map((detail) => (
-              <p className="text-sm" key={detail.id ?? detail.label}>
+              <p key={detail.id ?? detail.label}>
                 <strong>{detail.label}</strong>
                 {` ${detail.text}`}
               </p>
@@ -48,19 +46,17 @@ function AidCardItem({ card, isDetailed, isFeatured }: AidCardItemProps) {
           </div>
         ) : null}
         {card.highlight ? (
-          <p className="text-xs font-semibold text-primary">{card.highlight}</p>
+          <p className="font-bold text-primary">{card.highlight}</p>
         ) : null}
         {card.note ? (
-          <div
+          <p
             className={cn(
-              "p-3 rounded-lg",
-              isDetailed && !isFeatured ? "bg-muted" : "bg-primary/10",
+              "rounded-lg bg-surface-tint p-4",
+              isFeatured && "font-semibold",
             )}
           >
-            <p className={cn("text-xs", isFeatured && "font-semibold")}>
-              {card.note}
-            </p>
-          </div>
+            {card.note}
+          </p>
         ) : null}
       </CardContent>
     </Card>
@@ -74,69 +70,52 @@ interface AidCardsProps {
 export function AidCards({ block }: AidCardsProps) {
   const cards = block.cards ?? [];
   const isDetailed = block.variant === "detailed";
-  const tone = block.background === "muted" ? "muted" : "default";
 
   const button =
     block.buttonHref && block.buttonLabel ? (
-      <Button asChild size="lg">
+      <Button asChild className={primaryActionClass} size="lg">
         <Link href={block.buttonHref}>{block.buttonLabel}</Link>
       </Button>
     ) : null;
 
-  if (isDetailed) {
-    return (
-      <PageSection tone={tone}>
-        <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
-          {block.heading}
-        </h2>
-        {block.intro ? (
-          <p className="text-lg mb-8 text-center text-muted-foreground">
-            {block.intro}
-          </p>
-        ) : null}
-        <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-          {cards.map((card, index) => (
-            <AidCardItem
-              card={card}
-              isDetailed
-              isFeatured={index === 0}
-              key={card.id ?? card.title}
-            />
-          ))}
-        </div>
-        {button ? <div className="text-center mt-8">{button}</div> : null}
-      </PageSection>
-    );
-  }
+  const grid = cards.length ? (
+    <div
+      className={cn(
+        "grid gap-6",
+        isDetailed ? "lg:grid-cols-2" : "sm:grid-cols-2",
+      )}
+    >
+      {cards.map((card, index) => (
+        <AidCardItem
+          card={card}
+          isFeatured={isDetailed && index === 0}
+          key={card.id ?? card.title}
+        />
+      ))}
+    </div>
+  ) : null;
 
   return (
-    <PageSection tone={tone}>
-      <div className="max-w-3xl mx-auto text-center">
-        <h2 className="text-3xl md:text-4xl font-bold mb-6">{block.heading}</h2>
-        {block.intro ? (
-          <p
-            className={cn(
-              "text-lg mb-8",
-              cards.length ? "text-muted-foreground" : "max-w-2xl mx-auto",
-            )}
-          >
-            {block.intro}
-          </p>
-        ) : null}
-        {cards.length ? (
-          <div className="grid md:grid-cols-2 gap-6 text-left mb-8">
-            {cards.map((card) => (
-              <AidCardItem
-                card={card}
-                isDetailed={false}
-                isFeatured={false}
-                key={card.id ?? card.title}
-              />
-            ))}
+    <PageSection tone={block.background === "muted" ? "muted" : "default"}>
+      {isDetailed ? (
+        <div className="space-y-8">
+          <h2 className={sectionTitleClass}>{block.heading}</h2>
+          {block.intro ? (
+            <p className={cn(sectionLeadClass, "max-w-reading")}>
+              {block.intro}
+            </p>
+          ) : null}
+          {grid}
+          {button}
+        </div>
+      ) : (
+        <SectionSplit heading={block.heading} intro={block.intro}>
+          <div className="space-y-8">
+            {grid}
+            {button}
           </div>
-        ) : null}
-        {button}
-      </div>
+        </SectionSplit>
+      )}
     </PageSection>
   );
 }

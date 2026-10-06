@@ -21,13 +21,16 @@ export function PageBreadcrumb({ trail }: PageBreadcrumbProps) {
   return (
     <Breadcrumb
       aria-label="Fil d'Ariane"
-      className="container mx-auto px-4 sm:px-10 md:px-16 lg:px-32 py-3"
+      className="mx-auto max-w-page px-gutter py-2"
     >
-      <BreadcrumbList>
+      <BreadcrumbList className="text-small">
         {ancestors.map((link) => (
           <Fragment key={link.href}>
             <BreadcrumbItem>
-              <BreadcrumbLink asChild>
+              <BreadcrumbLink
+                asChild
+                className="inline-flex min-h-11 items-center underline hover:text-primary"
+              >
                 <Link href={link.href}>{link.label}</Link>
               </BreadcrumbLink>
             </BreadcrumbItem>

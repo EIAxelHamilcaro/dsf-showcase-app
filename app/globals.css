@@ -44,6 +44,26 @@
   --sidebar-accent-foreground: oklch(1 0 0); /* White */
   --sidebar-border: oklch(0.85 0.005 258); /* Light border */
   --sidebar-ring: oklch(0.65 0.15 220 / 0.5); /* Light blue ring */
+  --surface-tint: oklch(0.96 0.02 254);
+  --control-border: oklch(0.6 0.01 258);
+  --star: oklch(0.6 0.13 75);
+  --success: oklch(0.53 0.14 150);
+  --focus: var(--primary);
+  --gutter: 1rem;
+  --section-y: 3.5rem;
+}
+
+@media (min-width: 40rem) {
+  :root {
+    --gutter: 2rem;
+  }
+}
+
+@media (min-width: 64rem) {
+  :root {
+    --gutter: 3rem;
+    --section-y: 5.5rem;
+  }
 }
 
 .dark {
@@ -119,6 +139,16 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --color-surface-tint: var(--surface-tint);
+  --color-control-border: var(--control-border);
+  --color-star: var(--star);
+  --color-success: var(--success);
+  --spacing-gutter: var(--gutter);
+  --spacing-section: var(--section-y);
+  --container-page: 72rem;
+  --container-reading: 40rem;
+  --text-small: 0.9rem;
+  --text-small--line-height: 1.55;
 }
 
 @layer base {
@@ -145,8 +175,57 @@
   }
   /* Boutons plus grands par défaut */
   button,
-  [role="button"] {
+  [role="button"],
+  [data-slot="button"] {
     min-height: 44px; /* Taille minimale recommandée WCAG */
+    min-width: 44px;
+  }
+  h1,
+  h2 {
+    text-wrap: balance;
+  }
+}
+
+:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+}
+
+.bg-primary,
+.bg-foreground {
+  --focus: var(--background);
+}
+
+.bg-background,
+.bg-card,
+.bg-muted,
+.bg-surface-tint {
+  --focus: var(--primary);
+}
+
+[data-slot="input"],
+[data-slot="textarea"] {
+  border-color: var(--control-border);
+}
+
+.tile-motif {
+  background-image:
+    linear-gradient(var(--background) 2px, transparent 2px),
+    linear-gradient(90deg, var(--background) 2px, transparent 2px);
+  background-size: 4.5rem 4.5rem;
+  mask-image: linear-gradient(90deg, transparent, black 70%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms;
+    animation-iteration-count: 1;
+    transition-duration: 0.01ms;
   }
 }
 
@@ -171,4 +250,15 @@
 .animate-scroll-inf {
   animation: scrollInf 100s linear infinite;
   width: max-content;
+}
+
+.animate-scroll-inf:hover,
+.animate-scroll-inf:focus-within {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-scroll-inf {
+    animation: none;
+  }
 }

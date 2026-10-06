@@ -1,4 +1,4 @@
-import { PageSection } from "@/app/_components/pageSection";
+import { PageSection, SectionSplit } from "@/app/_components/pageSection";
 import {
   Accordion,
   AccordionContent,
@@ -7,6 +7,62 @@ import {
 } from "@/components/ui/accordion";
 import type { FaqBlock } from "@/payload-types";
 
+export interface FaqSource {
+  id?: string | null;
+  label: string;
+  url: string;
+}
+
+export interface FaqEntry {
+  id?: string | null;
+  question: string;
+  answer: string;
+  sources?: FaqSource[] | null;
+}
+
+export interface FaqAccordionProps {
+  items: FaqEntry[];
+}
+
+export function FaqAccordion({ items }: FaqAccordionProps) {
+  return (
+    <Accordion className="border-t" collapsible type="single">
+      {items.map((item, index) => (
+        <AccordionItem
+          key={item.id ?? item.question}
+          value={item.id ?? `item-${index}`}
+        >
+          <AccordionTrigger className="cursor-pointer items-center py-5 text-lg md:text-xl font-bold [&>svg]:size-6 [&>svg]:translate-y-0 [&>svg]:text-primary">
+            {item.question}
+          </AccordionTrigger>
+          <AccordionContent
+            className="max-w-reading space-y-2 pb-6 text-lg leading-relaxed"
+            forceMount
+          >
+            <p>{item.answer}</p>
+            {item.sources?.map((source) => (
+              <p
+                className="text-small text-muted-foreground"
+                key={source.id ?? source.url}
+              >
+                {"Source : "}
+                <a
+                  className="inline-flex min-h-11 items-center underline hover:text-primary"
+                  href={source.url}
+                  rel="noopener"
+                  target="_blank"
+                >
+                  {source.label}
+                </a>
+              </p>
+            ))}
+          </AccordionContent>
+        </AccordionItem>
+      ))}
+    </Accordion>
+  );
+}
+
 interface FaqProps {
   block: FaqBlock;
 }
@@ -14,46 +70,9 @@ interface FaqProps {
 export function Faq({ block }: FaqProps) {
   return (
     <PageSection tone={block.background === "muted" ? "muted" : "default"}>
-      <div className="max-w-3xl mx-auto">
-        <h2 className="text-3xl md:text-4xl font-bold text-center mb-8">
-          {block.heading}
-        </h2>
-        <Accordion className="space-y-3 sm:space-y-4" collapsible type="single">
-          {block.items.map((item, index) => (
-            <AccordionItem
-              className="border border-border rounded-lg px-3 sm:px-6"
-              key={item.id ?? item.question}
-              value={item.id ?? `item-${index}`}
-            >
-              <AccordionTrigger className="text-left hover:no-underline cursor-pointer text-base sm:text-lg py-4">
-                <span className="font-semibold pr-2">{item.question}</span>
-              </AccordionTrigger>
-              <AccordionContent
-                className="text-base sm:text-lg pt-2 pb-4 space-y-2 in-data-[state=closed]:hidden"
-                forceMount
-              >
-                <p>{item.answer}</p>
-                {item.sources?.map((source) => (
-                  <p
-                    className="text-sm text-muted-foreground"
-                    key={source.id ?? source.url}
-                  >
-                    {"Source : "}
-                    <a
-                      className="underline hover:text-primary"
-                      href={source.url}
-                      rel="noopener"
-                      target="_blank"
-                    >
-                      {source.label}
-                    </a>
-                  </p>
-                ))}
-              </AccordionContent>
-            </AccordionItem>
-          ))}
-        </Accordion>
-      </div>
+      <SectionSplit heading={block.heading}>
+        <FaqAccordion items={block.items} />
+      </SectionSplit>
     </PageSection>
   );
 }

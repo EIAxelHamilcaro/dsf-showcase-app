@@ -1,31 +1,57 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
-type SectionTone = "default" | "muted" | "hero" | "primary";
+export type SectionTone = "default" | "muted" | "hero" | "primary";
 
 const toneClasses: Record<SectionTone, string> = {
-  default: "py-16 lg:py-24",
-  muted: "py-16 lg:py-24 bg-muted",
-  hero: "py-16 lg:py-24 bg-gradient-to-b from-background to-muted",
-  primary: "py-16 lg:py-24 bg-primary text-primary-foreground",
+  default: "bg-background",
+  muted: "bg-muted",
+  hero: "bg-surface-tint",
+  primary: "bg-primary text-primary-foreground",
 };
 
-interface PageSectionProps {
+export const sectionTitleClass =
+  "text-3xl md:text-4xl font-extrabold tracking-tight";
+
+export const sectionLeadClass = "text-lg md:text-xl text-muted-foreground";
+
+export interface PageSectionProps {
   tone?: SectionTone;
+  id?: string;
+  className?: string;
   children: ReactNode;
 }
 
-export function PageSection({ tone = "default", children }: PageSectionProps) {
+export function PageSection({
+  tone = "default",
+  id,
+  className,
+  children,
+}: PageSectionProps) {
   return (
-    <section className={toneClasses[tone]}>
-      <div
-        className={cn(
-          "container mx-auto px-4",
-          tone === "primary" ? "text-center" : "sm:px-10 md:px-16 lg:px-32",
-        )}
-      >
-        {children}
-      </div>
+    <section
+      className={cn("py-section scroll-mt-20", toneClasses[tone], className)}
+      id={id}
+    >
+      <div className="mx-auto max-w-page px-gutter">{children}</div>
     </section>
+  );
+}
+
+export interface SectionSplitProps {
+  heading: ReactNode;
+  intro?: string | null;
+  children: ReactNode;
+}
+
+export function SectionSplit({ heading, intro, children }: SectionSplitProps) {
+  return (
+    <div className="grid gap-8 lg:grid-cols-[2fr_3fr] lg:gap-16">
+      <div className="space-y-4">
+        <h2 className={sectionTitleClass}>{heading}</h2>
+        {intro ? <p className={sectionLeadClass}>{intro}</p> : null}
+      </div>
+      <div className="min-w-0">{children}</div>
+    </div>
   );
 }

@@ -1,6 +1,5 @@
 import Link from "next/link";
-import { PageSection } from "@/app/_components/pageSection";
-import { Card, CardContent } from "@/components/ui/card";
+import { PageSection, SectionSplit } from "@/app/_components/pageSection";
 import type { LinkCardsBlock } from "@/payload-types";
 
 interface LinkCardsProps {
@@ -10,28 +9,23 @@ interface LinkCardsProps {
 export function LinkCards({ block }: LinkCardsProps) {
   return (
     <PageSection tone={block.background === "muted" ? "muted" : "default"}>
-      <div className="max-w-3xl mx-auto text-center">
-        <h2 className="text-3xl md:text-4xl font-bold mb-6">{block.heading}</h2>
-        {block.intro ? (
-          <p className="text-lg mb-8 text-muted-foreground">{block.intro}</p>
-        ) : null}
-        <ul className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
+      <SectionSplit heading={block.heading} intro={block.intro}>
+        <ul className="grid gap-4 sm:grid-cols-2">
           {block.links.map((link) => (
             <li key={link.id ?? link.href}>
-              <Link href={link.href}>
-                <Card className="hover:border-primary transition-colors cursor-pointer">
-                  <CardContent className="pt-6 text-center">
-                    <p className="font-bold">{link.label}</p>
-                    <p className="text-sm text-muted-foreground">
-                      {link.description}
-                    </p>
-                  </CardContent>
-                </Card>
+              <Link
+                className="group block h-full rounded-lg border bg-background p-5 hover:border-primary"
+                href={link.href}
+              >
+                <p className="text-lg font-bold text-primary underline group-hover:no-underline">
+                  {link.label}
+                </p>
+                <p className="text-muted-foreground">{link.description}</p>
               </Link>
             </li>
           ))}
         </ul>
-      </div>
+      </SectionSplit>
     </PageSection>
   );
 }

@@ -1,155 +1,84 @@
-import { PageSection } from "@/app/_components/pageSection";
-import { Card, CardContent } from "@/components/ui/card";
+import {
+  PageSection,
+  SectionSplit,
+  sectionLeadClass,
+} from "@/app/_components/pageSection";
 import { cn } from "@/lib/utils";
 import type { FeatureCardsBlock } from "@/payload-types";
 import { resolveIcon } from "./blockIcons";
 
-const gridClasses: Record<FeatureCardsBlock["columns"], string> = {
-  "1": "grid gap-4",
-  "2": "grid md:grid-cols-2 gap-6",
-  "3": "grid md:grid-cols-3 gap-8",
-  "4": "grid md:grid-cols-4 gap-6",
+const wideGridClasses: Record<FeatureCardsBlock["columns"], string> = {
+  "1": "max-w-reading",
+  "2": "sm:grid-cols-2",
+  "3": "sm:grid-cols-2 lg:grid-cols-3",
+  "4": "sm:grid-cols-2 lg:grid-cols-4",
 };
-
-const wideTwoColumnGrid = "grid md:grid-cols-2 gap-8 max-w-4xl mx-auto";
-const spaciousFourColumnGrid = "grid md:grid-cols-2 lg:grid-cols-4 gap-8";
-
-interface CardClasses {
-  content: string;
-  icon: string;
-  title: string;
-  text: string;
-}
-
-const smallText = "text-sm text-muted-foreground";
-
-const centeredCard: CardClasses = {
-  content: "pt-6 text-center",
-  icon: "h-12 w-12 text-primary mx-auto mb-4",
-  title: "font-bold mb-2",
-  text: smallText,
-};
-
-const spaciousCenteredCard: CardClasses = {
-  ...centeredCard,
-  title: "font-bold mb-3",
-};
-
-const leftCard: CardClasses = {
-  content: "pt-6",
-  icon: "h-12 w-12 text-primary mb-4",
-  title: "text-xl font-bold mb-3",
-  text: "text-muted-foreground",
-};
-
-const compactLeftCard: CardClasses = {
-  content: "pt-6",
-  icon: "h-8 w-8 text-primary mb-3",
-  title: "font-bold mb-2",
-  text: smallText,
-};
-
-function isSpaciousCentered(block: FeatureCardsBlock): boolean {
-  return (
-    block.layout === "centered" &&
-    block.columns === "4" &&
-    block.spacing === "spacious"
-  );
-}
-
-function resolveInlineTitleSpacing(block: FeatureCardsBlock): string {
-  if (block.columns === "1") {
-    return "mb-2";
-  }
-
-  return block.intro ? "mb-3" : "mb-4";
-}
-
-function resolveCardClasses(block: FeatureCardsBlock): CardClasses {
-  if (block.layout === "inline") {
-    return {
-      content: "pt-6",
-      icon: "h-5 w-5 text-primary",
-      title: cn(
-        "font-bold flex items-center gap-2",
-        resolveInlineTitleSpacing(block),
-      ),
-      text: smallText,
-    };
-  }
-
-  if (block.layout === "left") {
-    return block.intro ? compactLeftCard : leftCard;
-  }
-
-  return isSpaciousCentered(block) ? spaciousCenteredCard : centeredCard;
-}
-
-function resolveGridClass(block: FeatureCardsBlock): string {
-  if (block.columns === "2" && !block.intro) {
-    return wideTwoColumnGrid;
-  }
-
-  if (isSpaciousCentered(block)) {
-    return spaciousFourColumnGrid;
-  }
-
-  return gridClasses[block.columns];
-}
 
 interface FeatureCardsProps {
   block: FeatureCardsBlock;
 }
 
 export function FeatureCards({ block }: FeatureCardsProps) {
-  const CardTitle = block.heading ? "h3" : "h2";
-  const classes = resolveCardClasses(block);
+  const FeatureTitle = block.heading ? "h3" : "h2";
   const isInline = block.layout === "inline";
+  const isSingleColumn = block.columns === "1";
+  const splitGridClass = isSingleColumn ? undefined : "sm:grid-cols-2";
 
   const grid = (
-    <div className={resolveGridClass(block)}>
+    <ul
+      className={cn(
+        "grid gap-x-8",
+        block.spacing === "spacious" ? "gap-y-10" : "gap-y-8",
+        block.heading ? splitGridClass : wideGridClasses[block.columns],
+      )}
+    >
       {block.cards.map((card) => {
         const Icon = resolveIcon(card.icon);
-        const icon = Icon ? <Icon className={classes.icon} /> : null;
 
         return (
-          <Card key={card.id ?? card.title}>
-            <CardContent className={classes.content}>
-              {isInline ? null : icon}
-              <CardTitle className={classes.title}>
-                {isInline ? icon : null}
+          <li
+            className={cn(
+              "border-t-2 border-primary pt-5",
+              isInline ? "flex gap-4" : "space-y-3",
+            )}
+            key={card.id ?? card.title}
+          >
+            {Icon ? (
+              <Icon
+                aria-hidden="true"
+                className={cn(
+                  "shrink-0 text-primary",
+                  isInline ? "mt-0.5 h-7 w-7" : "h-9 w-9",
+                )}
+              />
+            ) : null}
+            <div className="space-y-2">
+              <FeatureTitle className="text-xl font-bold">
                 {card.title}
-              </CardTitle>
-              <p className={classes.text}>{card.text}</p>
-            </CardContent>
-          </Card>
+              </FeatureTitle>
+              <p className="text-muted-foreground">{card.text}</p>
+            </div>
+          </li>
         );
       })}
-    </div>
+    </ul>
   );
 
   return (
     <PageSection tone={block.background === "muted" ? "muted" : "default"}>
       {block.heading ? (
-        <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
-          {block.heading}
-        </h2>
-      ) : null}
-      {block.intro ? (
-        <div className="max-w-3xl mx-auto">
-          <p
-            className={cn(
-              "text-lg text-muted-foreground",
-              isInline && block.columns === "2" ? "mb-6" : "mb-8",
-              block.columns === "1" && "text-center",
-            )}
-          >
-            {block.intro}
-          </p>
+        <SectionSplit heading={block.heading} intro={block.intro}>
+          {grid}
+        </SectionSplit>
+      ) : (
+        <div className="space-y-8">
+          {block.intro ? (
+            <p className={cn(sectionLeadClass, "max-w-reading")}>
+              {block.intro}
+            </p>
+          ) : null}
           {grid}
         </div>
-      ) : (
-        grid
       )}
     </PageSection>
   );
