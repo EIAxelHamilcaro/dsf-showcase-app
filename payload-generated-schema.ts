@@ -44,6 +44,10 @@ export const enum_pages_blocks_feature_cards_columns = pgEnum(
   "enum_pages_blocks_feature_cards_columns",
   ["1", "2", "3", "4"],
 );
+export const enum_pages_blocks_feature_cards_spacing = pgEnum(
+  "enum_pages_blocks_feature_cards_spacing",
+  ["compact", "spacious"],
+);
 export const enum_pages_blocks_zone_list_background = pgEnum(
   "enum_pages_blocks_zone_list_background",
   ["default", "muted"],
@@ -622,6 +626,8 @@ export const pages_blocks_feature_cards = pgTable(
     columns: enum_pages_blocks_feature_cards_columns("columns")
       .notNull()
       .default("4"),
+    spacing:
+      enum_pages_blocks_feature_cards_spacing("spacing").default("compact"),
     blockName: varchar("block_name"),
   },
   (columns) => [
@@ -1611,6 +1617,7 @@ type DatabaseSchema = {
   enum_pages_blocks_feature_cards_background: typeof enum_pages_blocks_feature_cards_background;
   enum_pages_blocks_feature_cards_layout: typeof enum_pages_blocks_feature_cards_layout;
   enum_pages_blocks_feature_cards_columns: typeof enum_pages_blocks_feature_cards_columns;
+  enum_pages_blocks_feature_cards_spacing: typeof enum_pages_blocks_feature_cards_spacing;
   enum_pages_blocks_zone_list_background: typeof enum_pages_blocks_zone_list_background;
   enum_pages_blocks_zone_list_columns: typeof enum_pages_blocks_zone_list_columns;
   enum_pages_blocks_testimonial_background: typeof enum_pages_blocks_testimonial_background;

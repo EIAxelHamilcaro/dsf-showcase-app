@@ -12,6 +12,7 @@ const gridClasses: Record<FeatureCardsBlock["columns"], string> = {
 };
 
 const wideTwoColumnGrid = "grid md:grid-cols-2 gap-8 max-w-4xl mx-auto";
+const spaciousFourColumnGrid = "grid md:grid-cols-2 lg:grid-cols-4 gap-8";
 
 interface CardClasses {
   content: string;
@@ -29,6 +30,11 @@ const centeredCard: CardClasses = {
   text: smallText,
 };
 
+const spaciousCenteredCard: CardClasses = {
+  ...centeredCard,
+  title: "font-bold mb-3",
+};
+
 const leftCard: CardClasses = {
   content: "pt-6",
   icon: "h-12 w-12 text-primary mb-4",
@@ -42,6 +48,14 @@ const compactLeftCard: CardClasses = {
   title: "font-bold mb-2",
   text: smallText,
 };
+
+function isSpaciousCentered(block: FeatureCardsBlock): boolean {
+  return (
+    block.layout === "centered" &&
+    block.columns === "4" &&
+    block.spacing === "spacious"
+  );
+}
 
 function resolveInlineTitleSpacing(block: FeatureCardsBlock): string {
   if (block.columns === "1") {
@@ -68,12 +82,16 @@ function resolveCardClasses(block: FeatureCardsBlock): CardClasses {
     return block.intro ? compactLeftCard : leftCard;
   }
 
-  return centeredCard;
+  return isSpaciousCentered(block) ? spaciousCenteredCard : centeredCard;
 }
 
 function resolveGridClass(block: FeatureCardsBlock): string {
   if (block.columns === "2" && !block.intro) {
     return wideTwoColumnGrid;
+  }
+
+  if (isSpaciousCentered(block)) {
+    return spaciousFourColumnGrid;
   }
 
   return gridClasses[block.columns];

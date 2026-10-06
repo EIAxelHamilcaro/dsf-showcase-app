@@ -35,6 +35,23 @@ export const FeatureCardsBlock: Block = {
       ],
     },
     {
+      name: "spacing",
+      type: "select",
+      label: "Espacement des cartes centrées sur 4 colonnes",
+      defaultValue: "compact",
+      options: [
+        { label: "Serré, 4 colonnes dès la tablette", value: "compact" },
+        {
+          label: "Aéré, 2 colonnes sur tablette puis 4 sur grand écran",
+          value: "spacious",
+        },
+      ],
+      admin: {
+        condition: (_data, siblingData) =>
+          siblingData?.layout === "centered" && siblingData?.columns === "4",
+      },
+    },
+    {
       name: "cards",
       type: "array",
       label: "Cartes",

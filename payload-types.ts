@@ -802,6 +802,7 @@ export interface FeatureCardsBlock {
   intro?: string | null;
   layout: 'centered' | 'left' | 'inline';
   columns: '1' | '2' | '3' | '4';
+  spacing?: ('compact' | 'spacious') | null;
   cards: {
     icon: 'none' | 'mapPin' | 'clock' | 'shield' | 'euro' | 'checkCircle' | 'fileText';
     title: string;
@@ -1398,6 +1399,7 @@ export interface FeatureCardsBlockSelect<T extends boolean = true> {
   intro?: T;
   layout?: T;
   columns?: T;
+  spacing?: T;
   cards?:
     | T
     | {

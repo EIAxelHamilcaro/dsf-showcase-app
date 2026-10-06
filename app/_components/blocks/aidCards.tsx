@@ -41,7 +41,8 @@ function AidCardItem({ card, isDetailed, isFeatured }: AidCardItemProps) {
           <div className="space-y-2 mb-4">
             {card.details.map((detail) => (
               <p className="text-sm" key={detail.id ?? detail.label}>
-                <strong>{detail.label}</strong> {detail.text}
+                <strong>{detail.label}</strong>
+                {` ${detail.text}`}
               </p>
             ))}
           </div>

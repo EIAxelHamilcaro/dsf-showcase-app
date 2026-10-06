@@ -24,7 +24,7 @@ export function Testimonial({ block }: TestimonialProps) {
                 </span>
               ))}
             </div>
-            <p className="text-lg mb-4 italic">"{block.quote}"</p>
+            <p className="text-lg mb-4 italic">{`"${block.quote}"`}</p>
             <p className="font-semibold">{block.author}</p>
           </CardContent>
         </Card>
