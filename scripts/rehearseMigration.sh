@@ -4,6 +4,7 @@ set -euo pipefail
 root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 backup="${DSF_BACKUP:-$HOME/.local/share/dsf-backups/dsf-before-cms-refresh.dump}"
 target="dsf_rehearsal"
+replay="dsf_rehearsal_replay"
 work="$(mktemp -d)"
 
 run_psql() { docker exec -i dsf-local-pg psql -U postgres "$@"; }
@@ -27,12 +28,14 @@ docker exec -i dsf-local-pg pg_restore -U postgres -d "${target}" --no-owner --n
 
 run_psql -d "${target}" -v ON_ERROR_STOP=1 -At -f - < "${root}/scripts/sql/rowCounts.sql" > "${work}/rows-before.txt"
 run_psql -d "${target}" -v ON_ERROR_STOP=1 -At -f - < "${root}/scripts/sql/dataChecksums.sql" > "${work}/checksums-before.txt"
+run_psql -d "${target}" -v ON_ERROR_STOP=1 -At -f - < "${root}/scripts/sql/cellDump.sql" > "${work}/cells-before.txt"
 run_psql -d "${target}" -v ON_ERROR_STOP=1 -v baseline="${baseline}" -f - < "${root}/scripts/sql/markBaselineApplied.sql"
 
 DSF_DB="${target}" "${root}/scripts/local.sh" pnpm exec payload migrate
 
 run_psql -d "${target}" -v ON_ERROR_STOP=1 -At -f - < "${root}/scripts/sql/rowCounts.sql" > "${work}/rows-after.txt"
 run_psql -d "${target}" -v ON_ERROR_STOP=1 -At -f - < "${root}/scripts/sql/dataChecksums.sql" > "${work}/checksums-after.txt"
+run_psql -d "${target}" -v ON_ERROR_STOP=1 -At -f - < "${root}/scripts/sql/cellDump.sql" > "${work}/cells-after.txt"
 
 echo "--- row counts (lines starting with < are old tables whose count changed or vanished)"
 diff "${work}/rows-before.txt" "${work}/rows-after.txt" || true
@@ -49,4 +52,62 @@ if ! diff -u "${work}/checksums-before.txt" "${work}/checksums-after.txt"; then
   exit 1
 fi
 
-echo "OK: no existing row lost or altered (work files in ${work})"
+awk -F'|' '
+  function cell_key() { return $1 "|" $2 "|" $3 }
+  function cell_value() { return substr($0, length(cell_key()) + 2) }
+  NR == FNR { before[cell_key()] = cell_value(); next }
+  { after[cell_key()] = cell_value() }
+  END {
+    for (key in after) {
+      if (!(key in before)) {
+        if (after[key] != "null") print key "\t(new column)\t" after[key]
+        continue
+      }
+      if (before[key] != after[key]) print key "\t" before[key] "\t" after[key]
+    }
+    for (key in before) {
+      if (!(key in after)) print key "\t" before[key] "\t(removed)"
+    }
+  }
+' "${work}/cells-before.txt" "${work}/cells-after.txt" | sort > "${work}/cells-changed.txt"
+
+echo "--- config, gallery and media: every changed cell (table|row|column, before, after)"
+unexpected=""
+while IFS=$'\t' read -r key before after; do
+  IFS='|' read -r table _row column <<< "${key}"
+  printf '%s\n    before: %s\n    after:  %s\n' "${key}" "${before}" "${after}"
+  if ! grep -Fxq -e "${key}" -e "${table}|*|${column}" "${root}/scripts/sql/expectedCellChanges.txt"; then
+    unexpected="${unexpected}${key}"$'\n'
+  fi
+done < "${work}/cells-changed.txt"
+
+if [ -n "${unexpected}" ]; then
+  echo "FAIL: cells changed outside scripts/sql/expectedCellChanges.txt:" >&2
+  printf '%s' "${unexpected}" >&2
+  exit 1
+fi
+
+dump_content() {
+  docker exec -i dsf-local-pg pg_dump -U postgres -d "${replay}" --data-only --column-inserts --exclude-table='payload_migrations*' 2>/dev/null \
+    | grep -v -E '^\\(un)?restrict '
+}
+
+echo "--- replay: turnkey_content run again on its own result, after editor changes"
+run_psql -c "drop database if exists ${replay} with (force)" >/dev/null
+run_psql -c "create database ${replay} template ${target}" >/dev/null
+run_psql -d "${replay}" -v ON_ERROR_STOP=1 -At -f - < "${root}/scripts/sql/editorEdits.sql"
+dump_content > "${work}/replay-before.sql"
+
+DSF_DB="${replay}" "${root}/scripts/local.sh" pnpm exec payload migrate
+
+dump_content > "${work}/replay-after.sql"
+
+if ! diff -u "${work}/replay-before.sql" "${work}/replay-after.sql"; then
+  echo "FAIL: running turnkey_content a second time changed data or overwrote an editor change" >&2
+  exit 1
+fi
+
+run_psql -c "drop database ${replay} with (force)" >/dev/null
+echo "replay: second run changed nothing, editor changes kept"
+
+echo "OK: no existing row lost or altered beyond scripts/sql/expectedCellChanges.txt (work files in ${work})"

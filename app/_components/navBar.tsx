@@ -22,7 +22,7 @@ const fallbackServices = [
   {
     label: "Aides Financières",
     href: "/aides-financieres",
-    description: "MaPrimeAdapt et crédit d'impôt",
+    description: "MaPrimeAdapt' et aides des caisses de retraite",
   },
 ];
 

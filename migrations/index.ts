@@ -6,6 +6,7 @@ import * as migration_20261006_113015_testimonial_block_rating from './20261006_
 import * as migration_20261006_113018_faq_text_and_legal_blocks from './20261006_113018_faq_text_and_legal_blocks';
 import * as migration_20261006_113022_seed_pages_and_site_identity from './20261006_113022_seed_pages_and_site_identity';
 import * as migration_20261006_120701_blois_testimonial_rating from './20261006_120701_blois_testimonial_rating';
+import * as migration_20261006_123847_turnkey_content from './20261006_123847_turnkey_content';
 
 export const migrations = [
   {
@@ -47,5 +48,10 @@ export const migrations = [
     up: migration_20261006_120701_blois_testimonial_rating.up,
     down: migration_20261006_120701_blois_testimonial_rating.down,
     name: '20261006_120701_blois_testimonial_rating',
+  },
+  {
+    up: migration_20261006_123847_turnkey_content.up,
+    down: migration_20261006_123847_turnkey_content.down,
+    name: '20261006_123847_turnkey_content'
   },
 ];

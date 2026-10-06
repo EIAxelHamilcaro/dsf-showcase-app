@@ -8,6 +8,8 @@ import type { ReactNode } from "react";
 import { ContactModal } from "@/app/_components/contactModal";
 import { Footer } from "@/app/_components/footer";
 import NavBar from "@/app/_components/navBar";
+import { getAllPages } from "@/lib/pages/getPage";
+import { getLegalLinks } from "@/lib/pages/pageLinks";
 import { homeSeo, siteName, siteUrl } from "@/lib/site";
 import { cn } from "@/lib/utils";
 import payloadConfig from "@/payload.config";
@@ -52,6 +54,7 @@ export default async function RootLayout({
     id: 1,
     depth: 1,
   });
+  const legalLinks = getLegalLinks(await getAllPages());
 
   return (
     <html className="scroll-smooth" lang="fr" suppressHydrationWarning>
@@ -74,7 +77,7 @@ export default async function RootLayout({
         </a>
         <NavBar config={config} />
         <main id="main-content">{children}</main>
-        <Footer config={config} />
+        <Footer config={config} legalLinks={legalLinks} />
         <ContactModal phone={config.phone} />
       </body>
     </html>

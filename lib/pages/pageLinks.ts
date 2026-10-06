@@ -44,6 +44,10 @@ export function getCityLinks(all: Page[]): PageLink[] {
   return toLinks(all.filter((page) => page.pageType === "city"));
 }
 
+export function getLegalLinks(all: Page[]): PageLink[] {
+  return toLinks(all.filter((page) => page.pageType === "legal"));
+}
+
 export function getRelatedLinks(page: Page, all: Page[]): PageLink[] {
   const others = all.filter((candidate) => candidate.id !== page.id);
   const parent = parentOf(page, all);

@@ -1,8 +1,14 @@
 import { Mail, MapPin, Phone } from "lucide-react";
 import Link from "next/link";
+import type { PageLink } from "@/lib/pages/pageLinks";
 import type { Config1 } from "@/payload-types";
 
-export function Footer({ config }: { config: Config1 }) {
+interface FooterProps {
+  config: Config1;
+  legalLinks: PageLink[];
+}
+
+export function Footer({ config, legalLinks }: FooterProps) {
   return (
     <footer className="pt-8 lg:pt-12 bg-foreground text-background mx-auto px-4 sm:px-10 md:px-16 lg:px-32">
       <div className="grid md:grid-cols-2 gap-6 sm:gap-8">
@@ -41,6 +47,23 @@ export function Footer({ config }: { config: Config1 }) {
           ©{new Date().getFullYear()} Douche Senior France. Tous droits
           réservés. | Artisan français certifié | Devis gratuit
         </p>
+
+        {legalLinks.length > 0 ? (
+          <nav
+            aria-label="Informations légales"
+            className="flex flex-wrap justify-center gap-x-4 gap-y-1 text-xs sm:text-sm"
+          >
+            {legalLinks.map((link) => (
+              <Link
+                className="text-background/80 underline hover:text-primary transition-colors"
+                href={link.href}
+                key={link.href}
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
+        ) : null}
 
         <p className="text-background/50 text-xs">
           Site conçu par{" "}

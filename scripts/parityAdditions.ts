@@ -1,7 +1,10 @@
-export interface AcceptedAddition {
-  after: string;
-  text: string;
-}
+import { faqSeed } from "../migrations/seed/faqSeed";
+import { localTextSeed } from "../migrations/seed/localTextSeed";
+import { pagesSeed } from "../migrations/seed/pagesSeed";
+
+export type AcceptedAddition =
+  | { after: string; text: string }
+  | { before: string; text: string };
 
 export const ignoredNavLabels: string[] = [
   "Fil d'Ariane",
@@ -9,7 +12,39 @@ export const ignoredNavLabels: string[] = [
   "Villes desservies",
 ];
 
+function turnkeyAdditions(): Record<string, AcceptedAddition[]> {
+  return Object.fromEntries(
+    faqSeed.map((faq) => {
+      const page = pagesSeed.find((seed) => seed.slug === faq.slug);
+      const closing = page?.layout.at(-1);
+
+      if (closing?.blockType !== "cta") {
+        throw new Error(`No closing call to action seeded for ${faq.slug}`);
+      }
+
+      const local = localTextSeed.find((seed) => seed.slug === faq.slug);
+      const localTexts = local ? [local.heading, ...local.paragraphs] : [];
+      const faqTexts = faq.items.flatMap((item) => [
+        item.question,
+        item.answer,
+        ...item.sources.map((source) => `Source : ${source.label}`),
+      ]);
+
+      return [
+        faq.slug,
+        [
+          {
+            before: `${closing.heading} ${closing.text}`,
+            text: [...localTexts, faq.heading, ...faqTexts].join(" "),
+          },
+        ],
+      ];
+    }),
+  );
+}
+
 export const acceptedAdditions: Record<string, AcceptedAddition[]> = {
+  ...turnkeyAdditions(),
   home: [
     {
       after: "Pourquoi opter pour une douche Senior ?",
@@ -35,17 +70,19 @@ export function applyAcceptedAdditions(
   additions: AcceptedAddition[],
 ): string {
   return additions.reduce((text, addition) => {
-    const occurrences = text.split(addition.after).length - 1;
+    const anchor = "after" in addition ? addition.after : addition.before;
+    const occurrences = text.split(anchor).length - 1;
 
     if (occurrences !== 1) {
       throw new Error(
-        `The anchor "${addition.after}" must appear exactly once in the golden text, found ${occurrences}`,
+        `The anchor "${anchor}" must appear exactly once in the golden text, found ${occurrences}`,
       );
     }
 
-    return text.replace(
-      addition.after,
-      () => `${addition.after} ${addition.text}`,
+    return text.replace(anchor, () =>
+      "after" in addition
+        ? `${anchor} ${addition.text}`
+        : `${addition.text} ${anchor}`,
     );
   }, golden);
 }

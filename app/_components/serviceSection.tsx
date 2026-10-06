@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import type { Config1, Media } from "@/payload-types";
+import type { Config1 } from "@/payload-types";
 
 export function ServicesSection({ config }: { config: Config1 }) {
   const services = [
@@ -101,10 +101,8 @@ export function ServicesSection({ config }: { config: Config1 }) {
           <div className="text-center max-w-xs flex-1 min-w-[140px]">
             <Link
               className="group block transition-transform duration-200 hover:-translate-y-1"
-              href={
-                (config.financial_section?.financial_help_1?.impot_pdf as Media)
-                  ?.url || ""
-              }
+              href="https://www.service-public.gouv.fr/particuliers/vosdroits/F10752"
+              rel="noopener"
               target="_blank"
             >
               <div className="bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-full w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 flex items-center justify-center mx-auto mb-3 text-base sm:text-lg md:text-xl font-bold shadow-lg group-hover:shadow-xl group-hover:from-blue-400 group-hover:to-blue-500 transition-all duration-300">
