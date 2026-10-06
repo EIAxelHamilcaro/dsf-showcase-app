@@ -254,7 +254,7 @@ function ContactStep({
           </Label>
           <Input
             {...errorProps(`${id}-adress`, errors.adress)}
-            autoComplete="street-address"
+            autoComplete="address-line1"
             className={inputClassName}
             name="adress"
             onChange={onChange}

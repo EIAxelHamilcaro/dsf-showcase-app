@@ -127,7 +127,7 @@ export function ContactForm({ phone }: { phone?: string | null }) {
         </Label>
         <Input
           {...errorProps(`${id}-adress`, errors.adress)}
-          autoComplete="street-address"
+          autoComplete="address-line1"
           className={fieldClass}
           name="adress"
           onChange={handleChange}

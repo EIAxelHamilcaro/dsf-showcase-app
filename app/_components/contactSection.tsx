@@ -151,7 +151,7 @@ export function ContactSection({ config }: { config: Config1 }) {
                 </Label>
                 <Input
                   {...errorProps(`${id}-adress`, errors.adress)}
-                  autoComplete="street-address"
+                  autoComplete="address-level2"
                   className={fieldClass}
                   name="adress"
                   onChange={handleChange}
