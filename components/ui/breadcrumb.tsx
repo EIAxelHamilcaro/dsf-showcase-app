@@ -70,7 +70,6 @@ function BreadcrumbSeparator({
       aria-hidden="true"
       className={cn("[&>svg]:size-3.5", className)}
       data-slot="breadcrumb-separator"
-      role="presentation"
       {...props}
     >
       {children ?? <ChevronRight />}
