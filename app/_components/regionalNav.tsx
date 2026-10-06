@@ -1,35 +1,37 @@
 import { MapPin } from "lucide-react";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import type { PageLink } from "@/lib/pages/pageLinks";
 
-export function RegionalNavSection() {
-  const departments = [
-    {
-      name: "Loir-et-Cher (41)",
-      slug: "/loir-et-cher",
-      cities: "Blois, Romorantin, Vendôme",
-    },
-    {
-      name: "Indre-et-Loire (37)",
-      slug: "/indre-et-loire",
-      cities: "Tours, Joué-lès-Tours, Amboise",
-    },
-    {
-      name: "Loiret (45)",
-      slug: "/loiret",
-      cities: "Orléans, Montargis, Olivet",
-    },
-    {
-      name: "Indre (36)",
-      slug: "/indre",
-      cities: "Châteauroux, Issoudun, Le Blanc",
-    },
-    {
-      name: "Cher (18)",
-      slug: "/cher",
-      cities: "Bourges, Vierzon, St-Amand",
-    },
-  ];
+const citiesByDepartment: Record<string, string> = {
+  "/loir-et-cher": "Blois, Romorantin, Vendôme",
+  "/indre-et-loire": "Tours, Joué-lès-Tours, Amboise",
+  "/loiret": "Orléans, Montargis, Olivet",
+  "/indre": "Châteauroux, Issoudun, Le Blanc",
+  "/cher": "Bourges, Vierzon, St-Amand",
+};
+
+const displayOrder = Object.keys(citiesByDepartment);
+
+const displayRank = (href: string) => {
+  const rank = displayOrder.indexOf(href);
+
+  return rank === -1 ? displayOrder.length : rank;
+};
+
+interface RegionalNavSectionProps {
+  departments: PageLink[];
+  cities: PageLink[];
+}
+
+export function RegionalNavSection({
+  departments,
+  cities,
+}: RegionalNavSectionProps) {
+  const orderedDepartments = [...departments].sort(
+    (first, second) => displayRank(first.href) - displayRank(second.href),
+  );
 
   return (
     <section className="py-12 md:py-16 lg:py-24 bg-muted">
@@ -40,23 +42,25 @@ export function RegionalNavSection() {
               Toute la région Centre-Val de Loire
             </h2>
             <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto">
-              Artisan certifié présent dans les 5 départements. Installation rapide
-              partout en région Centre.
+              Artisan certifié présent dans les 5 départements. Installation
+              rapide partout en région Centre.
             </p>
           </div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-            {departments.map((dept) => (
-              <Link href={dept.slug} key={dept.slug}>
+            {orderedDepartments.map((dept) => (
+              <Link href={dept.href} key={dept.href}>
                 <Card className="h-full hover:border-primary transition-all duration-200 hover:shadow-lg cursor-pointer group">
                   <CardContent className="pt-6 text-center">
                     <MapPin className="h-10 w-10 md:h-12 md:w-12 text-primary mx-auto mb-3 group-hover:scale-110 transition-transform" />
                     <h3 className="font-bold text-lg md:text-xl mb-2 group-hover:text-primary transition-colors">
-                      {dept.name}
+                      {dept.label}
                     </h3>
-                    <p className="text-sm md:text-base text-muted-foreground">
-                      {dept.cities}
-                    </p>
+                    {citiesByDepartment[dept.href] ? (
+                      <p className="text-sm md:text-base text-muted-foreground">
+                        {citiesByDepartment[dept.href]}
+                      </p>
+                    ) : null}
                   </CardContent>
                 </Card>
               </Link>
@@ -67,6 +71,16 @@ export function RegionalNavSection() {
             <p className="text-muted-foreground">
               + toutes les communes des 5 départements
             </p>
+            <nav
+              aria-label="Villes desservies"
+              className="mt-6 flex flex-wrap justify-center gap-2"
+            >
+              {cities.map((city) => (
+                <Button asChild key={city.href} variant="outline">
+                  <Link href={city.href}>{city.label}</Link>
+                </Button>
+              ))}
+            </nav>
           </div>
         </div>
       </div>

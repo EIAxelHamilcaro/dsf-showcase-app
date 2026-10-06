@@ -4,11 +4,20 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  computeAggregateRating,
+  formatRating,
+  formatReviewDate,
+  toRatedReview,
+} from "@/lib/seo/reviews";
 import type { Config1, Media } from "@/payload-types";
+
+const sourceLabels = { direct: "Avis direct", google: "Avis Google" };
 
 export function GallerySection({ config }: { config: Config1 }) {
   const projects = config.caroussel_section || [];
   const testimonials = config.testimonials_section || [];
+  const aggregate = computeAggregateRating(config);
 
   const [currentProject, setCurrentProject] = useState(0);
   const autoplayRef = useRef<NodeJS.Timeout | null>(null);
@@ -37,8 +46,9 @@ export function GallerySection({ config }: { config: Config1 }) {
   // biome-ignore lint/correctness/useExhaustiveDependencies: ok
   useEffect(() => {
     // Respect user's motion preferences
-    const prefersReducedMotion =
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
 
     if (!prefersReducedMotion) {
       startAutoplay();
@@ -161,6 +171,25 @@ export function GallerySection({ config }: { config: Config1 }) {
         <h3 className="text-3xl md:text-4xl font-bold text-center mb-8">
           Témoignages clients
         </h3>
+        {aggregate ? (
+          <p className="text-base md:text-lg text-center mb-8">
+            {formatRating(aggregate.ratingValue)}/5 sur {aggregate.reviewCount}{" "}
+            {aggregate.origin === "google" ? "avis Google" : "avis"}
+            {aggregate.origin === "google" && config.google_profile_url ? (
+              <>
+                {" "}
+                <a
+                  className="underline"
+                  href={config.google_profile_url}
+                  rel="noopener noreferrer"
+                  target="_blank"
+                >
+                  Voir la fiche
+                </a>
+              </>
+            ) : null}
+          </p>
+        ) : null}
         <div className="relative w-full md:w-11/12 overflow-hidden">
           <div className="flex gap-4 md:gap-6 animate-scroll-inf">
             {[...Array(2)].map((_) => (
@@ -168,33 +197,51 @@ export function GallerySection({ config }: { config: Config1 }) {
                 className="flex gap-4 md:gap-6"
                 key={`clone_testimonial_${Math.random() * 1000}`}
               >
-                {testimonials.map((testimonial, index) => (
-                  <Card
-                    className="p-4 md:p-6 w-72 sm:w-80 md:w-96 mb-1 border rounded-2xl shadow-sm hover:shadow-md transition-shadow shrink-0"
-                    key={`testmonial_$${Math.random() * 1000}-${index.toString}`}
-                  >
-                    <CardHeader className="p-0 mb-0 gap-0">
-                      <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 md:w-15 md:h-15 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold">
-                          {testimonial?.title?.charAt(0)}
+                {testimonials.map((testimonial, index) => {
+                  const review = toRatedReview(testimonial);
+
+                  return (
+                    <Card
+                      className="p-4 md:p-6 w-72 sm:w-80 md:w-96 mb-1 border rounded-2xl shadow-sm hover:shadow-md transition-shadow shrink-0"
+                      key={`testmonial_$${Math.random() * 1000}-${index.toString}`}
+                    >
+                      <CardHeader className="p-0 mb-0 gap-0">
+                        <div className="flex items-center gap-3">
+                          <div className="w-12 h-12 md:w-15 md:h-15 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold">
+                            {testimonial?.title?.charAt(0)}
+                          </div>
+                          <div>
+                            <CardTitle className="text-lg md:text-xl">
+                              {testimonial.title}
+                            </CardTitle>
+                            <p className="text-sm md:text-base">
+                              {testimonial.age} • {testimonial.location}
+                            </p>
+                            {review ? (
+                              <p className="text-sm md:text-base text-muted-foreground">
+                                {formatRating(review.rating)}/5 •{" "}
+                                {sourceLabels[review.source]}
+                                {review.date ? (
+                                  <>
+                                    {" • "}
+                                    <time dateTime={review.date}>
+                                      {formatReviewDate(review.date)}
+                                    </time>
+                                  </>
+                                ) : null}
+                              </p>
+                            ) : null}
+                          </div>
                         </div>
-                        <div>
-                          <CardTitle className="text-lg md:text-xl">
-                            {testimonial.title}
-                          </CardTitle>
-                          <p className="text-sm md:text-base">
-                            {testimonial.age} • {testimonial.location}
-                          </p>
-                        </div>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="p-0 mt-0">
-                      <p className="text-base md:text-lg italic">
-                        "{testimonial.text}"
-                      </p>
-                    </CardContent>
-                  </Card>
-                ))}
+                      </CardHeader>
+                      <CardContent className="p-0 mt-0">
+                        <p className="text-base md:text-lg italic">
+                          "{testimonial.text}"
+                        </p>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
               </div>
             ))}
           </div>

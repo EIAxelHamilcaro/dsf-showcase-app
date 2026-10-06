@@ -33,7 +33,10 @@ export function FAQSection({ config }: { config: Config1 }) {
             <AccordionTrigger className="text-left hover:no-underline cursor-pointer text-base sm:text-lg py-4">
               <span className="font-semibold pr-2">{faq.question}</span>
             </AccordionTrigger>
-            <AccordionContent className="text-base sm:text-lg pt-2 pb-4">
+            <AccordionContent
+              className="text-base sm:text-lg pt-2 pb-4 in-data-[state=closed]:hidden"
+              forceMount
+            >
               {faq.answer}
             </AccordionContent>
           </AccordionItem>

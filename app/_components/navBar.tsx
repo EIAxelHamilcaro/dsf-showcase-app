@@ -3,7 +3,36 @@ import type { Config1 } from "@/payload-types";
 import Logo from "../../public/logo.png";
 import NavBarInteractive from "./navBarInteractive";
 
+const fallbackServices = [
+  {
+    label: "Remplacement Baignoire par Douche",
+    href: "/remplacement-baignoire-par-douche",
+    description: "Transformation de votre baignoire en douche sécurisée",
+  },
+  {
+    label: "Installation Douche PMR",
+    href: "/installation-douche-pmr",
+    description: "Douche aux normes pour personnes à mobilité réduite",
+  },
+  {
+    label: "Aménagement Salle de Bain",
+    href: "/amenagement-salle-bain-senior",
+    description: "Adaptation complète de votre salle de bain",
+  },
+  {
+    label: "Aides Financières",
+    href: "/aides-financieres",
+    description: "MaPrimeAdapt et crédit d'impôt",
+  },
+];
+
 export default function NavBar({ config }: { config: Config1 }) {
+  const configuredServices = (config.menu_services ?? []).map((item) => ({
+    label: item.label,
+    href: item.href,
+    description: item.description ?? undefined,
+  }));
+
   const items = [
     {
       label: "Accueil",
@@ -20,28 +49,8 @@ export default function NavBar({ config }: { config: Config1 }) {
     {
       label: "Services",
       href: "/#services",
-      children: [
-        {
-          label: "Remplacement Baignoire par Douche",
-          href: "/remplacement-baignoire-par-douche",
-          description: "Transformation de votre baignoire en douche sécurisée",
-        },
-        {
-          label: "Installation Douche PMR",
-          href: "/installation-douche-pmr",
-          description: "Douche aux normes pour personnes à mobilité réduite",
-        },
-        {
-          label: "Aménagement Salle de Bain",
-          href: "/amenagement-salle-bain-senior",
-          description: "Adaptation complète de votre salle de bain",
-        },
-        {
-          label: "Aides Financières",
-          href: "/aides-financieres",
-          description: "MaPrimeAdapt et crédit d'impôt",
-        },
-      ],
+      children:
+        configuredServices.length > 0 ? configuredServices : fallbackServices,
     },
     {
       label: "Contact",

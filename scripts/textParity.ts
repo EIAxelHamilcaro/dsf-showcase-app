@@ -1,10 +1,14 @@
 import { readFile } from "node:fs/promises";
 import { extractMainText } from "../lib/seo/extractMainText";
+import {
+  acceptedAdditions,
+  applyAcceptedAdditions,
+  ignoredNavLabels,
+} from "./parityAdditions";
 import { parityPages } from "./parityPages";
 
 const baseUrl = process.env.PARITY_BASE_URL ?? "http://localhost:3100";
 const fixtureDir = new URL("../tests/fixtures/mainText/", import.meta.url);
-const ignoredNavLabels: string[] = [];
 
 const pathFor = (slug: string) => (slug === "home" ? "/" : `/${slug}`);
 
@@ -26,9 +30,13 @@ function firstDifference(expected: string, actual: string): string {
 }
 
 async function checkPage(slug: string): Promise<string | null> {
-  const expected = (
+  const golden = (
     await readFile(new URL(`${slug}.txt`, fixtureDir), "utf8")
   ).trim();
+  const expected = applyAcceptedAdditions(
+    golden,
+    acceptedAdditions[slug] ?? [],
+  );
   const response = await fetch(`${baseUrl}${pathFor(slug)}`);
 
   if (!response.ok) {
