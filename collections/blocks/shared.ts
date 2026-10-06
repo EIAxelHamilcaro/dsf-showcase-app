@@ -1,4 +1,16 @@
-import type { Field } from "payload";
+import type { Block, Field } from "payload";
+
+const copyFields = (fields: Field[]): Field[] =>
+  fields.map((field) =>
+    "fields" in field
+      ? { ...field, fields: copyFields(field.fields) }
+      : { ...field },
+  );
+
+export const fieldsOf = (block: Block, omitted: string[] = []): Field[] =>
+  copyFields(block.fields).filter(
+    (field) => !("name" in field && omitted.includes(field.name)),
+  );
 
 export const iconOptions = [
   { label: "Aucune", value: "none" },

@@ -23,9 +23,7 @@ const parentOf = (page: Page, all: Page[]): Page | undefined => {
 
   return all.find(
     (candidate) =>
-      candidate.id === parentId &&
-      candidate.id !== page.id &&
-      candidate.pageType === "department",
+      candidate.id === parentId && candidate.pageType === "department",
   );
 };
 
@@ -49,7 +47,7 @@ export function getLegalLinks(all: Page[]): PageLink[] {
 }
 
 export function getRelatedLinks(page: Page, all: Page[]): PageLink[] {
-  const others = all.filter((candidate) => candidate.id !== page.id);
+  const others = all.filter((candidate) => candidate.slug !== page.slug);
   const parent = parentOf(page, all);
 
   if (page.pageType === "city") {

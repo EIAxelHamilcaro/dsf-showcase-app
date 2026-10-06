@@ -72,6 +72,7 @@ export interface Config {
     users: User;
     media: Media;
     pages: Page;
+    cities: City;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -84,6 +85,7 @@ export interface Config {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     pages: PagesSelect<false> | PagesSelect<true>;
+    cities: CitiesSelect<false> | CitiesSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -93,8 +95,12 @@ export interface Config {
     defaultIDType: number;
   };
   fallbackLocale: null;
-  globals: {};
-  globalsSelect: {};
+  globals: {
+    cityTemplate: CityTemplate;
+  };
+  globalsSelect: {
+    cityTemplate: CityTemplateSelect<false> | CityTemplateSelect<true>;
+  };
   locale: null;
   user: User & {
     collection: 'users';
@@ -737,7 +743,7 @@ export interface User {
   password?: string | null;
 }
 /**
- * Pages du site : villes, départements, services
+ * Pages du site : départements, services, pages légales. Les villes ont leur propre rubrique
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "pages".
@@ -755,7 +761,7 @@ export interface Page {
   pageType: 'city' | 'department' | 'service' | 'legal';
   parent?: (number | null) | Page;
   /**
-   * Nom de la ville ou du département, repris dans les données structurées
+   * Nom du département, repris dans les données structurées
    */
   areaName?: string | null;
   departmentCode?: string | null;
@@ -1062,6 +1068,83 @@ export interface CtaBlock {
   blockType: 'cta';
 }
 /**
+ * Une fiche par ville. La page est générée à partir du modèle des pages ville et de cette fiche
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "cities".
+ */
+export interface City {
+  id: number;
+  /**
+   * Remplace {ville} dans le modèle des pages ville, par exemple Tours
+   */
+  name: string;
+  /**
+   * Partie finale de l'URL, par exemple douche-senior-tours
+   */
+  slug: string;
+  /**
+   * Remplace {departement} et {code} dans le modèle, et place la ville dans le fil d'Ariane et sur la page du département
+   */
+  department: number | Page;
+  /**
+   * À remplir seulement s'il diffère du nom de la ville (Romorantin-Lanthenay). Repris dans les données structurées
+   */
+  areaName?: string | null;
+  /**
+   * Laisser vide pour utiliser celle du modèle (ville, agglomération, département)
+   */
+  locationLine?: string | null;
+  /**
+   * Laisser vide pour utiliser celui du modèle
+   */
+  zonesHeading?: string | null;
+  zones: {
+    name: string;
+    id?: string | null;
+  }[];
+  /**
+   * Facultatif. Affichées entre la liste des communes et le texte local
+   */
+  extraSections?: (TestimonialBlock | ServiceCardsBlock | AidCardsBlock)[] | null;
+  localSection: {
+    background: 'default' | 'muted';
+    heading: string;
+    paragraphs: {
+      text: string;
+      id?: string | null;
+    }[];
+  };
+  faq: {
+    background: 'default' | 'muted';
+    heading: string;
+    items: {
+      question: string;
+      answer: string;
+      /**
+       * Affichées sous la réponse, avec un lien vers la page officielle
+       */
+      sources?:
+        | {
+            label: string;
+            url: string;
+            id?: string | null;
+          }[]
+        | null;
+      id?: string | null;
+    }[];
+  };
+  /**
+   * Laisser vide pour utiliser le titre et la description du modèle
+   */
+  seo?: {
+    title?: string | null;
+    description?: string | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
@@ -1104,6 +1187,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'pages';
         value: number | Page;
+      } | null)
+    | ({
+        relationTo: 'cities';
+        value: number | City;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -1754,6 +1841,71 @@ export interface CtaBlockSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "cities_select".
+ */
+export interface CitiesSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  department?: T;
+  areaName?: T;
+  locationLine?: T;
+  zonesHeading?: T;
+  zones?:
+    | T
+    | {
+        name?: T;
+        id?: T;
+      };
+  extraSections?:
+    | T
+    | {
+        testimonial?: T | TestimonialBlockSelect<T>;
+        serviceCards?: T | ServiceCardsBlockSelect<T>;
+        aidCards?: T | AidCardsBlockSelect<T>;
+      };
+  localSection?:
+    | T
+    | {
+        background?: T;
+        heading?: T;
+        paragraphs?:
+          | T
+          | {
+              text?: T;
+              id?: T;
+            };
+      };
+  faq?:
+    | T
+    | {
+        background?: T;
+        heading?: T;
+        items?:
+          | T
+          | {
+              question?: T;
+              answer?: T;
+              sources?:
+                | T
+                | {
+                    label?: T;
+                    url?: T;
+                    id?: T;
+                  };
+              id?: T;
+            };
+      };
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv_select".
  */
 export interface PayloadKvSelect<T extends boolean = true> {
@@ -1791,6 +1943,130 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   batch?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * Texte commun à toutes les pages ville. {ville}, {departement}, {code} sont remplacés par le nom de la ville, le nom et le numéro de son département
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "cityTemplate".
+ */
+export interface CityTemplate {
+  id: number;
+  /**
+   * Utilisé dans le fil d'Ariane et les liens vers la page, par exemple Douche Senior {ville}
+   */
+  navLabel: string;
+  seo: {
+    title: string;
+    description: string;
+  };
+  hero: {
+    /**
+     * Ligne affichée avec un repère au dessus du titre (villes)
+     */
+    location?: string | null;
+    titleBefore: string;
+    titleHighlight: string;
+    titleAfter?: string | null;
+    intro: string;
+    ctaLabel: string;
+  };
+  featureCards: {
+    background: 'default' | 'muted';
+    heading?: string | null;
+    intro?: string | null;
+    layout: 'centered' | 'left' | 'inline';
+    columns: '1' | '2' | '3' | '4';
+    spacing?: ('compact' | 'spacious') | null;
+    cards: {
+      icon: 'none' | 'mapPin' | 'clock' | 'shield' | 'euro' | 'checkCircle' | 'fileText';
+      title: string;
+      text: string;
+      id?: string | null;
+    }[];
+  };
+  /**
+   * Les communes elles-mêmes se saisissent dans chaque ville
+   */
+  zoneList: {
+    background: 'default' | 'muted';
+    heading: string;
+    showMapIcon?: boolean | null;
+    intro?: string | null;
+    outro?: string | null;
+  };
+  cta: {
+    heading: string;
+    text: string;
+    ctaLabel: string;
+    /**
+     * Laisser vide pour afficher le numéro de téléphone
+     */
+    phoneLabel?: string | null;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "cityTemplate_select".
+ */
+export interface CityTemplateSelect<T extends boolean = true> {
+  navLabel?: T;
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+      };
+  hero?:
+    | T
+    | {
+        location?: T;
+        titleBefore?: T;
+        titleHighlight?: T;
+        titleAfter?: T;
+        intro?: T;
+        ctaLabel?: T;
+      };
+  featureCards?:
+    | T
+    | {
+        background?: T;
+        heading?: T;
+        intro?: T;
+        layout?: T;
+        columns?: T;
+        spacing?: T;
+        cards?:
+          | T
+          | {
+              icon?: T;
+              title?: T;
+              text?: T;
+              id?: T;
+            };
+      };
+  zoneList?:
+    | T
+    | {
+        background?: T;
+        heading?: T;
+        showMapIcon?: T;
+        intro?: T;
+        outro?: T;
+      };
+  cta?:
+    | T
+    | {
+        heading?: T;
+        text?: T;
+        ctaLabel?: T;
+        phoneLabel?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

@@ -1,5 +1,4 @@
 import type { CollectionConfig } from "payload";
-import { validateSlug } from "../lib/cms/validators";
 import { AidCardsBlock } from "./blocks/AidCardsBlock";
 import { CtaBlock } from "./blocks/CtaBlock";
 import { FaqBlock } from "./blocks/FaqBlock";
@@ -16,9 +15,10 @@ import {
   revalidateSiteAfterChange,
   revalidateSiteAfterDelete,
 } from "./hooks/revalidateSite";
+import { validateSlugUnusedBy } from "./validateSharedSlug";
 
-const isAreaPage = (data: { pageType?: string } | undefined) =>
-  data?.pageType === "city" || data?.pageType === "department";
+const isDepartmentPage = (data: { pageType?: string } | undefined) =>
+  data?.pageType === "department";
 
 const Pages: CollectionConfig = {
   slug: "pages",
@@ -32,7 +32,8 @@ const Pages: CollectionConfig = {
   admin: {
     useAsTitle: "navLabel",
     defaultColumns: ["navLabel", "slug", "pageType", "updatedAt"],
-    description: "Pages du site : villes, départements, services",
+    description:
+      "Pages du site : départements, services, pages légales. Les villes ont leur propre rubrique",
     livePreview: {
       url: ({ data }) =>
         `${process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000"}/${data?.slug ?? ""}`,
@@ -50,9 +51,12 @@ const Pages: CollectionConfig = {
       required: true,
       unique: true,
       index: true,
-      validate: validateSlug,
+      validate: validateSlugUnusedBy(
+        "cities",
+        "Une ville utilise déjà cette adresse",
+      ),
       admin: {
-        description: "Partie finale de l'URL, par exemple douche-senior-blois",
+        description: "Partie finale de l'URL, par exemple aides-financieres",
       },
     },
     {
@@ -76,6 +80,12 @@ const Pages: CollectionConfig = {
         { label: "Service", value: "service" },
         { label: "Page légale", value: "legal" },
       ],
+      filterOptions: ({ options, req }) =>
+        req.user
+          ? options.filter(
+              (option) => typeof option !== "string" && option.value !== "city",
+            )
+          : options,
     },
     {
       name: "parent",
@@ -83,23 +93,22 @@ const Pages: CollectionConfig = {
       relationTo: "pages",
       label: "Département de la ville",
       filterOptions: { pageType: { equals: "department" } },
-      admin: { condition: (data) => data?.pageType === "city" },
+      admin: { hidden: true },
     },
     {
       name: "areaName",
       type: "text",
       label: "Nom du territoire",
       admin: {
-        description:
-          "Nom de la ville ou du département, repris dans les données structurées",
-        condition: isAreaPage,
+        description: "Nom du département, repris dans les données structurées",
+        condition: isDepartmentPage,
       },
     },
     {
       name: "departmentCode",
       type: "text",
       label: "Numéro du département",
-      admin: { condition: (data) => data?.pageType === "department" },
+      admin: { condition: isDepartmentPage },
     },
     {
       name: "seo",

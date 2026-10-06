@@ -2,6 +2,7 @@ import { revalidatePath } from "next/cache";
 import type {
   CollectionAfterChangeHook,
   CollectionAfterDeleteHook,
+  GlobalAfterChangeHook,
   PayloadRequest,
 } from "payload";
 
@@ -30,4 +31,7 @@ export const revalidateSiteAfterChange: CollectionAfterChangeHook =
   revalidateSite;
 
 export const revalidateSiteAfterDelete: CollectionAfterDeleteHook =
+  revalidateSite;
+
+export const revalidateSiteAfterGlobalChange: GlobalAfterChangeHook =
   revalidateSite;

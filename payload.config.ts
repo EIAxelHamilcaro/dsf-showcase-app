@@ -7,6 +7,8 @@ import { vercelBlobStorage } from "@payloadcms/storage-vercel-blob";
 import { fr } from "@payloadcms/translations/languages/fr";
 import { buildConfig } from "payload";
 import sharp from "sharp";
+import Cities from "./collections/Cities";
+import CityTemplate from "./collections/CityTemplate";
 import Config from "./collections/Config";
 import Leads from "./collections/Leads";
 import { Media } from "./collections/Media";
@@ -26,8 +28,8 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Leads, Config, Users, Media, Pages],
-  globals: [],
+  collections: [Leads, Config, Users, Media, Pages, Cities],
+  globals: [CityTemplate],
   i18n: {
     fallbackLanguage: "fr",
     supportedLanguages: { fr },

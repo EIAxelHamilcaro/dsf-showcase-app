@@ -102,6 +102,62 @@ export const enum_pages_page_type = pgEnum("enum_pages_page_type", [
   "service",
   "legal",
 ]);
+export const enum_cities_blocks_testimonial_background = pgEnum(
+  "enum_cities_blocks_testimonial_background",
+  ["default", "muted"],
+);
+export const enum_cities_blocks_service_cards_background = pgEnum(
+  "enum_cities_blocks_service_cards_background",
+  ["default", "muted"],
+);
+export const enum_cities_blocks_service_cards_columns = pgEnum(
+  "enum_cities_blocks_service_cards_columns",
+  ["2", "3"],
+);
+export const enum_cities_blocks_aid_cards_cards_icon = pgEnum(
+  "enum_cities_blocks_aid_cards_cards_icon",
+  ["none", "mapPin", "clock", "shield", "euro", "checkCircle", "fileText"],
+);
+export const enum_cities_blocks_aid_cards_background = pgEnum(
+  "enum_cities_blocks_aid_cards_background",
+  ["default", "muted"],
+);
+export const enum_cities_blocks_aid_cards_variant = pgEnum(
+  "enum_cities_blocks_aid_cards_variant",
+  ["compact", "detailed"],
+);
+export const enum_cities_local_section_background = pgEnum(
+  "enum_cities_local_section_background",
+  ["default", "muted"],
+);
+export const enum_cities_faq_background = pgEnum("enum_cities_faq_background", [
+  "default",
+  "muted",
+]);
+export const enum_city_template_feature_cards_cards_icon = pgEnum(
+  "enum_city_template_feature_cards_cards_icon",
+  ["none", "mapPin", "clock", "shield", "euro", "checkCircle", "fileText"],
+);
+export const enum_city_template_feature_cards_background = pgEnum(
+  "enum_city_template_feature_cards_background",
+  ["default", "muted"],
+);
+export const enum_city_template_feature_cards_layout = pgEnum(
+  "enum_city_template_feature_cards_layout",
+  ["centered", "left", "inline"],
+);
+export const enum_city_template_feature_cards_columns = pgEnum(
+  "enum_city_template_feature_cards_columns",
+  ["1", "2", "3", "4"],
+);
+export const enum_city_template_feature_cards_spacing = pgEnum(
+  "enum_city_template_feature_cards_spacing",
+  ["compact", "spacious"],
+);
+export const enum_city_template_zone_list_background = pgEnum(
+  "enum_city_template_zone_list_background",
+  ["default", "muted"],
+);
 
 export const leads = pgTable(
   "leads",
@@ -1306,6 +1362,313 @@ export const pages = pgTable(
   ],
 );
 
+export const cities_zones = pgTable(
+  "cities_zones",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: integer("_parent_id").notNull(),
+    id: varchar("id").primaryKey(),
+    name: varchar("name").notNull(),
+  },
+  (columns) => [
+    index("cities_zones_order_idx").on(columns._order),
+    index("cities_zones_parent_id_idx").on(columns._parentID),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [cities.id],
+      name: "cities_zones_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const cities_blocks_testimonial = pgTable(
+  "cities_blocks_testimonial",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: integer("_parent_id").notNull(),
+    _path: text("_path").notNull(),
+    id: varchar("id").primaryKey(),
+    background: enum_cities_blocks_testimonial_background("background")
+      .notNull()
+      .default("default"),
+    quote: varchar("quote").notNull(),
+    author: varchar("author").notNull(),
+    rating: numeric("rating", { mode: "number" }),
+    blockName: varchar("block_name"),
+  },
+  (columns) => [
+    index("cities_blocks_testimonial_order_idx").on(columns._order),
+    index("cities_blocks_testimonial_parent_id_idx").on(columns._parentID),
+    index("cities_blocks_testimonial_path_idx").on(columns._path),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [cities.id],
+      name: "cities_blocks_testimonial_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const cities_blocks_service_cards_cards_bullets = pgTable(
+  "cities_blocks_service_cards_cards_bullets",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: varchar("_parent_id").notNull(),
+    id: varchar("id").primaryKey(),
+    text: varchar("text").notNull(),
+  },
+  (columns) => [
+    index("cities_blocks_service_cards_cards_bullets_order_idx").on(
+      columns._order,
+    ),
+    index("cities_blocks_service_cards_cards_bullets_parent_id_idx").on(
+      columns._parentID,
+    ),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [cities_blocks_service_cards_cards.id],
+      name: "cities_blocks_service_cards_cards_bullets_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const cities_blocks_service_cards_cards = pgTable(
+  "cities_blocks_service_cards_cards",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: varchar("_parent_id").notNull(),
+    id: varchar("id").primaryKey(),
+    title: varchar("title").notNull(),
+    description: varchar("description"),
+    linkLabel: varchar("link_label"),
+    linkHref: varchar("link_href"),
+  },
+  (columns) => [
+    index("cities_blocks_service_cards_cards_order_idx").on(columns._order),
+    index("cities_blocks_service_cards_cards_parent_id_idx").on(
+      columns._parentID,
+    ),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [cities_blocks_service_cards.id],
+      name: "cities_blocks_service_cards_cards_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const cities_blocks_service_cards = pgTable(
+  "cities_blocks_service_cards",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: integer("_parent_id").notNull(),
+    _path: text("_path").notNull(),
+    id: varchar("id").primaryKey(),
+    background: enum_cities_blocks_service_cards_background("background")
+      .notNull()
+      .default("default"),
+    heading: varchar("heading").notNull(),
+    columns: enum_cities_blocks_service_cards_columns("columns")
+      .notNull()
+      .default("2"),
+    blockName: varchar("block_name"),
+  },
+  (columns) => [
+    index("cities_blocks_service_cards_order_idx").on(columns._order),
+    index("cities_blocks_service_cards_parent_id_idx").on(columns._parentID),
+    index("cities_blocks_service_cards_path_idx").on(columns._path),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [cities.id],
+      name: "cities_blocks_service_cards_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const cities_blocks_aid_cards_cards_details = pgTable(
+  "cities_blocks_aid_cards_cards_details",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: varchar("_parent_id").notNull(),
+    id: varchar("id").primaryKey(),
+    label: varchar("label").notNull(),
+    text: varchar("text").notNull(),
+  },
+  (columns) => [
+    index("cities_blocks_aid_cards_cards_details_order_idx").on(columns._order),
+    index("cities_blocks_aid_cards_cards_details_parent_id_idx").on(
+      columns._parentID,
+    ),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [cities_blocks_aid_cards_cards.id],
+      name: "cities_blocks_aid_cards_cards_details_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const cities_blocks_aid_cards_cards = pgTable(
+  "cities_blocks_aid_cards_cards",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: varchar("_parent_id").notNull(),
+    id: varchar("id").primaryKey(),
+    icon: enum_cities_blocks_aid_cards_cards_icon("icon")
+      .notNull()
+      .default("none"),
+    title: varchar("title").notNull(),
+    text: varchar("text").notNull(),
+    highlight: varchar("highlight"),
+    note: varchar("note"),
+  },
+  (columns) => [
+    index("cities_blocks_aid_cards_cards_order_idx").on(columns._order),
+    index("cities_blocks_aid_cards_cards_parent_id_idx").on(columns._parentID),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [cities_blocks_aid_cards.id],
+      name: "cities_blocks_aid_cards_cards_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const cities_blocks_aid_cards = pgTable(
+  "cities_blocks_aid_cards",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: integer("_parent_id").notNull(),
+    _path: text("_path").notNull(),
+    id: varchar("id").primaryKey(),
+    background: enum_cities_blocks_aid_cards_background("background")
+      .notNull()
+      .default("default"),
+    variant: enum_cities_blocks_aid_cards_variant("variant").default("compact"),
+    heading: varchar("heading").notNull(),
+    intro: varchar("intro"),
+    buttonLabel: varchar("button_label"),
+    buttonHref: varchar("button_href"),
+    blockName: varchar("block_name"),
+  },
+  (columns) => [
+    index("cities_blocks_aid_cards_order_idx").on(columns._order),
+    index("cities_blocks_aid_cards_parent_id_idx").on(columns._parentID),
+    index("cities_blocks_aid_cards_path_idx").on(columns._path),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [cities.id],
+      name: "cities_blocks_aid_cards_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const cities_local_section_paragraphs = pgTable(
+  "cities_local_section_paragraphs",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: integer("_parent_id").notNull(),
+    id: varchar("id").primaryKey(),
+    text: varchar("text").notNull(),
+  },
+  (columns) => [
+    index("cities_local_section_paragraphs_order_idx").on(columns._order),
+    index("cities_local_section_paragraphs_parent_id_idx").on(
+      columns._parentID,
+    ),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [cities.id],
+      name: "cities_local_section_paragraphs_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const cities_faq_items_sources = pgTable(
+  "cities_faq_items_sources",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: varchar("_parent_id").notNull(),
+    id: varchar("id").primaryKey(),
+    label: varchar("label").notNull(),
+    url: varchar("url").notNull(),
+  },
+  (columns) => [
+    index("cities_faq_items_sources_order_idx").on(columns._order),
+    index("cities_faq_items_sources_parent_id_idx").on(columns._parentID),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [cities_faq_items.id],
+      name: "cities_faq_items_sources_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const cities_faq_items = pgTable(
+  "cities_faq_items",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: integer("_parent_id").notNull(),
+    id: varchar("id").primaryKey(),
+    question: varchar("question").notNull(),
+    answer: varchar("answer").notNull(),
+  },
+  (columns) => [
+    index("cities_faq_items_order_idx").on(columns._order),
+    index("cities_faq_items_parent_id_idx").on(columns._parentID),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [cities.id],
+      name: "cities_faq_items_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const cities = pgTable(
+  "cities",
+  {
+    id: serial("id").primaryKey(),
+    name: varchar("name").notNull(),
+    slug: varchar("slug").notNull(),
+    department: integer("department_id")
+      .notNull()
+      .references(() => pages.id, {
+        onDelete: "set null",
+      }),
+    areaName: varchar("area_name"),
+    locationLine: varchar("location_line"),
+    zonesHeading: varchar("zones_heading"),
+    localSection_background: enum_cities_local_section_background(
+      "local_section_background",
+    )
+      .notNull()
+      .default("default"),
+    localSection_heading: varchar("local_section_heading").notNull(),
+    faq_background: enum_cities_faq_background("faq_background")
+      .notNull()
+      .default("default"),
+    faq_heading: varchar("faq_heading").notNull(),
+    seo_title: varchar("seo_title"),
+    seo_description: varchar("seo_description"),
+    updatedAt: timestamp("updated_at", {
+      mode: "string",
+      withTimezone: true,
+      precision: 3,
+    })
+      .defaultNow()
+      .notNull(),
+    createdAt: timestamp("created_at", {
+      mode: "string",
+      withTimezone: true,
+      precision: 3,
+    })
+      .defaultNow()
+      .notNull(),
+  },
+  (columns) => [
+    uniqueIndex("cities_slug_idx").on(columns.slug),
+    index("cities_department_idx").on(columns.department),
+    index("cities_updated_at_idx").on(columns.updatedAt),
+    index("cities_created_at_idx").on(columns.createdAt),
+  ],
+);
+
 export const payload_kv = pgTable(
   "payload_kv",
   {
@@ -1355,6 +1718,7 @@ export const payload_locked_documents_rels = pgTable(
     usersID: integer("users_id"),
     mediaID: integer("media_id"),
     pagesID: integer("pages_id"),
+    citiesID: integer("cities_id"),
   },
   (columns) => [
     index("payload_locked_documents_rels_order_idx").on(columns.order),
@@ -1365,6 +1729,7 @@ export const payload_locked_documents_rels = pgTable(
     index("payload_locked_documents_rels_users_id_idx").on(columns.usersID),
     index("payload_locked_documents_rels_media_id_idx").on(columns.mediaID),
     index("payload_locked_documents_rels_pages_id_idx").on(columns.pagesID),
+    index("payload_locked_documents_rels_cities_id_idx").on(columns.citiesID),
     foreignKey({
       columns: [columns["parent"]],
       foreignColumns: [payload_locked_documents.id],
@@ -1394,6 +1759,11 @@ export const payload_locked_documents_rels = pgTable(
       columns: [columns["pagesID"]],
       foreignColumns: [pages.id],
       name: "payload_locked_documents_rels_pages_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["citiesID"]],
+      foreignColumns: [cities.id],
+      name: "payload_locked_documents_rels_cities_fk",
     }).onDelete("cascade"),
   ],
 );
@@ -1479,6 +1849,87 @@ export const payload_migrations = pgTable(
     index("payload_migrations_created_at_idx").on(columns.createdAt),
   ],
 );
+
+export const city_template_feature_cards_cards = pgTable(
+  "city_template_feature_cards_cards",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: integer("_parent_id").notNull(),
+    id: varchar("id").primaryKey(),
+    icon: enum_city_template_feature_cards_cards_icon("icon")
+      .notNull()
+      .default("none"),
+    title: varchar("title").notNull(),
+    text: varchar("text").notNull(),
+  },
+  (columns) => [
+    index("city_template_feature_cards_cards_order_idx").on(columns._order),
+    index("city_template_feature_cards_cards_parent_id_idx").on(
+      columns._parentID,
+    ),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [city_template.id],
+      name: "city_template_feature_cards_cards_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const city_template = pgTable("city_template", {
+  id: serial("id").primaryKey(),
+  navLabel: varchar("nav_label").notNull(),
+  seo_title: varchar("seo_title").notNull(),
+  seo_description: varchar("seo_description").notNull(),
+  hero_location: varchar("hero_location"),
+  hero_titleBefore: varchar("hero_title_before").notNull(),
+  hero_titleHighlight: varchar("hero_title_highlight").notNull(),
+  hero_titleAfter: varchar("hero_title_after"),
+  hero_intro: varchar("hero_intro").notNull(),
+  hero_ctaLabel: varchar("hero_cta_label").notNull(),
+  featureCards_background: enum_city_template_feature_cards_background(
+    "feature_cards_background",
+  )
+    .notNull()
+    .default("default"),
+  featureCards_heading: varchar("feature_cards_heading"),
+  featureCards_intro: varchar("feature_cards_intro"),
+  featureCards_layout: enum_city_template_feature_cards_layout(
+    "feature_cards_layout",
+  )
+    .notNull()
+    .default("centered"),
+  featureCards_columns: enum_city_template_feature_cards_columns(
+    "feature_cards_columns",
+  )
+    .notNull()
+    .default("4"),
+  featureCards_spacing: enum_city_template_feature_cards_spacing(
+    "feature_cards_spacing",
+  ).default("compact"),
+  zoneList_background: enum_city_template_zone_list_background(
+    "zone_list_background",
+  )
+    .notNull()
+    .default("default"),
+  zoneList_heading: varchar("zone_list_heading").notNull(),
+  zoneList_showMapIcon: boolean("zone_list_show_map_icon").default(false),
+  zoneList_intro: varchar("zone_list_intro"),
+  zoneList_outro: varchar("zone_list_outro"),
+  cta_heading: varchar("cta_heading").notNull(),
+  cta_text: varchar("cta_text").notNull(),
+  cta_ctaLabel: varchar("cta_cta_label").notNull(),
+  cta_phoneLabel: varchar("cta_phone_label"),
+  updatedAt: timestamp("updated_at", {
+    mode: "string",
+    withTimezone: true,
+    precision: 3,
+  }),
+  createdAt: timestamp("created_at", {
+    mode: "string",
+    withTimezone: true,
+    precision: 3,
+  }),
+});
 
 export const relations_leads = relations(leads, () => ({}));
 export const relations_config_caroussel_section = relations(
@@ -1971,6 +2422,153 @@ export const relations_pages = relations(pages, ({ one, many }) => ({
     relationName: "_blocks_cta",
   }),
 }));
+export const relations_cities_zones = relations(cities_zones, ({ one }) => ({
+  _parentID: one(cities, {
+    fields: [cities_zones._parentID],
+    references: [cities.id],
+    relationName: "zones",
+  }),
+}));
+export const relations_cities_blocks_testimonial = relations(
+  cities_blocks_testimonial,
+  ({ one }) => ({
+    _parentID: one(cities, {
+      fields: [cities_blocks_testimonial._parentID],
+      references: [cities.id],
+      relationName: "_blocks_testimonial",
+    }),
+  }),
+);
+export const relations_cities_blocks_service_cards_cards_bullets = relations(
+  cities_blocks_service_cards_cards_bullets,
+  ({ one }) => ({
+    _parentID: one(cities_blocks_service_cards_cards, {
+      fields: [cities_blocks_service_cards_cards_bullets._parentID],
+      references: [cities_blocks_service_cards_cards.id],
+      relationName: "bullets",
+    }),
+  }),
+);
+export const relations_cities_blocks_service_cards_cards = relations(
+  cities_blocks_service_cards_cards,
+  ({ one, many }) => ({
+    _parentID: one(cities_blocks_service_cards, {
+      fields: [cities_blocks_service_cards_cards._parentID],
+      references: [cities_blocks_service_cards.id],
+      relationName: "cards",
+    }),
+    bullets: many(cities_blocks_service_cards_cards_bullets, {
+      relationName: "bullets",
+    }),
+  }),
+);
+export const relations_cities_blocks_service_cards = relations(
+  cities_blocks_service_cards,
+  ({ one, many }) => ({
+    _parentID: one(cities, {
+      fields: [cities_blocks_service_cards._parentID],
+      references: [cities.id],
+      relationName: "_blocks_serviceCards",
+    }),
+    cards: many(cities_blocks_service_cards_cards, {
+      relationName: "cards",
+    }),
+  }),
+);
+export const relations_cities_blocks_aid_cards_cards_details = relations(
+  cities_blocks_aid_cards_cards_details,
+  ({ one }) => ({
+    _parentID: one(cities_blocks_aid_cards_cards, {
+      fields: [cities_blocks_aid_cards_cards_details._parentID],
+      references: [cities_blocks_aid_cards_cards.id],
+      relationName: "details",
+    }),
+  }),
+);
+export const relations_cities_blocks_aid_cards_cards = relations(
+  cities_blocks_aid_cards_cards,
+  ({ one, many }) => ({
+    _parentID: one(cities_blocks_aid_cards, {
+      fields: [cities_blocks_aid_cards_cards._parentID],
+      references: [cities_blocks_aid_cards.id],
+      relationName: "cards",
+    }),
+    details: many(cities_blocks_aid_cards_cards_details, {
+      relationName: "details",
+    }),
+  }),
+);
+export const relations_cities_blocks_aid_cards = relations(
+  cities_blocks_aid_cards,
+  ({ one, many }) => ({
+    _parentID: one(cities, {
+      fields: [cities_blocks_aid_cards._parentID],
+      references: [cities.id],
+      relationName: "_blocks_aidCards",
+    }),
+    cards: many(cities_blocks_aid_cards_cards, {
+      relationName: "cards",
+    }),
+  }),
+);
+export const relations_cities_local_section_paragraphs = relations(
+  cities_local_section_paragraphs,
+  ({ one }) => ({
+    _parentID: one(cities, {
+      fields: [cities_local_section_paragraphs._parentID],
+      references: [cities.id],
+      relationName: "localSection_paragraphs",
+    }),
+  }),
+);
+export const relations_cities_faq_items_sources = relations(
+  cities_faq_items_sources,
+  ({ one }) => ({
+    _parentID: one(cities_faq_items, {
+      fields: [cities_faq_items_sources._parentID],
+      references: [cities_faq_items.id],
+      relationName: "sources",
+    }),
+  }),
+);
+export const relations_cities_faq_items = relations(
+  cities_faq_items,
+  ({ one, many }) => ({
+    _parentID: one(cities, {
+      fields: [cities_faq_items._parentID],
+      references: [cities.id],
+      relationName: "faq_items",
+    }),
+    sources: many(cities_faq_items_sources, {
+      relationName: "sources",
+    }),
+  }),
+);
+export const relations_cities = relations(cities, ({ one, many }) => ({
+  department: one(pages, {
+    fields: [cities.department],
+    references: [pages.id],
+    relationName: "department",
+  }),
+  zones: many(cities_zones, {
+    relationName: "zones",
+  }),
+  _blocks_testimonial: many(cities_blocks_testimonial, {
+    relationName: "_blocks_testimonial",
+  }),
+  _blocks_serviceCards: many(cities_blocks_service_cards, {
+    relationName: "_blocks_serviceCards",
+  }),
+  _blocks_aidCards: many(cities_blocks_aid_cards, {
+    relationName: "_blocks_aidCards",
+  }),
+  localSection_paragraphs: many(cities_local_section_paragraphs, {
+    relationName: "localSection_paragraphs",
+  }),
+  faq_items: many(cities_faq_items, {
+    relationName: "faq_items",
+  }),
+}));
 export const relations_payload_kv = relations(payload_kv, () => ({}));
 export const relations_payload_locked_documents_rels = relations(
   payload_locked_documents_rels,
@@ -2004,6 +2602,11 @@ export const relations_payload_locked_documents_rels = relations(
       fields: [payload_locked_documents_rels.pagesID],
       references: [pages.id],
       relationName: "pages",
+    }),
+    citiesID: one(cities, {
+      fields: [payload_locked_documents_rels.citiesID],
+      references: [cities.id],
+      relationName: "cities",
     }),
   }),
 );
@@ -2042,6 +2645,21 @@ export const relations_payload_migrations = relations(
   payload_migrations,
   () => ({}),
 );
+export const relations_city_template_feature_cards_cards = relations(
+  city_template_feature_cards_cards,
+  ({ one }) => ({
+    _parentID: one(city_template, {
+      fields: [city_template_feature_cards_cards._parentID],
+      references: [city_template.id],
+      relationName: "featureCards_cards",
+    }),
+  }),
+);
+export const relations_city_template = relations(city_template, ({ many }) => ({
+  featureCards_cards: many(city_template_feature_cards_cards, {
+    relationName: "featureCards_cards",
+  }),
+}));
 
 type DatabaseSchema = {
   enum_config_testimonials_section_source: typeof enum_config_testimonials_section_source;
@@ -2063,6 +2681,20 @@ type DatabaseSchema = {
   enum_pages_blocks_text_section_background: typeof enum_pages_blocks_text_section_background;
   enum_pages_blocks_faq_background: typeof enum_pages_blocks_faq_background;
   enum_pages_page_type: typeof enum_pages_page_type;
+  enum_cities_blocks_testimonial_background: typeof enum_cities_blocks_testimonial_background;
+  enum_cities_blocks_service_cards_background: typeof enum_cities_blocks_service_cards_background;
+  enum_cities_blocks_service_cards_columns: typeof enum_cities_blocks_service_cards_columns;
+  enum_cities_blocks_aid_cards_cards_icon: typeof enum_cities_blocks_aid_cards_cards_icon;
+  enum_cities_blocks_aid_cards_background: typeof enum_cities_blocks_aid_cards_background;
+  enum_cities_blocks_aid_cards_variant: typeof enum_cities_blocks_aid_cards_variant;
+  enum_cities_local_section_background: typeof enum_cities_local_section_background;
+  enum_cities_faq_background: typeof enum_cities_faq_background;
+  enum_city_template_feature_cards_cards_icon: typeof enum_city_template_feature_cards_cards_icon;
+  enum_city_template_feature_cards_background: typeof enum_city_template_feature_cards_background;
+  enum_city_template_feature_cards_layout: typeof enum_city_template_feature_cards_layout;
+  enum_city_template_feature_cards_columns: typeof enum_city_template_feature_cards_columns;
+  enum_city_template_feature_cards_spacing: typeof enum_city_template_feature_cards_spacing;
+  enum_city_template_zone_list_background: typeof enum_city_template_zone_list_background;
   leads: typeof leads;
   config_caroussel_section: typeof config_caroussel_section;
   config_testimonials_section: typeof config_testimonials_section;
@@ -2102,12 +2734,26 @@ type DatabaseSchema = {
   pages_blocks_legal_content: typeof pages_blocks_legal_content;
   pages_blocks_cta: typeof pages_blocks_cta;
   pages: typeof pages;
+  cities_zones: typeof cities_zones;
+  cities_blocks_testimonial: typeof cities_blocks_testimonial;
+  cities_blocks_service_cards_cards_bullets: typeof cities_blocks_service_cards_cards_bullets;
+  cities_blocks_service_cards_cards: typeof cities_blocks_service_cards_cards;
+  cities_blocks_service_cards: typeof cities_blocks_service_cards;
+  cities_blocks_aid_cards_cards_details: typeof cities_blocks_aid_cards_cards_details;
+  cities_blocks_aid_cards_cards: typeof cities_blocks_aid_cards_cards;
+  cities_blocks_aid_cards: typeof cities_blocks_aid_cards;
+  cities_local_section_paragraphs: typeof cities_local_section_paragraphs;
+  cities_faq_items_sources: typeof cities_faq_items_sources;
+  cities_faq_items: typeof cities_faq_items;
+  cities: typeof cities;
   payload_kv: typeof payload_kv;
   payload_locked_documents: typeof payload_locked_documents;
   payload_locked_documents_rels: typeof payload_locked_documents_rels;
   payload_preferences: typeof payload_preferences;
   payload_preferences_rels: typeof payload_preferences_rels;
   payload_migrations: typeof payload_migrations;
+  city_template_feature_cards_cards: typeof city_template_feature_cards_cards;
+  city_template: typeof city_template;
   relations_leads: typeof relations_leads;
   relations_config_caroussel_section: typeof relations_config_caroussel_section;
   relations_config_testimonials_section: typeof relations_config_testimonials_section;
@@ -2147,12 +2793,26 @@ type DatabaseSchema = {
   relations_pages_blocks_legal_content: typeof relations_pages_blocks_legal_content;
   relations_pages_blocks_cta: typeof relations_pages_blocks_cta;
   relations_pages: typeof relations_pages;
+  relations_cities_zones: typeof relations_cities_zones;
+  relations_cities_blocks_testimonial: typeof relations_cities_blocks_testimonial;
+  relations_cities_blocks_service_cards_cards_bullets: typeof relations_cities_blocks_service_cards_cards_bullets;
+  relations_cities_blocks_service_cards_cards: typeof relations_cities_blocks_service_cards_cards;
+  relations_cities_blocks_service_cards: typeof relations_cities_blocks_service_cards;
+  relations_cities_blocks_aid_cards_cards_details: typeof relations_cities_blocks_aid_cards_cards_details;
+  relations_cities_blocks_aid_cards_cards: typeof relations_cities_blocks_aid_cards_cards;
+  relations_cities_blocks_aid_cards: typeof relations_cities_blocks_aid_cards;
+  relations_cities_local_section_paragraphs: typeof relations_cities_local_section_paragraphs;
+  relations_cities_faq_items_sources: typeof relations_cities_faq_items_sources;
+  relations_cities_faq_items: typeof relations_cities_faq_items;
+  relations_cities: typeof relations_cities;
   relations_payload_kv: typeof relations_payload_kv;
   relations_payload_locked_documents_rels: typeof relations_payload_locked_documents_rels;
   relations_payload_locked_documents: typeof relations_payload_locked_documents;
   relations_payload_preferences_rels: typeof relations_payload_preferences_rels;
   relations_payload_preferences: typeof relations_payload_preferences;
   relations_payload_migrations: typeof relations_payload_migrations;
+  relations_city_template_feature_cards_cards: typeof relations_city_template_feature_cards_cards;
+  relations_city_template: typeof relations_city_template;
 };
 
 declare module "@payloadcms/db-postgres" {
