@@ -6,7 +6,7 @@ Ce qui a été vérifié l'a été en local (base `127.0.0.1:5544`, répétition
 
 ## Règles
 
-- Jamais `migrate:down`, `migrate:fresh`, `migrate:reset` ni `migrate:refresh` sur la production. Le `down` des 16 migrations lève une erreur exprès, les trois autres commandes suppriment des tables.
+- Jamais `migrate:down`, `migrate:fresh`, `migrate:reset` ni `migrate:refresh` sur la production. Le `down` des 17 migrations lève une erreur exprès, les trois autres commandes suppriment des tables.
 - La migration fait partie du build de production : `scripts/vercelBuild.sh` lance `payload migrate` puis `next build`, qui lit la base (`generateStaticParams`, `sitemap.xml`, `llms.txt`). Plus aucun `payload migrate` à la main sur la production.
 - Seul `VERCEL_ENV=production` migre. Les previews et les déploiements de développement ne migrent jamais, même s'ils partagent la base de production.
 - `pnpm dev`, `pnpm build`, `pnpm start`, `pnpm test` et `pnpm payload` passent par `scripts/local.sh`, qui force la base locale et refuse tout hôte autre que `127.0.0.1` ou `localhost`. Ce garde-fou ne se contourne pas et ne se modifie pas.
@@ -72,22 +72,22 @@ Le script restaure la sauvegarde dans la base locale `dsf_rehearsal` (conteneur 
 ```
 (a) OK: schema and data untouched
 (b) OK: refused with the dev mode row, refused with an unrecorded baseline, nothing written
-(c) OK: 16 of 16 migrations recorded
+(c) OK: 17 of 17 migrations recorded
 (d) OK: schema and data untouched
 (e) OK: 6 city records, 1 template, 0 city page documents
 ```
 
 - (a) build de preview : aucune migration.
 - (b) build de production sur une base non amorcée : refus, rien d'écrit.
-- (c) amorçage (`scripts/sql/markBaselineApplied.sql`) puis build de production : les 15 migrations passent.
+- (c) amorçage (`scripts/sql/markBaselineApplied.sql`) puis build de production : les 16 migrations passent.
 - (d) second build de production : rien ne change.
 - (e) les 6 pages ville sont devenues 6 fiches ville et un modèle, il ne reste aucun document de page de type ville.
 
-Il compare ensuite la base avant et après, puis rejoue les migrations de contenu sur des copies modifiées comme le ferait un éditeur : les trois premières sur l'état qui précède les fiches ville (elles exigent les 6 documents de page ville), puis `city_pages_from_template` et `city_pages_share_one_model` sur leur propre résultat, avec une ville supprimée entre-temps. Il doit finir par :
+Il compare ensuite la base avant et après, puis rejoue les migrations de contenu sur des copies modifiées comme le ferait un éditeur : les trois premières sur l'état qui précède les fiches ville (elles exigent les 6 documents de page ville), puis `city_pages_from_template`, `city_pages_share_one_model` et `city_descriptions_from_the_client` sur leur propre résultat, avec une ville supprimée entre-temps. Ce second rejeu réécrit des lignes des fiches ville et du modèle avec le même contenu (la deuxième migration vide les descriptions, la troisième les remet) : il compare donc le contenu de ces tables hors dates (`scripts/sql/cityContent.sql`) et exige que toutes les autres tables soient intactes. Il doit finir par :
 
 ```
 replay 1: second run changed nothing, editor changes kept
-replay 2: second run changed nothing, editor changes kept, deleted city not recreated
+replay 2: second run left every city and template value as it was (rows rewritten with the same content), editor changes kept, deleted city not recreated, other tables untouched
 OK: no existing row lost or altered beyond scripts/sql/expectedCellChanges.txt
 ```
 
@@ -198,7 +198,7 @@ Ordre :
 | `production` | contrôle de l'amorçage, `payload migrate`, puis `next build --webpack` |
 | autre valeur ou absent | `next build --webpack` seul, avec la ligne `migrations skipped: VERCEL_ENV is 'preview', only production deployments migrate` |
 
-Journal attendu d'un build de production : `bootstrap check passed: database <hôte>/<base>, 1 migration(s) recorded`, puis 15 couples `Migrating:` / `Migrated:` dans cet ordre, puis `Done.`, puis le build Next :
+Journal attendu d'un build de production : `bootstrap check passed: database <hôte>/<base>, 1 migration(s) recorded`, puis 16 couples `Migrating:` / `Migrated:` dans cet ordre, puis `Done.`, puis le build Next :
 
 1. `pages_and_site_settings`
 2. `block_display_options`
@@ -215,8 +215,9 @@ Journal attendu d'un build de production : `bootstrap check passed: database <h�
 13. `home_seo_and_aid_conditions`
 14. `city_pages_from_template`
 15. `city_pages_share_one_model`
+16. `city_descriptions_from_the_client`
 
-Les builds suivants affichent `16 migration(s) recorded` puis `Done.` sans rien migrer, jusqu'à la prochaine migration ajoutée au dépôt.
+Les builds suivants affichent `17 migration(s) recorded` puis `Done.` sans rien migrer, jusqu'à la prochaine migration ajoutée au dépôt.
 
 Lignes de journal attendues (comptées sur la répétition du 06/10/2026) :
 
@@ -227,10 +228,11 @@ Lignes de journal attendues (comptées sur la répétition du 06/10/2026) :
 | `home_seo_and_aid_conditions` | 4 | 1 `corrected`, 1 `marked as an information page`, 1 `home title set`, 1 `home description set` |
 | `city_pages_from_template` | 57 | 1 `city page template created`, 6 `converted`, 50 `now uses the template wording` (Blois 15, Bourges 5, Châteauroux 9, Orléans 3, Romorantin 7, Tours 11) |
 | `city_pages_share_one_model` | 27 | 12 `template ... set to`, 2 `filled from the section of douche-senior-blois`, 1 `no longer carries its own serviceCards and aidCards`, 9 `emptied, the template pattern applies`, 3 `search title already follows the template` (Bourges, Châteauroux, Orléans : attendu) |
+| `city_descriptions_from_the_client` | 7 | 1 `template search description set to`, 6 `search description set back to the client wording` |
 
-Soit 30 `corrected`, 1 `removed`, 1 `swapped`, 3 `set`, 1 `marked`, 1 `created`, 6 `converted`, 50 `now uses the template wording`, 12 `set to`, 2 `filled`, 9 `emptied`.
+Soit 30 `corrected`, 1 `removed`, 1 `swapped`, 3 `set`, 1 `marked`, 1 `created`, 6 `converted`, 50 `now uses the template wording`, 13 `set to`, 2 `filled`, 9 `emptied`, 6 `set back`.
 
-`city_pages_from_template` remplace les 6 documents de page ville, créés par `seed_pages_and_site_identity` dans ce même build (aucune donnée du client), par 6 fiches de la rubrique Villes et un modèle commun. Chaque fiche est relue et comparée à sa page avant que la page soit supprimée. Les lignes `now uses the template wording` listent chaque texte d'une ville remplacé par celui du modèle. `city_pages_share_one_model` pose ensuite le texte définitif du modèle (celui de la page Tours), y déplace les sections prestations et aides de Blois pour toutes les villes, et vide les titres et descriptions de recherche propres aux villes pour que ceux du modèle s'appliquent. Chaque valeur n'est touchée que si elle est encore celle écrite par `city_pages_from_template`.
+`city_pages_from_template` remplace les 6 documents de page ville, créés par `seed_pages_and_site_identity` dans ce même build (aucune donnée du client), par 6 fiches de la rubrique Villes et un modèle commun. Chaque fiche est relue et comparée à sa page avant que la page soit supprimée. Les lignes `now uses the template wording` listent chaque texte d'une ville remplacé par celui du modèle. `city_pages_share_one_model` pose ensuite le texte définitif du modèle (celui de la page Tours), y déplace les sections prestations et aides de Blois pour toutes les villes, et vide les titres et descriptions de recherche propres aux villes pour que ceux du modèle s'appliquent. Chaque valeur n'est touchée que si elle est encore celle écrite par `city_pages_from_template`. `city_descriptions_from_the_client` retire enfin la liste de communes de la description du modèle (elle ne sert plus qu'aux villes créées ensuite) et rend aux 6 villes la description de recherche rédigée par le client, là où la fiche n'en a pas.
 
 ### Fenêtre pendant le build
 
@@ -292,13 +294,13 @@ psql "$PROD_URI" -Atc "select name, batch from payload_migrations order by id;"
 
 Attendu :
 
-- Comptes : une seule ligne `<`, `payload_migrations|1` (devenue `16`). Les lignes `>` sont les nouvelles tables, dont `pages|11`, `cities|6`, `city_template|1`, `cities_zones|52`, `cities_faq_items|24`, `cities_blocks_testimonial|1`, `cities_blocks_service_cards|0`, `city_template_service_cards_cards|2`, `city_template_aid_cards_cards|2`, `config_menu_services|4`, `pages_blocks_faq|9`, `pages_blocks_legal_content|2`. Toute autre ligne `<` : une table existante a perdu ou gagné des lignes, enquêter (un lead arrivé entre-temps change `leads` : le vérifier dans l'admin).
+- Comptes : une seule ligne `<`, `payload_migrations|1` (devenue `17`). Les lignes `>` sont les nouvelles tables, dont `pages|11`, `cities|6`, `city_template|1`, `cities_zones|52`, `cities_faq_items|24`, `cities_blocks_testimonial|1`, `cities_blocks_service_cards|0`, `city_template_service_cards_cards|2`, `city_template_aid_cards_cards|2`, `config_menu_services|4`, `pages_blocks_faq|9`, `pages_blocks_legal_content|2`. Toute autre ligne `<` : une table existante a perdu ou gagné des lignes, enquêter (un lead arrivé entre-temps change `leads` : le vérifier dans l'admin).
 - Sommes de contrôle : aucune différence sur `leads`, `users`, `users_sessions`, `config_faq_section_faq`, `config_testimonials_section` (hors colonnes ajoutées `rating`, `date`, `source`). Une différence sur `leads`, `users` ou `users_sessions` peut venir d'un lead ou d'une connexion à l'admin entre-temps : le confirmer.
 - Cellules : exactement 6 lignes `<`, toutes prévues par `scripts/sql/expectedCellChanges.txt` :
   - `config|1|financial_section_financial_help_1_title`, `..._icon_text`, `..._description` (crédit d'impôt supprimé) ;
   - `config|1|updated_at` ;
   - `config_caroussel_section|2|before_id` et `after_id` (photos avant et après inversées).
-- `payload_migrations` : 16 lignes, la baseline en lot 1, les 15 autres en lot 2.
+- `payload_migrations` : 17 lignes, la baseline en lot 1, les 16 autres en lot 2.
 - Villes : `select (select count(*) from cities), (select count(*) from city_template), (select count(*) from pages where page_type = 'city');` répond `6|1|0`.
 
 Cette release modifie donc 3 textes de l'accueil et une paire de photos existants, et remplit des colonnes neuves (identité légale, lien de la fiche Google, description des 34 médias, titre et description de l'accueil pour les moteurs de recherche). Aucune ligne existante n'est supprimée.
@@ -343,7 +345,7 @@ Attendu :
 
 - Code : redéployer le build précédent depuis Vercel (promotion de l'ancien déploiement). Une promotion ne reconstruit rien, donc ne migre pas. Le schéma migré lui convient, avec les limites de la section 4.
 - Attention : ne jamais promouvoir un build antérieur au correctif de sécurité `b6243b1` (section 1). Il rouvrirait l'accès public à `/api/leads` (nom, téléphone, email, adresse des demandes), ainsi que la suppression des leads et la modification de la configuration sans connexion. Avant toute promotion, vérifier que le déploiement choisi contient ce commit, puis relancer le `curl` de la section 1 : il doit répondre `403`.
-- Schéma et données : aucun `down`. Les 16 migrations lèvent une erreur à l'annulation, parce que leurs écritures ne se distinguent plus de celles d'un éditeur.
+- Schéma et données : aucun `down`. Les 17 migrations lèvent une erreur à l'annulation, parce que leurs écritures ne se distinguent plus de celles d'un éditeur.
 - Dernier recours : restaurer. De préférence la branche Neon ou le point de restauration notés avant l'amorçage, sinon `pg_restore` de la sauvegarde dans une base neuve, puis changer `DATABASE_URI` dans Vercel et redéployer. Perdu dans ce cas : les leads reçus et les modifications faites dans l'admin depuis la sauvegarde. Exporter d'abord les leads récents depuis l'admin. Les fichiers médias sont dans Vercel Blob et ne font pas partie de la sauvegarde.
 - Un essai laissé en base (lead de test, page créée par erreur) se supprime par l'admin, jamais en SQL.
 
