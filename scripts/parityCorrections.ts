@@ -22,6 +22,20 @@ const removedFormLabels: TextCorrection[] = [
   },
 ];
 
+export interface RepeatedBlock {
+  ref: string;
+  page: string;
+  firstWords: string;
+}
+
+export const repeatedBlocks: RepeatedBlock[] = [
+  {
+    ref: "G2",
+    page: "home",
+    firstWords: "M M. et Mme Chevy",
+  },
+];
+
 const followUpOf = (correction: PageFieldCorrection) =>
   pageTextFixes.find(
     (fix) =>
@@ -84,4 +98,32 @@ export function applyCorrections(
     )
     .replace(/\s+/g, " ")
     .trim();
+}
+
+export function removeRepeatedBlocks(
+  golden: string,
+  blocks: RepeatedBlock[],
+): string {
+  return blocks.reduce((text, block) => {
+    const starts = text.split(block.firstWords).length - 1;
+
+    if (starts !== 2) {
+      throw new Error(
+        `Repeated block ${block.ref}: "${block.firstWords}" must start exactly two copies in the captured text of ${block.page}, found ${starts}`,
+      );
+    }
+
+    const first = text.indexOf(block.firstWords);
+    const second = text.indexOf(block.firstWords, first + 1);
+    const copy = text.slice(first, second);
+    const afterSecond = second + copy.length;
+
+    if (text.slice(second, afterSecond) !== copy) {
+      throw new Error(
+        `Repeated block ${block.ref}: the second copy differs from the first in the captured text of ${block.page}`,
+      );
+    }
+
+    return text.slice(0, second) + text.slice(afterSecond);
+  }, golden);
 }

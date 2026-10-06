@@ -5,6 +5,8 @@ import { faqSeed } from "../migrations/seed/faqSeed";
 import { faqFixes } from "../migrations/seed/reviewFixesSeed";
 import {
   applyCorrections,
+  removeRepeatedBlocks,
+  repeatedBlocks,
   textCorrections,
 } from "../scripts/parityCorrections";
 import { buildExpectedText } from "../scripts/parityExpected";
@@ -47,7 +49,47 @@ describe("applyCorrections", () => {
   });
 });
 
+describe("removeRepeatedBlocks", () => {
+  const block = { ref: "X4", page: "p", firstWords: "Avis de" };
+
+  it("keeps one copy of a block captured twice in a row", () => {
+    const single = removeRepeatedBlocks(
+      "Titre Avis de Paul. Avis de Paul. Suite",
+      [block],
+    );
+
+    assert.equal(single, "Titre Avis de Paul. Suite");
+  });
+
+  it("refuses a block that is not captured exactly twice or whose copies differ", () => {
+    assert.throws(
+      () => removeRepeatedBlocks("Titre Avis de Paul. Suite", [block]),
+      /X4/,
+    );
+    assert.throws(
+      () =>
+        removeRepeatedBlocks("Titre Avis de Paul. Avis de Jean. Suite", [
+          block,
+        ]),
+      /X4/,
+    );
+  });
+});
+
 describe("expected text of the 16 captured pages", () => {
+  it("drops only the reviewed repeated blocks, each listed by its reference", () => {
+    assert.deepEqual(
+      repeatedBlocks.map((block) => `${block.page} ${block.ref}`),
+      ["home G2"],
+    );
+  });
+
+  it("keeps the 8 home testimonials exactly once", () => {
+    const expected = buildExpectedText("home", readGolden("home"));
+
+    assert.equal(expected.split("M. et Mme Chevy").length - 1, 1);
+  });
+
   it("finds every listed correction exactly once in the captured text of its page", () => {
     assert.ok(textCorrections.length > 0);
 
