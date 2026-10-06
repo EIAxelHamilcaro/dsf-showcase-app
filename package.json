@@ -7,7 +7,7 @@
     "clean": "turbo clean && rm -rf node_modules",
     "dev": "./scripts/local.sh next dev --turbopack",
     "build": "./scripts/local.sh next build --webpack",
-    "build:production": "next build --webpack",
+    "build:production": "./scripts/vercelBuild.sh",
     "start": "./scripts/local.sh next start",
     "format": "biome format . --write",
     "lint": "biome lint .",
