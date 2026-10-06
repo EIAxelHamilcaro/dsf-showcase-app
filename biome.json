@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.3.8/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.5.15/schema.json",
   "root": true,
   "files": {
     "includes": [
@@ -9,16 +9,17 @@
       "!**/migrations",
       "!**/tests/fixtures",
       "!**/app/(payload)/admin/importMap.js",
-      "!**/app/globals.css"
+      "!**/app/globals.css",
+      "!**/*.svg"
     ]
   },
   "assist": {
     "enabled": true,
     "actions": {
-      "recommended": true,
+      "preset": "recommended",
       "source": {
         "organizeImports": "on",
-        "recommended": true,
+        "preset": "recommended",
         "useSortedAttributes": "on"
       }
     }
@@ -26,10 +27,7 @@
   "linter": {
     "enabled": true,
     "rules": {
-      "recommended": true,
-      "nursery": {
-        "noImportCycles": "error"
-      },
+      "preset": "recommended",
       "correctness": {
         "noUnusedVariables": "error",
         "noUndeclaredVariables": "error",
@@ -53,7 +51,8 @@
           "options": {
             "allow": ["log"]
           }
-        }
+        },
+        "noImportCycles": "error"
       },
       "style": {
         "noNonNullAssertion": "warn",
@@ -171,5 +170,18 @@
     "linter": {
       "enabled": true
     }
-  }
+  },
+  "overrides": [
+    {
+      "includes": ["components/ui/**"],
+      "linter": {
+        "rules": {
+          "a11y": {
+            "useFocusableInteractive": "off",
+            "useSemanticElements": "off"
+          }
+        }
+      }
+    }
+  ]
 }

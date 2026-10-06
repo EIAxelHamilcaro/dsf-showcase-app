@@ -1,7 +1,6 @@
-import { Slot } from "@radix-ui/react-slot";
 import { ChevronRight, MoreHorizontal } from "lucide-react";
+import { Slot } from "radix-ui";
 import type * as React from "react";
-
 import { cn } from "@/lib/utils";
 
 function Breadcrumb({ ...props }: React.ComponentProps<"nav">) {
@@ -38,7 +37,7 @@ function BreadcrumbLink({
 }: React.ComponentProps<"a"> & {
   asChild?: boolean;
 }) {
-  const Comp = asChild ? Slot : "a";
+  const Comp = asChild ? Slot.Root : "a";
 
   return (
     <Comp
@@ -53,8 +52,10 @@ function BreadcrumbPage({ className, ...props }: React.ComponentProps<"span">) {
   return (
     <span
       aria-current="page"
+      aria-disabled="true"
       className={cn("font-normal text-foreground", className)}
       data-slot="breadcrumb-page"
+      role="link"
       {...props}
     />
   );
@@ -70,6 +71,7 @@ function BreadcrumbSeparator({
       aria-hidden="true"
       className={cn("[&>svg]:size-3.5", className)}
       data-slot="breadcrumb-separator"
+      role="presentation"
       {...props}
     >
       {children ?? <ChevronRight />}
@@ -97,10 +99,10 @@ function BreadcrumbEllipsis({
 
 export {
   Breadcrumb,
-  BreadcrumbList,
+  BreadcrumbEllipsis,
   BreadcrumbItem,
   BreadcrumbLink,
+  BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-  BreadcrumbEllipsis,
 };
