@@ -1,5 +1,12 @@
 import { lexicalEditor } from "@payloadcms/richtext-lexical";
 import type { CollectionConfig } from "payload";
+import {
+  validateHttpsUrl,
+  validateRequiredInternalPath,
+  validateReviewRating,
+  validateSiren,
+} from "../lib/cms/validators";
+import { revalidateSiteAfterChange } from "./hooks/revalidateSite";
 
 const Config: CollectionConfig = {
   slug: "config",
@@ -18,6 +25,7 @@ const Config: CollectionConfig = {
     useAsTitle: "main_title", // ça aide dans l’admin comme titre
   },
   hooks: {
+    afterChange: [revalidateSiteAfterChange],
     beforeChange: [
       async ({ req, operation }) => {
         if (operation === "create") {
@@ -484,6 +492,33 @@ const Config: CollectionConfig = {
           admin: {
             description: "Ville, région ou lieu du client",
           },
+        },
+        {
+          name: "rating",
+          label: "Note sur 5",
+          type: "number",
+          min: 1,
+          max: 5,
+          validate: validateReviewRating,
+          admin: {
+            description:
+              "Note donnée par le client, entier de 1 à 5. Laisser vide si inconnue.",
+          },
+        },
+        {
+          name: "date",
+          label: "Date de l'avis",
+          type: "date",
+          admin: { date: { pickerAppearance: "dayOnly" } },
+        },
+        {
+          name: "source",
+          label: "Source de l'avis",
+          type: "select",
+          options: [
+            { label: "Reçu directement", value: "direct" },
+            { label: "Google", value: "google" },
+          ],
         },
       ],
     },
@@ -1026,6 +1061,78 @@ const Config: CollectionConfig = {
           label: "Région",
           type: "text",
         },
+      ],
+    },
+    {
+      name: "legal_section",
+      label: "Identité légale",
+      type: "group",
+      admin: {
+        description:
+          "Informations légales de l'entreprise, reprises dans les données structurées du site",
+      },
+      fields: [
+        { name: "legal_name", label: "Raison sociale", type: "text" },
+        { name: "legal_form", label: "Forme juridique", type: "text" },
+        {
+          name: "siren",
+          label: "SIREN",
+          type: "text",
+          validate: validateSiren,
+        },
+        { name: "street_address", label: "Adresse", type: "text" },
+        { name: "postal_code", label: "Code postal", type: "text" },
+        { name: "locality", label: "Ville", type: "text" },
+      ],
+    },
+    {
+      name: "google_rating",
+      label: "Note Google",
+      type: "number",
+      min: 1,
+      max: 5,
+      admin: {
+        description:
+          "Note moyenne de la fiche Google, telle qu'affichée sur Google. Laisser vide si inconnue.",
+      },
+    },
+    {
+      name: "google_review_count",
+      label: "Nombre d'avis Google",
+      type: "number",
+      min: 0,
+      admin: {
+        description:
+          "Nombre d'avis de la fiche Google, tel qu'affiché sur Google.",
+      },
+    },
+    {
+      name: "google_profile_url",
+      label: "Lien de la fiche Google",
+      type: "text",
+      validate: validateHttpsUrl,
+      admin: {
+        description:
+          "Adresse https de la fiche Google, pour que la note soit vérifiable.",
+      },
+    },
+    {
+      name: "menu_services",
+      label: "Liens du menu Services",
+      type: "array",
+      admin: {
+        description: "Liens affichés dans le menu déroulant Services",
+      },
+      fields: [
+        { name: "label", label: "Libellé", type: "text", required: true },
+        {
+          name: "href",
+          label: "Lien",
+          type: "text",
+          required: true,
+          validate: validateRequiredInternalPath,
+        },
+        { name: "description", label: "Description", type: "text" },
       ],
     },
   ],

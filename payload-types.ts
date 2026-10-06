@@ -71,6 +71,7 @@ export interface Config {
     config: Config1;
     users: User;
     media: Media;
+    pages: Page;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -82,6 +83,7 @@ export interface Config {
     config: ConfigSelect<false> | ConfigSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
+    pages: PagesSelect<false> | PagesSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -375,6 +377,12 @@ export interface Config1 {
          * Ville, région ou lieu du client
          */
         location?: string | null;
+        /**
+         * Note donnée par le client, entier de 1 à 5. Laisser vide si inconnue.
+         */
+        rating?: number | null;
+        date?: string | null;
+        source?: ('direct' | 'google') | null;
         id?: string | null;
       }[]
     | null;
@@ -637,6 +645,40 @@ export interface Config1 {
     description?: string | null;
     region?: string | null;
   };
+  /**
+   * Informations légales de l'entreprise, reprises dans les données structurées du site
+   */
+  legal_section?: {
+    legal_name?: string | null;
+    legal_form?: string | null;
+    siren?: string | null;
+    street_address?: string | null;
+    postal_code?: string | null;
+    locality?: string | null;
+  };
+  /**
+   * Note moyenne de la fiche Google, telle qu'affichée sur Google. Laisser vide si inconnue.
+   */
+  google_rating?: number | null;
+  /**
+   * Nombre d'avis de la fiche Google, tel qu'affiché sur Google.
+   */
+  google_review_count?: number | null;
+  /**
+   * Adresse https de la fiche Google, pour que la note soit vérifiable.
+   */
+  google_profile_url?: string | null;
+  /**
+   * Liens affichés dans le menu déroulant Services
+   */
+  menu_services?:
+    | {
+        label: string;
+        href: string;
+        description?: string | null;
+        id?: string | null;
+      }[]
+    | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -646,6 +688,10 @@ export interface Config1 {
  */
 export interface Media {
   id: number;
+  /**
+   * Description courte de l'image, lue par les lecteurs d'écran
+   */
+  alt?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -682,6 +728,226 @@ export interface User {
       }[]
     | null;
   password?: string | null;
+}
+/**
+ * Pages du site : villes, départements, services
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pages".
+ */
+export interface Page {
+  id: number;
+  /**
+   * Partie finale de l'URL, par exemple douche-senior-blois
+   */
+  slug: string;
+  /**
+   * Utilisé dans le fil d'Ariane et les liens vers cette page
+   */
+  navLabel: string;
+  pageType: 'city' | 'department' | 'service' | 'legal';
+  parent?: (number | null) | Page;
+  /**
+   * Nom de la ville ou du département, repris dans les données structurées
+   */
+  areaName?: string | null;
+  departmentCode?: string | null;
+  seo: {
+    title: string;
+    description: string;
+    /**
+     * Image 1200 x 630, remplacée par l'image par défaut si vide
+     */
+    image?: (number | null) | Media;
+  };
+  layout: (
+    | HeroBlock
+    | FeatureCardsBlock
+    | ZoneListBlock
+    | TestimonialBlock
+    | ServiceCardsBlock
+    | AidCardsBlock
+    | StepsBlock
+    | LinkCardsBlock
+    | CtaBlock
+  )[];
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HeroBlock".
+ */
+export interface HeroBlock {
+  /**
+   * Ligne affichée avec un repère au dessus du titre (villes)
+   */
+  location?: string | null;
+  titleBefore: string;
+  titleHighlight: string;
+  titleAfter?: string | null;
+  intro: string;
+  ctaLabel: string;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'hero';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "FeatureCardsBlock".
+ */
+export interface FeatureCardsBlock {
+  background: 'default' | 'muted';
+  heading?: string | null;
+  intro?: string | null;
+  layout: 'centered' | 'left' | 'inline';
+  columns: '1' | '2' | '3' | '4';
+  cards: {
+    icon: 'none' | 'mapPin' | 'clock' | 'shield' | 'euro' | 'checkCircle' | 'fileText';
+    title: string;
+    text: string;
+    id?: string | null;
+  }[];
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'featureCards';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ZoneListBlock".
+ */
+export interface ZoneListBlock {
+  background: 'default' | 'muted';
+  heading: string;
+  showMapIcon?: boolean | null;
+  intro?: string | null;
+  items: {
+    name: string;
+    id?: string | null;
+  }[];
+  outro?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'zoneList';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TestimonialBlock".
+ */
+export interface TestimonialBlock {
+  background: 'default' | 'muted';
+  quote: string;
+  author: string;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'testimonial';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ServiceCardsBlock".
+ */
+export interface ServiceCardsBlock {
+  background: 'default' | 'muted';
+  heading: string;
+  columns: '2' | '3';
+  cards: {
+    title: string;
+    description?: string | null;
+    bullets?:
+      | {
+          text: string;
+          id?: string | null;
+        }[]
+      | null;
+    linkLabel?: string | null;
+    linkHref?: string | null;
+    id?: string | null;
+  }[];
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'serviceCards';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "AidCardsBlock".
+ */
+export interface AidCardsBlock {
+  background: 'default' | 'muted';
+  heading: string;
+  intro?: string | null;
+  cards?:
+    | {
+        icon: 'none' | 'mapPin' | 'clock' | 'shield' | 'euro' | 'checkCircle' | 'fileText';
+        title: string;
+        text: string;
+        highlight?: string | null;
+        details?:
+          | {
+              label: string;
+              text: string;
+              id?: string | null;
+            }[]
+          | null;
+        note?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  buttonLabel?: string | null;
+  buttonHref?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'aidCards';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "StepsBlock".
+ */
+export interface StepsBlock {
+  background: 'default' | 'muted';
+  heading: string;
+  withCards?: boolean | null;
+  items: {
+    title: string;
+    text: string;
+    id?: string | null;
+  }[];
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'steps';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "LinkCardsBlock".
+ */
+export interface LinkCardsBlock {
+  background: 'default' | 'muted';
+  heading: string;
+  intro?: string | null;
+  links: {
+    label: string;
+    description: string;
+    href: string;
+    id?: string | null;
+  }[];
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'linkCards';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CtaBlock".
+ */
+export interface CtaBlock {
+  heading: string;
+  text: string;
+  ctaLabel: string;
+  /**
+   * Laisser vide pour afficher le numéro de téléphone
+   */
+  phoneLabel?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'cta';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -722,6 +988,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'media';
         value: number | Media;
+      } | null)
+    | ({
+        relationTo: 'pages';
+        value: number | Page;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -874,6 +1144,9 @@ export interface ConfigSelect<T extends boolean = true> {
         age?: T;
         text?: T;
         location?: T;
+        rating?: T;
+        date?: T;
+        source?: T;
         id?: T;
       };
   services_section?:
@@ -1000,6 +1273,27 @@ export interface ConfigSelect<T extends boolean = true> {
         description?: T;
         region?: T;
       };
+  legal_section?:
+    | T
+    | {
+        legal_name?: T;
+        legal_form?: T;
+        siren?: T;
+        street_address?: T;
+        postal_code?: T;
+        locality?: T;
+      };
+  google_rating?: T;
+  google_review_count?: T;
+  google_profile_url?: T;
+  menu_services?:
+    | T
+    | {
+        label?: T;
+        href?: T;
+        description?: T;
+        id?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1030,6 +1324,7 @@ export interface UsersSelect<T extends boolean = true> {
  * via the `definition` "media_select".
  */
 export interface MediaSelect<T extends boolean = true> {
+  alt?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -1042,6 +1337,210 @@ export interface MediaSelect<T extends boolean = true> {
   focalX?: T;
   focalY?: T;
   sizes?: T | {};
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pages_select".
+ */
+export interface PagesSelect<T extends boolean = true> {
+  slug?: T;
+  navLabel?: T;
+  pageType?: T;
+  parent?: T;
+  areaName?: T;
+  departmentCode?: T;
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+      };
+  layout?:
+    | T
+    | {
+        hero?: T | HeroBlockSelect<T>;
+        featureCards?: T | FeatureCardsBlockSelect<T>;
+        zoneList?: T | ZoneListBlockSelect<T>;
+        testimonial?: T | TestimonialBlockSelect<T>;
+        serviceCards?: T | ServiceCardsBlockSelect<T>;
+        aidCards?: T | AidCardsBlockSelect<T>;
+        steps?: T | StepsBlockSelect<T>;
+        linkCards?: T | LinkCardsBlockSelect<T>;
+        cta?: T | CtaBlockSelect<T>;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HeroBlock_select".
+ */
+export interface HeroBlockSelect<T extends boolean = true> {
+  location?: T;
+  titleBefore?: T;
+  titleHighlight?: T;
+  titleAfter?: T;
+  intro?: T;
+  ctaLabel?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "FeatureCardsBlock_select".
+ */
+export interface FeatureCardsBlockSelect<T extends boolean = true> {
+  background?: T;
+  heading?: T;
+  intro?: T;
+  layout?: T;
+  columns?: T;
+  cards?:
+    | T
+    | {
+        icon?: T;
+        title?: T;
+        text?: T;
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ZoneListBlock_select".
+ */
+export interface ZoneListBlockSelect<T extends boolean = true> {
+  background?: T;
+  heading?: T;
+  showMapIcon?: T;
+  intro?: T;
+  items?:
+    | T
+    | {
+        name?: T;
+        id?: T;
+      };
+  outro?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TestimonialBlock_select".
+ */
+export interface TestimonialBlockSelect<T extends boolean = true> {
+  background?: T;
+  quote?: T;
+  author?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ServiceCardsBlock_select".
+ */
+export interface ServiceCardsBlockSelect<T extends boolean = true> {
+  background?: T;
+  heading?: T;
+  columns?: T;
+  cards?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        bullets?:
+          | T
+          | {
+              text?: T;
+              id?: T;
+            };
+        linkLabel?: T;
+        linkHref?: T;
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "AidCardsBlock_select".
+ */
+export interface AidCardsBlockSelect<T extends boolean = true> {
+  background?: T;
+  heading?: T;
+  intro?: T;
+  cards?:
+    | T
+    | {
+        icon?: T;
+        title?: T;
+        text?: T;
+        highlight?: T;
+        details?:
+          | T
+          | {
+              label?: T;
+              text?: T;
+              id?: T;
+            };
+        note?: T;
+        id?: T;
+      };
+  buttonLabel?: T;
+  buttonHref?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "StepsBlock_select".
+ */
+export interface StepsBlockSelect<T extends boolean = true> {
+  background?: T;
+  heading?: T;
+  withCards?: T;
+  items?:
+    | T
+    | {
+        title?: T;
+        text?: T;
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "LinkCardsBlock_select".
+ */
+export interface LinkCardsBlockSelect<T extends boolean = true> {
+  background?: T;
+  heading?: T;
+  intro?: T;
+  links?:
+    | T
+    | {
+        label?: T;
+        description?: T;
+        href?: T;
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CtaBlock_select".
+ */
+export interface CtaBlockSelect<T extends boolean = true> {
+  heading?: T;
+  text?: T;
+  ctaLabel?: T;
+  phoneLabel?: T;
+  id?: T;
+  blockName?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

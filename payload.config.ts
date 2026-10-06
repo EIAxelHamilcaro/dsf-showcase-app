@@ -10,6 +10,7 @@ import sharp from "sharp";
 import Config from "./collections/Config";
 import Leads from "./collections/Leads";
 import { Media } from "./collections/Media";
+import Pages from "./collections/Pages";
 import { Users } from "./collections/Users";
 
 const filename = fileURLToPath(import.meta.url);
@@ -22,7 +23,7 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Leads, Config, Users, Media],
+  collections: [Leads, Config, Users, Media, Pages],
   globals: [],
   i18n: {
     fallbackLanguage: "fr",

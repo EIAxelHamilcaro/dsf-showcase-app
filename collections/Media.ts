@@ -9,5 +9,15 @@ export const Media: CollectionConfig = {
   access: {
     read: () => true,
   },
-  fields: [],
+  fields: [
+    {
+      name: "alt",
+      type: "text",
+      label: "Texte alternatif",
+      admin: {
+        description:
+          "Description courte de l'image, lue par les lecteurs d'écran",
+      },
+    },
+  ],
 };
