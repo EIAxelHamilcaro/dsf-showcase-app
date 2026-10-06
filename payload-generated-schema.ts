@@ -88,6 +88,14 @@ export const enum_pages_blocks_link_cards_background = pgEnum(
   "enum_pages_blocks_link_cards_background",
   ["default", "muted"],
 );
+export const enum_pages_blocks_text_section_background = pgEnum(
+  "enum_pages_blocks_text_section_background",
+  ["default", "muted"],
+);
+export const enum_pages_blocks_faq_background = pgEnum(
+  "enum_pages_blocks_faq_background",
+  ["default", "muted"],
+);
 export const enum_pages_page_type = pgEnum("enum_pages_page_type", [
   "city",
   "department",
@@ -961,6 +969,274 @@ export const pages_blocks_link_cards = pgTable(
   ],
 );
 
+export const pages_blocks_text_section_paragraphs = pgTable(
+  "pages_blocks_text_section_paragraphs",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: varchar("_parent_id").notNull(),
+    id: varchar("id").primaryKey(),
+    text: varchar("text").notNull(),
+  },
+  (columns) => [
+    index("pages_blocks_text_section_paragraphs_order_idx").on(columns._order),
+    index("pages_blocks_text_section_paragraphs_parent_id_idx").on(
+      columns._parentID,
+    ),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [pages_blocks_text_section.id],
+      name: "pages_blocks_text_section_paragraphs_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const pages_blocks_text_section = pgTable(
+  "pages_blocks_text_section",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: integer("_parent_id").notNull(),
+    _path: text("_path").notNull(),
+    id: varchar("id").primaryKey(),
+    background: enum_pages_blocks_text_section_background("background")
+      .notNull()
+      .default("default"),
+    heading: varchar("heading").notNull(),
+    blockName: varchar("block_name"),
+  },
+  (columns) => [
+    index("pages_blocks_text_section_order_idx").on(columns._order),
+    index("pages_blocks_text_section_parent_id_idx").on(columns._parentID),
+    index("pages_blocks_text_section_path_idx").on(columns._path),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [pages.id],
+      name: "pages_blocks_text_section_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const pages_blocks_faq_items_sources = pgTable(
+  "pages_blocks_faq_items_sources",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: varchar("_parent_id").notNull(),
+    id: varchar("id").primaryKey(),
+    label: varchar("label").notNull(),
+    url: varchar("url").notNull(),
+  },
+  (columns) => [
+    index("pages_blocks_faq_items_sources_order_idx").on(columns._order),
+    index("pages_blocks_faq_items_sources_parent_id_idx").on(columns._parentID),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [pages_blocks_faq_items.id],
+      name: "pages_blocks_faq_items_sources_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const pages_blocks_faq_items = pgTable(
+  "pages_blocks_faq_items",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: varchar("_parent_id").notNull(),
+    id: varchar("id").primaryKey(),
+    question: varchar("question").notNull(),
+    answer: varchar("answer").notNull(),
+  },
+  (columns) => [
+    index("pages_blocks_faq_items_order_idx").on(columns._order),
+    index("pages_blocks_faq_items_parent_id_idx").on(columns._parentID),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [pages_blocks_faq.id],
+      name: "pages_blocks_faq_items_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const pages_blocks_faq = pgTable(
+  "pages_blocks_faq",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: integer("_parent_id").notNull(),
+    _path: text("_path").notNull(),
+    id: varchar("id").primaryKey(),
+    background: enum_pages_blocks_faq_background("background")
+      .notNull()
+      .default("default"),
+    heading: varchar("heading").notNull(),
+    blockName: varchar("block_name"),
+  },
+  (columns) => [
+    index("pages_blocks_faq_order_idx").on(columns._order),
+    index("pages_blocks_faq_parent_id_idx").on(columns._parentID),
+    index("pages_blocks_faq_path_idx").on(columns._path),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [pages.id],
+      name: "pages_blocks_faq_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const pages_blocks_legal_content_sections_paragraphs = pgTable(
+  "pages_blocks_legal_content_sections_paragraphs",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: varchar("_parent_id").notNull(),
+    id: varchar("id").primaryKey(),
+    text: varchar("text").notNull(),
+  },
+  (columns) => [
+    index("pages_blocks_legal_content_sections_paragraphs_order_idx").on(
+      columns._order,
+    ),
+    index("pages_blocks_legal_content_sections_paragraphs_parent_id_idx").on(
+      columns._parentID,
+    ),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [pages_blocks_legal_content_sections.id],
+      name: "pages_blocks_legal_content_sections_paragraphs_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const pages_blocks_legal_content_sections_items = pgTable(
+  "pages_blocks_legal_content_sections_items",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: varchar("_parent_id").notNull(),
+    id: varchar("id").primaryKey(),
+    text: varchar("text").notNull(),
+  },
+  (columns) => [
+    index("pages_blocks_legal_content_sections_items_order_idx").on(
+      columns._order,
+    ),
+    index("pages_blocks_legal_content_sections_items_parent_id_idx").on(
+      columns._parentID,
+    ),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [pages_blocks_legal_content_sections.id],
+      name: "pages_blocks_legal_content_sections_items_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const pages_blocks_legal_content_sections_headers = pgTable(
+  "pages_blocks_legal_content_sections_headers",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: varchar("_parent_id").notNull(),
+    id: varchar("id").primaryKey(),
+    label: varchar("label").notNull(),
+  },
+  (columns) => [
+    index("pages_blocks_legal_content_sections_headers_order_idx").on(
+      columns._order,
+    ),
+    index("pages_blocks_legal_content_sections_headers_parent_id_idx").on(
+      columns._parentID,
+    ),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [pages_blocks_legal_content_sections.id],
+      name: "pages_blocks_legal_content_sections_headers_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const pages_blocks_legal_content_sections_rows_cells = pgTable(
+  "pages_blocks_legal_content_sections_rows_cells",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: varchar("_parent_id").notNull(),
+    id: varchar("id").primaryKey(),
+    text: varchar("text").notNull(),
+  },
+  (columns) => [
+    index("pages_blocks_legal_content_sections_rows_cells_order_idx").on(
+      columns._order,
+    ),
+    index("pages_blocks_legal_content_sections_rows_cells_parent_id_idx").on(
+      columns._parentID,
+    ),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [pages_blocks_legal_content_sections_rows.id],
+      name: "pages_blocks_legal_content_sections_rows_cells_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const pages_blocks_legal_content_sections_rows = pgTable(
+  "pages_blocks_legal_content_sections_rows",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: varchar("_parent_id").notNull(),
+    id: varchar("id").primaryKey(),
+  },
+  (columns) => [
+    index("pages_blocks_legal_content_sections_rows_order_idx").on(
+      columns._order,
+    ),
+    index("pages_blocks_legal_content_sections_rows_parent_id_idx").on(
+      columns._parentID,
+    ),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [pages_blocks_legal_content_sections.id],
+      name: "pages_blocks_legal_content_sections_rows_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const pages_blocks_legal_content_sections = pgTable(
+  "pages_blocks_legal_content_sections",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: varchar("_parent_id").notNull(),
+    id: varchar("id").primaryKey(),
+    heading: varchar("heading"),
+  },
+  (columns) => [
+    index("pages_blocks_legal_content_sections_order_idx").on(columns._order),
+    index("pages_blocks_legal_content_sections_parent_id_idx").on(
+      columns._parentID,
+    ),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [pages_blocks_legal_content.id],
+      name: "pages_blocks_legal_content_sections_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const pages_blocks_legal_content = pgTable(
+  "pages_blocks_legal_content",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: integer("_parent_id").notNull(),
+    _path: text("_path").notNull(),
+    id: varchar("id").primaryKey(),
+    title: varchar("title").notNull(),
+    blockName: varchar("block_name"),
+  },
+  (columns) => [
+    index("pages_blocks_legal_content_order_idx").on(columns._order),
+    index("pages_blocks_legal_content_parent_id_idx").on(columns._parentID),
+    index("pages_blocks_legal_content_path_idx").on(columns._path),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [pages.id],
+      name: "pages_blocks_legal_content_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
 export const pages_blocks_cta = pgTable(
   "pages_blocks_cta",
   {
@@ -1491,6 +1767,149 @@ export const relations_pages_blocks_link_cards = relations(
     }),
   }),
 );
+export const relations_pages_blocks_text_section_paragraphs = relations(
+  pages_blocks_text_section_paragraphs,
+  ({ one }) => ({
+    _parentID: one(pages_blocks_text_section, {
+      fields: [pages_blocks_text_section_paragraphs._parentID],
+      references: [pages_blocks_text_section.id],
+      relationName: "paragraphs",
+    }),
+  }),
+);
+export const relations_pages_blocks_text_section = relations(
+  pages_blocks_text_section,
+  ({ one, many }) => ({
+    _parentID: one(pages, {
+      fields: [pages_blocks_text_section._parentID],
+      references: [pages.id],
+      relationName: "_blocks_textSection",
+    }),
+    paragraphs: many(pages_blocks_text_section_paragraphs, {
+      relationName: "paragraphs",
+    }),
+  }),
+);
+export const relations_pages_blocks_faq_items_sources = relations(
+  pages_blocks_faq_items_sources,
+  ({ one }) => ({
+    _parentID: one(pages_blocks_faq_items, {
+      fields: [pages_blocks_faq_items_sources._parentID],
+      references: [pages_blocks_faq_items.id],
+      relationName: "sources",
+    }),
+  }),
+);
+export const relations_pages_blocks_faq_items = relations(
+  pages_blocks_faq_items,
+  ({ one, many }) => ({
+    _parentID: one(pages_blocks_faq, {
+      fields: [pages_blocks_faq_items._parentID],
+      references: [pages_blocks_faq.id],
+      relationName: "items",
+    }),
+    sources: many(pages_blocks_faq_items_sources, {
+      relationName: "sources",
+    }),
+  }),
+);
+export const relations_pages_blocks_faq = relations(
+  pages_blocks_faq,
+  ({ one, many }) => ({
+    _parentID: one(pages, {
+      fields: [pages_blocks_faq._parentID],
+      references: [pages.id],
+      relationName: "_blocks_faq",
+    }),
+    items: many(pages_blocks_faq_items, {
+      relationName: "items",
+    }),
+  }),
+);
+export const relations_pages_blocks_legal_content_sections_paragraphs =
+  relations(pages_blocks_legal_content_sections_paragraphs, ({ one }) => ({
+    _parentID: one(pages_blocks_legal_content_sections, {
+      fields: [pages_blocks_legal_content_sections_paragraphs._parentID],
+      references: [pages_blocks_legal_content_sections.id],
+      relationName: "paragraphs",
+    }),
+  }));
+export const relations_pages_blocks_legal_content_sections_items = relations(
+  pages_blocks_legal_content_sections_items,
+  ({ one }) => ({
+    _parentID: one(pages_blocks_legal_content_sections, {
+      fields: [pages_blocks_legal_content_sections_items._parentID],
+      references: [pages_blocks_legal_content_sections.id],
+      relationName: "items",
+    }),
+  }),
+);
+export const relations_pages_blocks_legal_content_sections_headers = relations(
+  pages_blocks_legal_content_sections_headers,
+  ({ one }) => ({
+    _parentID: one(pages_blocks_legal_content_sections, {
+      fields: [pages_blocks_legal_content_sections_headers._parentID],
+      references: [pages_blocks_legal_content_sections.id],
+      relationName: "headers",
+    }),
+  }),
+);
+export const relations_pages_blocks_legal_content_sections_rows_cells =
+  relations(pages_blocks_legal_content_sections_rows_cells, ({ one }) => ({
+    _parentID: one(pages_blocks_legal_content_sections_rows, {
+      fields: [pages_blocks_legal_content_sections_rows_cells._parentID],
+      references: [pages_blocks_legal_content_sections_rows.id],
+      relationName: "cells",
+    }),
+  }));
+export const relations_pages_blocks_legal_content_sections_rows = relations(
+  pages_blocks_legal_content_sections_rows,
+  ({ one, many }) => ({
+    _parentID: one(pages_blocks_legal_content_sections, {
+      fields: [pages_blocks_legal_content_sections_rows._parentID],
+      references: [pages_blocks_legal_content_sections.id],
+      relationName: "rows",
+    }),
+    cells: many(pages_blocks_legal_content_sections_rows_cells, {
+      relationName: "cells",
+    }),
+  }),
+);
+export const relations_pages_blocks_legal_content_sections = relations(
+  pages_blocks_legal_content_sections,
+  ({ one, many }) => ({
+    _parentID: one(pages_blocks_legal_content, {
+      fields: [pages_blocks_legal_content_sections._parentID],
+      references: [pages_blocks_legal_content.id],
+      relationName: "sections",
+    }),
+    paragraphs: many(pages_blocks_legal_content_sections_paragraphs, {
+      relationName: "paragraphs",
+    }),
+    items: many(pages_blocks_legal_content_sections_items, {
+      relationName: "items",
+    }),
+    headers: many(pages_blocks_legal_content_sections_headers, {
+      relationName: "headers",
+    }),
+    rows: many(pages_blocks_legal_content_sections_rows, {
+      relationName: "rows",
+    }),
+  }),
+);
+export const relations_pages_blocks_legal_content = relations(
+  pages_blocks_legal_content,
+  ({ one, many }) => ({
+    _parentID: one(pages, {
+      fields: [pages_blocks_legal_content._parentID],
+      references: [pages.id],
+      relationName: "_blocks_legalContent",
+    }),
+    sections: many(pages_blocks_legal_content_sections, {
+      relationName: "sections",
+    }),
+  }),
+);
 export const relations_pages_blocks_cta = relations(
   pages_blocks_cta,
   ({ one }) => ({
@@ -1535,6 +1954,15 @@ export const relations_pages = relations(pages, ({ one, many }) => ({
   }),
   _blocks_linkCards: many(pages_blocks_link_cards, {
     relationName: "_blocks_linkCards",
+  }),
+  _blocks_textSection: many(pages_blocks_text_section, {
+    relationName: "_blocks_textSection",
+  }),
+  _blocks_faq: many(pages_blocks_faq, {
+    relationName: "_blocks_faq",
+  }),
+  _blocks_legalContent: many(pages_blocks_legal_content, {
+    relationName: "_blocks_legalContent",
   }),
   _blocks_cta: many(pages_blocks_cta, {
     relationName: "_blocks_cta",
@@ -1629,6 +2057,8 @@ type DatabaseSchema = {
   enum_pages_blocks_aid_cards_variant: typeof enum_pages_blocks_aid_cards_variant;
   enum_pages_blocks_steps_background: typeof enum_pages_blocks_steps_background;
   enum_pages_blocks_link_cards_background: typeof enum_pages_blocks_link_cards_background;
+  enum_pages_blocks_text_section_background: typeof enum_pages_blocks_text_section_background;
+  enum_pages_blocks_faq_background: typeof enum_pages_blocks_faq_background;
   enum_pages_page_type: typeof enum_pages_page_type;
   leads: typeof leads;
   config_caroussel_section: typeof config_caroussel_section;
@@ -1655,6 +2085,18 @@ type DatabaseSchema = {
   pages_blocks_steps: typeof pages_blocks_steps;
   pages_blocks_link_cards_links: typeof pages_blocks_link_cards_links;
   pages_blocks_link_cards: typeof pages_blocks_link_cards;
+  pages_blocks_text_section_paragraphs: typeof pages_blocks_text_section_paragraphs;
+  pages_blocks_text_section: typeof pages_blocks_text_section;
+  pages_blocks_faq_items_sources: typeof pages_blocks_faq_items_sources;
+  pages_blocks_faq_items: typeof pages_blocks_faq_items;
+  pages_blocks_faq: typeof pages_blocks_faq;
+  pages_blocks_legal_content_sections_paragraphs: typeof pages_blocks_legal_content_sections_paragraphs;
+  pages_blocks_legal_content_sections_items: typeof pages_blocks_legal_content_sections_items;
+  pages_blocks_legal_content_sections_headers: typeof pages_blocks_legal_content_sections_headers;
+  pages_blocks_legal_content_sections_rows_cells: typeof pages_blocks_legal_content_sections_rows_cells;
+  pages_blocks_legal_content_sections_rows: typeof pages_blocks_legal_content_sections_rows;
+  pages_blocks_legal_content_sections: typeof pages_blocks_legal_content_sections;
+  pages_blocks_legal_content: typeof pages_blocks_legal_content;
   pages_blocks_cta: typeof pages_blocks_cta;
   pages: typeof pages;
   payload_kv: typeof payload_kv;
@@ -1688,6 +2130,18 @@ type DatabaseSchema = {
   relations_pages_blocks_steps: typeof relations_pages_blocks_steps;
   relations_pages_blocks_link_cards_links: typeof relations_pages_blocks_link_cards_links;
   relations_pages_blocks_link_cards: typeof relations_pages_blocks_link_cards;
+  relations_pages_blocks_text_section_paragraphs: typeof relations_pages_blocks_text_section_paragraphs;
+  relations_pages_blocks_text_section: typeof relations_pages_blocks_text_section;
+  relations_pages_blocks_faq_items_sources: typeof relations_pages_blocks_faq_items_sources;
+  relations_pages_blocks_faq_items: typeof relations_pages_blocks_faq_items;
+  relations_pages_blocks_faq: typeof relations_pages_blocks_faq;
+  relations_pages_blocks_legal_content_sections_paragraphs: typeof relations_pages_blocks_legal_content_sections_paragraphs;
+  relations_pages_blocks_legal_content_sections_items: typeof relations_pages_blocks_legal_content_sections_items;
+  relations_pages_blocks_legal_content_sections_headers: typeof relations_pages_blocks_legal_content_sections_headers;
+  relations_pages_blocks_legal_content_sections_rows_cells: typeof relations_pages_blocks_legal_content_sections_rows_cells;
+  relations_pages_blocks_legal_content_sections_rows: typeof relations_pages_blocks_legal_content_sections_rows;
+  relations_pages_blocks_legal_content_sections: typeof relations_pages_blocks_legal_content_sections;
+  relations_pages_blocks_legal_content: typeof relations_pages_blocks_legal_content;
   relations_pages_blocks_cta: typeof relations_pages_blocks_cta;
   relations_pages: typeof relations_pages;
   relations_payload_kv: typeof relations_payload_kv;

@@ -2,12 +2,15 @@ import type { CollectionConfig } from "payload";
 import { validateSlug } from "../lib/cms/validators";
 import { AidCardsBlock } from "./blocks/AidCardsBlock";
 import { CtaBlock } from "./blocks/CtaBlock";
+import { FaqBlock } from "./blocks/FaqBlock";
 import { FeatureCardsBlock } from "./blocks/FeatureCardsBlock";
 import { HeroBlock } from "./blocks/HeroBlock";
+import { LegalContentBlock } from "./blocks/LegalContentBlock";
 import { LinkCardsBlock } from "./blocks/LinkCardsBlock";
 import { ServiceCardsBlock } from "./blocks/ServiceCardsBlock";
 import { StepsBlock } from "./blocks/StepsBlock";
 import { TestimonialBlock } from "./blocks/TestimonialBlock";
+import { TextSectionBlock } from "./blocks/TextSectionBlock";
 import { ZoneListBlock } from "./blocks/ZoneListBlock";
 import {
   revalidateSiteAfterChange,
@@ -144,6 +147,9 @@ const Pages: CollectionConfig = {
         AidCardsBlock,
         StepsBlock,
         LinkCardsBlock,
+        TextSectionBlock,
+        FaqBlock,
+        LegalContentBlock,
         CtaBlock,
       ],
     },

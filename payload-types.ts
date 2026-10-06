@@ -769,6 +769,9 @@ export interface Page {
     | AidCardsBlock
     | StepsBlock
     | LinkCardsBlock
+    | TextSectionBlock
+    | FaqBlock
+    | LegalContentBlock
     | CtaBlock
   )[];
   updatedAt: string;
@@ -939,6 +942,97 @@ export interface LinkCardsBlock {
   id?: string | null;
   blockName?: string | null;
   blockType: 'linkCards';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TextSectionBlock".
+ */
+export interface TextSectionBlock {
+  background: 'default' | 'muted';
+  heading: string;
+  paragraphs: {
+    text: string;
+    id?: string | null;
+  }[];
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'textSection';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "FaqBlock".
+ */
+export interface FaqBlock {
+  background: 'default' | 'muted';
+  heading: string;
+  items: {
+    question: string;
+    answer: string;
+    /**
+     * Affichées sous la réponse, avec un lien vers la page officielle
+     */
+    sources?:
+      | {
+          label: string;
+          url: string;
+          id?: string | null;
+        }[]
+      | null;
+    id?: string | null;
+  }[];
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'faq';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "LegalContentBlock".
+ */
+export interface LegalContentBlock {
+  /**
+   * Titre principal de la page, à utiliser sans bloc Hero au dessus
+   */
+  title: string;
+  sections: {
+    /**
+     * Laisser vide pour continuer la section précédente après une liste ou un tableau
+     */
+    heading?: string | null;
+    paragraphs?:
+      | {
+          /**
+           * Un retour à la ligne est conservé, une adresse https devient un lien
+           */
+          text: string;
+          id?: string | null;
+        }[]
+      | null;
+    items?:
+      | {
+          text: string;
+          id?: string | null;
+        }[]
+      | null;
+    headers?:
+      | {
+          label: string;
+          id?: string | null;
+        }[]
+      | null;
+    rows?:
+      | {
+          cells: {
+            text: string;
+            id?: string | null;
+          }[];
+          id?: string | null;
+        }[]
+      | null;
+    id?: string | null;
+  }[];
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'legalContent';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1374,6 +1468,9 @@ export interface PagesSelect<T extends boolean = true> {
         aidCards?: T | AidCardsBlockSelect<T>;
         steps?: T | StepsBlockSelect<T>;
         linkCards?: T | LinkCardsBlockSelect<T>;
+        textSection?: T | TextSectionBlockSelect<T>;
+        faq?: T | FaqBlockSelect<T>;
+        legalContent?: T | LegalContentBlockSelect<T>;
         cta?: T | CtaBlockSelect<T>;
       };
   updatedAt?: T;
@@ -1536,6 +1633,90 @@ export interface LinkCardsBlockSelect<T extends boolean = true> {
         label?: T;
         description?: T;
         href?: T;
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TextSectionBlock_select".
+ */
+export interface TextSectionBlockSelect<T extends boolean = true> {
+  background?: T;
+  heading?: T;
+  paragraphs?:
+    | T
+    | {
+        text?: T;
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "FaqBlock_select".
+ */
+export interface FaqBlockSelect<T extends boolean = true> {
+  background?: T;
+  heading?: T;
+  items?:
+    | T
+    | {
+        question?: T;
+        answer?: T;
+        sources?:
+          | T
+          | {
+              label?: T;
+              url?: T;
+              id?: T;
+            };
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "LegalContentBlock_select".
+ */
+export interface LegalContentBlockSelect<T extends boolean = true> {
+  title?: T;
+  sections?:
+    | T
+    | {
+        heading?: T;
+        paragraphs?:
+          | T
+          | {
+              text?: T;
+              id?: T;
+            };
+        items?:
+          | T
+          | {
+              text?: T;
+              id?: T;
+            };
+        headers?:
+          | T
+          | {
+              label?: T;
+              id?: T;
+            };
+        rows?:
+          | T
+          | {
+              cells?:
+                | T
+                | {
+                    text?: T;
+                    id?: T;
+                  };
+              id?: T;
+            };
         id?: T;
       };
   id?: T;

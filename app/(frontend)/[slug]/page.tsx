@@ -58,7 +58,11 @@ export default async function CmsPage({ params }: CmsPageProps) {
       <RefreshRouteOnSave />
       <JsonLdScript graph={buildPageGraph({ page, all, config })} />
       <PageBreadcrumb trail={trail} />
-      <BlockRenderer blocks={page.layout} phone={config.phone ?? ""} />
+      <BlockRenderer
+        blocks={page.layout}
+        phone={config.phone ?? ""}
+        updatedAt={page.updatedAt}
+      />
       <RelatedLinks links={getRelatedLinks(page, all)} />
     </>
   );
