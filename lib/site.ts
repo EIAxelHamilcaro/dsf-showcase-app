@@ -23,7 +23,14 @@ export const aiCrawlers: readonly string[] = [
   "CCBot",
 ];
 
-export const privatePaths: readonly string[] = ["/admin", "/api/"];
+export const privatePaths: readonly string[] = [
+  "/admin$",
+  "/admin/",
+  "/api$",
+  "/api/",
+];
+
+export const crawlablePaths: readonly string[] = ["/", "/api/media/file/"];
 
 export const businessFacts = {
   facebookUrl: "https://www.facebook.com/douche.senior.france/",

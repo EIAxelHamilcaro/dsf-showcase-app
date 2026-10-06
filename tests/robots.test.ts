@@ -3,48 +3,97 @@ import { describe, it } from "node:test";
 import robots from "../app/robots";
 import { aiCrawlers } from "../lib/site";
 
-function groupsFor(userAgent: string) {
-  const rules = robots().rules;
-  const list = Array.isArray(rules) ? rules : [rules];
-
-  return list.filter((rule) => {
-    const agents = Array.isArray(rule.userAgent)
-      ? rule.userAgent
-      : [rule.userAgent];
-    return agents.includes(userAgent);
-  });
-}
-
 const asList = (value: string | string[] | undefined) =>
   Array.isArray(value) ? value : value ? [value] : [];
 
-describe("robots", () => {
-  it("lets every AI crawler read the public site", () => {
-    for (const crawler of aiCrawlers) {
-      const groups = groupsFor(crawler);
-      assert.ok(groups.length > 0, `${crawler} has no group`);
+function groups() {
+  const rules = robots().rules;
 
-      for (const group of groups) {
-        assert.ok(
-          !asList(group.disallow).includes("/"),
-          `${crawler} is blocked`,
-        );
-        assert.ok(
-          asList(group.allow).includes("/"),
-          `${crawler} is not allowed`,
-        );
+  return Array.isArray(rules) ? rules : [rules];
+}
+
+function groupFor(userAgent: string) {
+  const named = groups().find((group) =>
+    asList(group.userAgent).includes(userAgent),
+  );
+
+  return (
+    named ?? groups().find((group) => asList(group.userAgent).includes("*"))
+  );
+}
+
+function ruleMatches(rule: string, path: string) {
+  const anchored = rule.endsWith("$");
+  const body = anchored ? rule.slice(0, -1) : rule;
+  const source = body
+    .split("*")
+    .map((part) => part.replace(/[.+?^${}()|[\]\\]/g, "\\$&"))
+    .join(".*");
+
+  return new RegExp(`^${source}${anchored ? "$" : ""}`).test(path);
+}
+
+function longestMatch(rules: string[], path: string) {
+  const lengths = rules
+    .filter((rule) => ruleMatches(rule, path))
+    .map((rule) => rule.length);
+
+  return Math.max(-1, ...lengths);
+}
+
+function canCrawl(userAgent: string, path: string) {
+  const group = groupFor(userAgent);
+  assert.ok(group, `${userAgent} has no group`);
+
+  const allowed = longestMatch(asList(group.allow), path);
+  const disallowed = longestMatch(asList(group.disallow), path);
+
+  return allowed >= disallowed;
+}
+
+const crawlers = ["Googlebot", "facebookexternalhit", ...aiCrawlers];
+
+const openPaths = [
+  "/",
+  "/douche-senior-blois",
+  "/administration-aides",
+  "/apiculture",
+  "/api/media/file/x.jpg",
+  "/_next/static/chunks/main.js",
+];
+
+const closedPaths = [
+  "/admin",
+  "/admin/login",
+  "/api",
+  "/api/leads",
+  "/api/users/me",
+  "/api/media",
+];
+
+describe("robots", () => {
+  it("gives every AI crawler its own group", () => {
+    for (const crawler of aiCrawlers) {
+      const named = groups().some((group) =>
+        asList(group.userAgent).includes(crawler),
+      );
+      assert.ok(named, `${crawler} has no group`);
+    }
+  });
+
+  it("lets every crawler read the public pages and the CMS share images", () => {
+    for (const crawler of crawlers) {
+      for (const path of openPaths) {
+        assert.ok(canCrawl(crawler, path), `${crawler} cannot read ${path}`);
       }
     }
   });
 
-  it("keeps the admin and the API private for every group, AI crawlers included", () => {
-    const rules = robots().rules;
-    const list = Array.isArray(rules) ? rules : [rules];
-
-    for (const group of list) {
-      const disallowed = asList(group.disallow);
-      assert.ok(disallowed.includes("/admin"), "admin is exposed");
-      assert.ok(disallowed.includes("/api/"), "api is exposed");
+  it("keeps the admin and the API private for every crawler", () => {
+    for (const crawler of crawlers) {
+      for (const path of closedPaths) {
+        assert.ok(!canCrawl(crawler, path), `${crawler} can read ${path}`);
+      }
     }
   });
 
