@@ -255,37 +255,3 @@
     transition-duration: 0.01ms;
   }
 }
-
-@keyframes scroll {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(-50%);
-  }
-}
-
-@keyframes scrollInf {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(-50%);
-  } /* décale d’une largeur de liste */
-}
-
-.animate-scroll-inf {
-  animation: scrollInf 100s linear infinite;
-  width: max-content;
-}
-
-.animate-scroll-inf:hover,
-.animate-scroll-inf:focus-within {
-  animation-play-state: paused;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .animate-scroll-inf {
-    animation: none;
-  }
-}
