@@ -72,7 +72,7 @@ export default function NavBar({ config }: { config: Config1 }) {
             className="h-7 w-auto min-[360px]:h-8 min-[400px]:h-10 md:h-12"
             fetchPriority="low"
             loading="eager"
-            sizes="160px"
+            sizes="(min-width: 768px) 144px, (min-width: 400px) 120px, (min-width: 360px) 96px, 84px"
             src={Logo}
           />
         </Link>
