@@ -7,7 +7,7 @@ import { getSiteConfig } from "@/lib/pages/getSiteConfig";
 
 export const metadata: Metadata = {
   title: "Page introuvable",
-  robots: { index: false, follow: false },
+  robots: null,
 };
 
 export default async function NotFound() {

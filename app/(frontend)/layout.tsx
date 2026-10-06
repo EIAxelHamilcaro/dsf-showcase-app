@@ -3,16 +3,15 @@ import { Nunito } from "next/font/google";
 import "../globals.css";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
-import { getPayload } from "payload";
 import type { ReactNode } from "react";
 import { ContactModal } from "@/app/_components/contactModal";
 import { Footer } from "@/app/_components/footer";
 import NavBar from "@/app/_components/navBar";
 import { getAllPages } from "@/lib/pages/getPage";
+import { getSiteConfig } from "@/lib/pages/getSiteConfig";
 import { getLegalLinks } from "@/lib/pages/pageLinks";
 import { homeSeo, siteName, siteUrl } from "@/lib/site";
 import { cn } from "@/lib/utils";
-import payloadConfig from "@/payload.config";
 
 const nunito = Nunito({
   variable: "--font-nunito",
@@ -48,13 +47,8 @@ export default async function RootLayout({
 }: Readonly<{
   children: ReactNode;
 }>) {
-  const payload = await getPayload({ config: payloadConfig });
-  const config = await payload.findByID({
-    collection: "config",
-    id: 1,
-    depth: 1,
-  });
-  const legalLinks = getLegalLinks(await getAllPages());
+  const [config, pages] = await Promise.all([getSiteConfig(), getAllPages()]);
+  const legalLinks = getLegalLinks(pages);
 
   return (
     <html className="scroll-smooth" lang="fr" suppressHydrationWarning>

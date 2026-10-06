@@ -1,10 +1,15 @@
 import { getPayload } from "payload";
 import { cache } from "react";
+import { validateSlug } from "@/lib/cms/validators";
 import payloadConfig from "@/payload.config";
 import type { Page } from "@/payload-types";
 
 export const getPageBySlug = cache(
   async (slug: string): Promise<Page | null> => {
+    if (validateSlug(slug) !== true) {
+      return null;
+    }
+
     const payload = await getPayload({ config: payloadConfig });
     const { docs } = await payload.find({
       collection: "pages",
