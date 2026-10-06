@@ -92,7 +92,7 @@ dump_content() {
     | grep -v -E '^\\(un)?restrict '
 }
 
-echo "--- replay: turnkey_content run again on its own result, after editor changes"
+echo "--- replay: turnkey_content and content_review_fixes run again on their own result, after editor changes"
 run_psql -c "drop database if exists ${replay} with (force)" >/dev/null
 run_psql -c "create database ${replay} template ${target}" >/dev/null
 run_psql -d "${replay}" -v ON_ERROR_STOP=1 -At -f - < "${root}/scripts/sql/editorEdits.sql"
@@ -103,7 +103,7 @@ DSF_DB="${replay}" "${root}/scripts/local.sh" pnpm exec payload migrate
 dump_content > "${work}/replay-after.sql"
 
 if ! diff -u "${work}/replay-before.sql" "${work}/replay-after.sql"; then
-  echo "FAIL: running turnkey_content a second time changed data or overwrote an editor change" >&2
+  echo "FAIL: running the content migrations a second time changed data or overwrote an editor change" >&2
   exit 1
 fi
 

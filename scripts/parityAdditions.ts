@@ -1,6 +1,7 @@
 import { faqSeed } from "../migrations/seed/faqSeed";
 import { localTextSeed } from "../migrations/seed/localTextSeed";
 import { pagesSeed } from "../migrations/seed/pagesSeed";
+import { faqFixes } from "../migrations/seed/reviewFixesSeed";
 
 export type AcceptedAddition =
   | { after: string; text: string }
@@ -11,6 +12,17 @@ export const ignoredNavLabels: string[] = [
   "Pages liées",
   "Villes desservies",
 ];
+
+function reviewedFaqText(slug: string, field: string, text: string): string {
+  const fix = faqFixes.find(
+    (candidate) =>
+      candidate.slug === slug &&
+      candidate.field === field &&
+      candidate.from === text,
+  );
+
+  return fix?.to ?? text;
+}
 
 function turnkeyAdditions(): Record<string, AcceptedAddition[]> {
   return Object.fromEntries(
@@ -25,8 +37,8 @@ function turnkeyAdditions(): Record<string, AcceptedAddition[]> {
       const local = localTextSeed.find((seed) => seed.slug === faq.slug);
       const localTexts = local ? [local.heading, ...local.paragraphs] : [];
       const faqTexts = faq.items.flatMap((item) => [
-        item.question,
-        item.answer,
+        reviewedFaqText(faq.slug, "question", item.question),
+        reviewedFaqText(faq.slug, "answer", item.answer),
         ...item.sources.map((source) => `Source : ${source.label}`),
       ]);
 

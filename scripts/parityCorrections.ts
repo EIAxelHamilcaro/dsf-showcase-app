@@ -1,5 +1,7 @@
+import { pageTextFixes } from "../migrations/seed/reviewFixesSeed";
 import {
   homeCorrections,
+  type PageFieldCorrection,
   pageDetailRemovals,
   pageFieldCorrections,
 } from "../migrations/seed/taxCreditCorrections";
@@ -11,13 +13,32 @@ export interface TextCorrection {
   to: string;
 }
 
+const followUpOf = (correction: PageFieldCorrection) =>
+  pageTextFixes.find(
+    (fix) =>
+      fix.slug === correction.slug &&
+      fix.field === correction.field &&
+      fix.from === correction.to,
+  );
+
+const followUps = pageFieldCorrections.flatMap(
+  (correction) => followUpOf(correction) ?? [],
+);
+
 export const textCorrections: TextCorrection[] = [
-  ...pageFieldCorrections.map(({ ref, slug, from, to }) => ({
-    ref,
-    page: slug,
-    from,
-    to,
-  })),
+  ...pageFieldCorrections.map((correction) => {
+    const followUp = followUpOf(correction);
+
+    return {
+      ref: followUp ? `${correction.ref}+${followUp.ref}` : correction.ref,
+      page: correction.slug,
+      from: correction.from,
+      to: followUp?.to ?? correction.to,
+    };
+  }),
+  ...pageTextFixes
+    .filter((fix) => !followUps.includes(fix))
+    .map(({ ref, slug, from, to }) => ({ ref, page: slug, from, to })),
   ...pageDetailRemovals.map(({ ref, slug, label, text }) => ({
     ref,
     page: slug,

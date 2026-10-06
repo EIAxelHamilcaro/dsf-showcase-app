@@ -15,6 +15,8 @@ update pages_blocks_text_section set heading = 'Titre saisi par le client';
 update pages_blocks_legal_content set title = 'Titre saisi par le client';
 update pages set seo_description = 'Description saisie par le client'
 where slug = 'aides-financieres';
-delete from payload_migrations where name like '%\_turnkey\_content';
+delete from payload_migrations
+where name like '%\_turnkey\_content' or name like '%\_content\_review\_fixes';
 commit;
-select 'editor changes applied, turnkey_content records left: ' || count(*) from payload_migrations where name like '%\_turnkey\_content';
+select 'editor changes applied, content migration records left: ' || count(*) from payload_migrations
+where name like '%\_turnkey\_content' or name like '%\_content\_review\_fixes';
