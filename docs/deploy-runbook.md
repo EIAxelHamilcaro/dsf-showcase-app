@@ -6,7 +6,7 @@ Ce qui a été vérifié l'a été en local (base `127.0.0.1:5544`, répétition
 
 ## Règles
 
-- Jamais `migrate:down`, `migrate:fresh`, `migrate:reset` ni `migrate:refresh` sur la production. Le `down` des 17 migrations lève une erreur exprès, les trois autres commandes suppriment des tables.
+- Jamais `migrate:down`, `migrate:fresh`, `migrate:reset` ni `migrate:refresh` sur la production. Le `down` des 18 migrations lève une erreur exprès, les trois autres commandes suppriment des tables.
 - La migration fait partie du build de production : `scripts/vercelBuild.sh` lance `payload migrate` puis `next build`, qui lit la base (`generateStaticParams`, `sitemap.xml`, `llms.txt`). Plus aucun `payload migrate` à la main sur la production.
 - Seul `VERCEL_ENV=production` migre. Les previews et les déploiements de développement ne migrent jamais, même s'ils partagent la base de production.
 - `pnpm dev`, `pnpm build`, `pnpm start`, `pnpm test` et `pnpm payload` passent par `scripts/local.sh`, qui force la base locale et refuse tout hôte autre que `127.0.0.1` ou `localhost`. Ce garde-fou ne se contourne pas et ne se modifie pas.
@@ -72,14 +72,14 @@ Le script restaure la sauvegarde dans la base locale `dsf_rehearsal` (conteneur 
 ```
 (a) OK: schema and data untouched
 (b) OK: refused with the dev mode row, refused with an unrecorded baseline, nothing written
-(c) OK: 17 of 17 migrations recorded
+(c) OK: 18 of 18 migrations recorded
 (d) OK: schema and data untouched
 (e) OK: 6 city records, 1 template, 0 city page documents
 ```
 
 - (a) build de preview : aucune migration.
 - (b) build de production sur une base non amorcée : refus, rien d'écrit.
-- (c) amorçage (`scripts/sql/markBaselineApplied.sql`) puis build de production : les 16 migrations passent.
+- (c) amorçage (`scripts/sql/markBaselineApplied.sql`) puis build de production : les 17 migrations passent.
 - (d) second build de production : rien ne change.
 - (e) les 6 pages ville sont devenues 6 fiches ville et un modèle, il ne reste aucun document de page de type ville.
 

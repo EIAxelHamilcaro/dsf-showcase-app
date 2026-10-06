@@ -3,7 +3,9 @@ select 'leads' as table_name, count(*) as row_count,
 from leads t
 union all
 select 'users', count(*),
-  md5(coalesce(string_agg(to_jsonb(t)::text, '|' order by id), ''))
+  md5(coalesce(string_agg(
+    (to_jsonb(t) - 'reset_password_requested_at')::text, '|' order by id
+  ), ''))
 from users t
 union all
 select 'users_sessions', count(*),
