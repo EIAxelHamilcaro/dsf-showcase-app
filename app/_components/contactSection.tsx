@@ -1,6 +1,13 @@
 "use client";
 import { Clock, Mail, MapPin, Phone } from "lucide-react";
-import { type ChangeEvent, type FormEvent, useId, useState } from "react";
+import {
+  type ChangeEvent,
+  type FormEvent,
+  useEffect,
+  useId,
+  useRef,
+  useState,
+} from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -16,15 +23,21 @@ const emptyForm = {
   email: "",
   message: "",
   adress: "",
-  website: "",
 };
 
 export function ContactSection({ config }: { config: Config1 }) {
   const id = useId();
   const [formData, setFormData] = useState(emptyForm);
   const [isSent, setIsSent] = useState(false);
+  const success = useRef<HTMLOutputElement>(null);
   const { formRef, errors, formError, isPending, turnstileWidget, ...form } =
     useContactSubmission();
+
+  useEffect(() => {
+    if (isSent) {
+      success.current?.focus();
+    }
+  }, [isSent]);
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
@@ -76,18 +89,6 @@ export function ContactSection({ config }: { config: Config1 }) {
               onSubmit={handleSubmit}
               ref={formRef}
             >
-              <div className="hidden">
-                <Label htmlFor={`${id}-website`}>website</Label>
-                <Input
-                  autoComplete="off"
-                  id={`${id}-website`}
-                  name="website"
-                  onChange={handleChange}
-                  tabIndex={-1}
-                  value={formData.website}
-                />
-              </div>
-
               <div>
                 <Label className="text-base sm:text-lg" htmlFor={`${id}-name`}>
                   Nom complet *
@@ -188,7 +189,11 @@ export function ContactSection({ config }: { config: Config1 }) {
               <FormError message={formError} phone={config.phone} />
 
               {isSent && (
-                <output className="block p-3 bg-primary/10 border border-primary rounded-md font-semibold">
+                <output
+                  className="block p-3 bg-primary/10 border border-primary rounded-md font-semibold"
+                  ref={success}
+                  tabIndex={-1}
+                >
                   Votre demande a bien été envoyée.
                 </output>
               )}

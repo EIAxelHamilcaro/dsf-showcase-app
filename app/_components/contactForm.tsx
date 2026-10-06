@@ -19,7 +19,6 @@ const emptyForm = {
   email: "",
   message: "",
   adress: "",
-  website: "",
 };
 
 export function ContactForm({ phone }: { phone?: string | null }) {
@@ -64,18 +63,6 @@ export function ContactForm({ phone }: { phone?: string | null }) {
       onSubmit={handleSubmit}
       ref={formRef}
     >
-      <div className="hidden">
-        <Label htmlFor={`${id}-website`}>website</Label>
-        <Input
-          autoComplete="off"
-          id={`${id}-website`}
-          name="website"
-          onChange={handleChange}
-          tabIndex={-1}
-          value={formData.website}
-        />
-      </div>
-
       <div>
         <Label className="text-base" htmlFor={`${id}-name`}>
           Nom complet *

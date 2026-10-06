@@ -1,19 +1,24 @@
+import { isTestKey } from "./lib/contact/turnstileKeys";
+
 export function register() {
-  if (process.env.NODE_ENV !== "production") {
+  const isDeployed = Boolean(process.env.VERCEL_ENV);
+
+  if (process.env.NODE_ENV !== "production" && !isDeployed) {
     return;
   }
 
-  const missing = [
-    process.env.TURNSTILE_SECRET_KEY ? undefined : "TURNSTILE_SECRET_KEY",
-    process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY
-      ? undefined
-      : "NEXT_PUBLIC_TURNSTILE_SITE_KEY",
-  ].filter(Boolean);
+  const keys = {
+    TURNSTILE_SECRET_KEY: process.env.TURNSTILE_SECRET_KEY,
+    NEXT_PUBLIC_TURNSTILE_SITE_KEY: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY,
+  };
+  const unusable = Object.entries(keys)
+    .filter(([, key]) => !key || (isDeployed && isTestKey(key)))
+    .map(([name, key]) => `${name} ${key ? "is a test key" : "is missing"}`);
 
-  if (missing.length > 0) {
+  if (unusable.length > 0) {
     // biome-ignore lint/suspicious/noConsole: server log read in the hosting dashboard
     console.error(
-      `[contact] Turnstile is not configured (${missing.join(", ")} missing), the contact forms refuse every request`,
+      `[contact] Turnstile is not usable (${unusable.join(", ")}), the contact forms refuse every request`,
     );
   }
 }

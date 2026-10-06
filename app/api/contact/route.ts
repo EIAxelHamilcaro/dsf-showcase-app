@@ -9,6 +9,8 @@ import {
 import { verifyTurnstile } from "@/lib/contact/turnstile";
 import payloadConfig from "@/payload.config";
 
+export const maxDuration = 30;
+
 const logError = (message: string, context: Record<string, unknown>) =>
   // biome-ignore lint/suspicious/noConsole: server log read in the hosting dashboard
   console.error(`[contact] ${message}`, context);
@@ -51,6 +53,7 @@ export async function POST(request: Request) {
         secret: process.env.TURNSTILE_SECRET_KEY,
         siteKey: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY,
         isProduction: process.env.NODE_ENV === "production",
+        isDeployed: Boolean(process.env.VERCEL_ENV),
         logError,
       }),
     saveLead,

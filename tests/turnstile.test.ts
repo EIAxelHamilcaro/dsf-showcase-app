@@ -14,6 +14,7 @@ const verify = (overrides: Partial<VerifyTurnstileInput>) =>
     secret: "secret",
     siteKey: "site",
     isProduction: true,
+    isDeployed: false,
     remoteIp: "203.0.113.7",
     logError: () => undefined,
     ...overrides,
@@ -91,6 +92,46 @@ describe("verifyTurnstile", () => {
       ["unavailable", "unavailable", "unavailable"],
     );
     assert.equal(logError.mock.callCount(), 3);
+  });
+
+  it("refuses Cloudflare's test keys on a deployed environment without calling Cloudflare, and logs no key", async () => {
+    const testKeys = [
+      { secret: "1x0000000000000000000000000000000AA" },
+      { secret: "2x0000000000000000000000000000000AA" },
+      { siteKey: "1x00000000000000000000AA" },
+      { siteKey: "3x00000000000000000000FF" },
+      { secret: undefined, isProduction: false },
+    ];
+
+    for (const keys of testKeys) {
+      const fetchFn = mock.fn(() => jsonResponse({ success: true }));
+      const logError = mock.fn(
+        (_message: string, _context: Record<string, unknown>) => undefined,
+      );
+
+      const outcome = await verify({
+        ...keys,
+        isDeployed: true,
+        fetchFn: fetchFn as typeof fetch,
+        logError,
+      });
+      const logged = JSON.stringify(logError.mock.calls[0]?.arguments);
+
+      assert.equal(outcome, "unavailable", JSON.stringify(keys));
+      assert.equal(fetchFn.mock.callCount(), 0);
+      assert.equal(logError.mock.callCount(), 1);
+      assert.doesNotMatch(logged, /[123]x0{10,}/);
+    }
+  });
+
+  it("accepts the test keys on a local production build, which is not a deployed environment", async () => {
+    const outcome = await verify({
+      secret: "1x0000000000000000000000000000000AA",
+      siteKey: "1x00000000000000000000AA",
+      fetchFn: () => jsonResponse({ success: true }),
+    });
+
+    assert.equal(outcome, "valid");
   });
 
   it("uses Cloudflare's published test secret outside production when none is configured", async () => {

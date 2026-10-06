@@ -322,9 +322,9 @@ function ConsentStep({
         <div>
           <div className="flex items-start gap-4">
             <Checkbox
-              {...errorProps(`${id}-partners`, errors.consentPartners)}
               checked={data.consentPartners}
               className="w-8 h-8 border-2 border-gray-400 mt-1 cursor-pointer"
+              id={`${id}-partners`}
               onCheckedChange={(checked) =>
                 onCheck("consentPartners", checked === true)
               }
@@ -332,10 +332,8 @@ function ConsentStep({
             <Label className="text-base text-pretty" htmlFor={`${id}-partners`}>
               Oui, je consens au traitement de mes données personnelles par les
               partenaires de Douche Senior France.
-              <span className="text-red-500">*</span>
             </Label>
           </div>
-          <FieldError error={errors.consentPartners} id={`${id}-partners`} />
         </div>
       </div>
     </div>
@@ -403,10 +401,10 @@ export function ModalMultiStepForm({ link, phone }: ModalFormProps) {
       return;
     }
 
-    const isSent = await form.submit(data, {
-      ...(data.consentMain ? {} : { consentMain: consentRequired }),
-      ...(data.consentPartners ? {} : { consentPartners: consentRequired }),
-    });
+    const isSent = await form.submit(
+      data,
+      data.consentMain ? {} : { consentMain: consentRequired },
+    );
 
     setIsSubmitted(isSent);
   };

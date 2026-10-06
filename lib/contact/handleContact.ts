@@ -4,9 +4,10 @@ import {
   type FieldErrors,
   fieldErrorsOf,
 } from "./contactSchema";
+import { describeError } from "./describeError";
 import type { TurnstileOutcome } from "./turnstile";
 
-export type Lead = Omit<ContactInput, "turnstileToken" | "website">;
+export type Lead = Omit<ContactInput, "turnstileToken">;
 
 export interface LeadMail {
   subject: string;
@@ -64,9 +65,6 @@ const leadMail = (lead: Lead): LeadMail => ({
   ].join("\n"),
 });
 
-const isFilled = (value: unknown): boolean =>
-  typeof value === "string" && value.trim().length > 0;
-
 export async function handleContact(
   raw: unknown,
   deps: ContactDeps,
@@ -77,10 +75,6 @@ export async function handleContact(
       "VALIDATION_FAILED",
       "Votre demande n'a pas pu être lue, rechargez la page puis réessayez.",
     );
-  }
-
-  if (isFilled((raw as { website?: unknown }).website)) {
-    return accepted;
   }
 
   const parsed = contactSchema.safeParse(raw);
@@ -97,7 +91,7 @@ export async function handleContact(
     };
   }
 
-  const { turnstileToken, website: _website, ...lead } = parsed.data;
+  const { turnstileToken, ...lead } = parsed.data;
   const outcome = await deps.verifyToken(turnstileToken);
 
   if (outcome === "rejected") {
@@ -117,7 +111,7 @@ export async function handleContact(
   }
 
   const leadId = await deps.saveLead(lead).catch((error: unknown) => {
-    deps.logError("Lead could not be saved", { error });
+    deps.logError("Lead could not be saved", describeError(error));
 
     return undefined;
   });
@@ -125,12 +119,10 @@ export async function handleContact(
   const isEmailed = await deps.sendMail(leadMail(lead)).then(
     () => true,
     (error: unknown) => {
-      deps.logError(
-        "Lead email could not be sent",
-        leadId === undefined
-          ? { error, name: lead.name, phone: lead.phone, email: lead.email }
-          : { error, leadId },
-      );
+      deps.logError("Lead email could not be sent", {
+        ...describeError(error),
+        leadId,
+      });
 
       return false;
     },

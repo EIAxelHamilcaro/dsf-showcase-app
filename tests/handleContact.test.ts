@@ -20,27 +20,23 @@ const request = {
 
 interface Scenario {
   outcome?: TurnstileOutcome;
-  saveFails?: boolean;
-  mailFails?: boolean;
+  saveError?: Error;
+  mailError?: Error;
 }
 
-function makeDeps({
-  outcome = "valid",
-  saveFails = false,
-  mailFails = false,
-}: Scenario = {}) {
+function makeDeps({ outcome = "valid", saveError, mailError }: Scenario = {}) {
   return {
     verifyToken: mock.fn(async (_token: string) => outcome),
     saveLead: mock.fn(async (_lead: Lead) => {
-      if (saveFails) {
-        throw new Error("database down");
+      if (saveError) {
+        throw saveError;
       }
 
       return 42;
     }),
     sendMail: mock.fn(async (_mail: LeadMail) => {
-      if (mailFails) {
-        throw new Error("smtp down");
+      if (mailError) {
+        throw mailError;
       }
     }),
     logError: mock.fn(
@@ -74,7 +70,7 @@ describe("handleContact", () => {
   });
 
   it("keeps the lead and reports success when the email fails, logging which lead to follow up", async () => {
-    const deps = makeDeps({ mailFails: true });
+    const deps = makeDeps({ mailError: new Error("smtp down") });
 
     const result = await handleContact(request, deps);
 
@@ -85,7 +81,7 @@ describe("handleContact", () => {
   });
 
   it("still succeeds when only the database fails, because the company got the email", async () => {
-    const deps = makeDeps({ saveFails: true });
+    const deps = makeDeps({ saveError: new Error("database down") });
 
     const result = await handleContact(request, deps);
 
@@ -95,7 +91,10 @@ describe("handleContact", () => {
   });
 
   it("returns an explicit error without internals when the lead could be neither saved nor emailed", async () => {
-    const deps = makeDeps({ saveFails: true, mailFails: true });
+    const deps = makeDeps({
+      saveError: new Error("database down"),
+      mailError: new Error("smtp down"),
+    });
 
     const result = await handleContact(request, deps);
 
@@ -159,18 +158,55 @@ describe("handleContact", () => {
     assert.equal(deps.saveLead.mock.callCount(), 0);
   });
 
-  it("treats a filled honeypot as a silent success without verifying, saving or sending", async () => {
+  it("never logs what the visitor typed, even when the database and mail errors quote it", async () => {
+    const quoting = (label: string) =>
+      Object.assign(
+        new Error(
+          `${label} failed, params: Marie Dupont,06.12.34.56.78,marie@example.test,12 rue des Lilas, 41000 Blois,Bonjour`,
+          {
+            cause: Object.assign(new Error("duplicate key"), { code: "23505" }),
+          },
+        ),
+        { name: "DrizzleQueryError" },
+      );
+    const deps = makeDeps({
+      saveError: quoting("insert"),
+      mailError: quoting("smtp"),
+    });
+
+    await handleContact(request, deps);
+    const logged = JSON.stringify(
+      deps.logError.mock.calls.map((call) => call.arguments),
+    );
+
+    assert.equal(deps.logError.mock.callCount(), 2);
+    assert.deepEqual(deps.logError.mock.calls[0]?.arguments[1], {
+      errorName: "DrizzleQueryError",
+      errorCode: "23505",
+    });
+
+    for (const typed of [
+      "Marie",
+      "06.12.34.56.78",
+      "marie@example.test",
+      "Lilas",
+      "Bonjour",
+    ]) {
+      assert.equal(logged.includes(typed), false, typed);
+    }
+  });
+
+  it("ignores a key it does not know, such as the former honeypot, and saves the lead", async () => {
     const deps = makeDeps();
 
     const result = await handleContact(
       { ...request, website: "http://spam.test" },
       deps,
     );
+    const saved = deps.saveLead.mock.calls[0]?.arguments[0] ?? {};
 
-    assert.deepEqual(result, { status: 200, body: { success: true } });
-    assert.equal(deps.verifyToken.mock.callCount(), 0);
-    assert.equal(deps.saveLead.mock.callCount(), 0);
-    assert.equal(deps.sendMail.mock.callCount(), 0);
+    assert.equal(result.status, 200);
+    assert.equal("website" in saved, false);
   });
 
   it("answers 400 in French, without parser internals, to a body that is not an object or carries wrong types", async () => {

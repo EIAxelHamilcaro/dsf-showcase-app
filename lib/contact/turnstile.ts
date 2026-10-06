@@ -1,4 +1,5 @@
-import { testSecretKey } from "./turnstileKeys";
+import { describeError } from "./describeError";
+import { isTestKey, testSecretKey } from "./turnstileKeys";
 
 export type TurnstileOutcome = "valid" | "rejected" | "unavailable";
 
@@ -7,6 +8,7 @@ export interface VerifyTurnstileInput {
   secret: string | undefined;
   siteKey: string | undefined;
   isProduction: boolean;
+  isDeployed: boolean;
   remoteIp?: string;
   fetchFn?: typeof fetch;
   logError: (message: string, context: Record<string, unknown>) => void;
@@ -20,17 +22,30 @@ export async function verifyTurnstile({
   secret,
   siteKey,
   isProduction,
+  isDeployed,
   remoteIp,
   fetchFn = fetch,
   logError,
 }: VerifyTurnstileInput): Promise<TurnstileOutcome> {
   const isConfigured = Boolean(secret && siteKey);
 
-  if (!isConfigured && isProduction) {
+  if (!isConfigured && (isProduction || isDeployed)) {
     logError("Turnstile is not configured, every request is refused", {
       hasSecretKey: Boolean(secret),
       hasSiteKey: Boolean(siteKey),
     });
+
+    return "unavailable";
+  }
+
+  if (isDeployed && (isTestKey(secret) || isTestKey(siteKey))) {
+    logError(
+      "Turnstile runs on Cloudflare test keys on a deployed environment, every request is refused",
+      {
+        isTestSecretKey: isTestKey(secret),
+        isTestSiteKey: isTestKey(siteKey),
+      },
+    );
 
     return "unavailable";
   }
@@ -63,7 +78,10 @@ export async function verifyTurnstile({
 
     return result.success === true ? "valid" : "rejected";
   } catch (error) {
-    logError("Turnstile verification could not be reached", { error });
+    logError(
+      "Turnstile verification could not be reached",
+      describeError(error),
+    );
 
     return "unavailable";
   }

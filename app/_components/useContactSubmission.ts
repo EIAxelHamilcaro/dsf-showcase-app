@@ -34,7 +34,7 @@ const fieldsToCorrect = "Certains champs du formulaire sont à corriger.";
 const verificationUnavailable =
   "La vérification anti-robot est indisponible, appelez-nous pour votre demande.";
 const verificationPending =
-  "Veuillez valider la vérification anti-robot affichée au-dessus du bouton, puis renvoyez votre demande.";
+  "La vérification anti-robot n'a pas abouti, patientez quelques secondes puis renvoyez votre demande, ou appelez-nous.";
 
 export function useContactSubmission({
   onFieldErrors,
@@ -93,35 +93,37 @@ export function useContactSubmission({
       return false;
     }
 
-    if (!turnstile.token) {
+    isSending.current = true;
+    setIsPending(true);
+
+    const turnstileToken = await turnstile.getToken();
+    const result = turnstileToken
+      ? await submitContact({ ...values, turnstileToken })
+      : undefined;
+
+    isSending.current = false;
+    setIsPending(false);
+
+    if (!result) {
       setFormError(verificationPending);
       return false;
     }
 
-    isSending.current = true;
-    setIsPending(true);
-
-    const result = await submitContact({
-      ...values,
-      turnstileToken: turnstile.token,
-    });
-
     turnstile.reset();
-    isSending.current = false;
-    setIsPending(false);
 
     if (result.ok) {
       return true;
     }
 
-    const { turnstileToken, ...fieldErrors } = result.fieldErrors ?? {};
+    const { turnstileToken: tokenError, ...fieldErrors } =
+      result.fieldErrors ?? {};
 
     if (Object.keys(fieldErrors).length > 0) {
       reportFieldErrors(fieldErrors);
       return false;
     }
 
-    setFormError(turnstileToken ?? result.message);
+    setFormError(tokenError ?? result.message);
     return false;
   };
 

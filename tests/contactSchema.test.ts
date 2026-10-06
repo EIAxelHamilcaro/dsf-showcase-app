@@ -85,6 +85,33 @@ describe("contactSchema", () => {
     assert.equal(parse({ name: "a".repeat(121) }).success, false);
   });
 
+  it("refuses a line break inside every single-line field, and allows it in the message", () => {
+    for (const field of ["name", "phone", "email", "adress", "step1"]) {
+      const result = parse({ [field]: "06 12 34 56 78\nBcc: x@example.test" });
+
+      assert.equal(result.success, false, field);
+      assert.equal(result.error?.issues[0]?.path[0], field);
+    }
+
+    assert.equal(
+      firstMessage({ name: "Marie\r\nDupont" }),
+      "Ce champ doit tenir sur une seule ligne",
+    );
+    assert.equal(parse({ message: "Bonjour,\nMarie" }).success, true);
+  });
+
+  it("refuses an oversized Turnstile token", () => {
+    assert.equal(parse({ turnstileToken: "a".repeat(2048) }).success, true);
+    assert.equal(parse({ turnstileToken: "a".repeat(2049) }).success, false);
+  });
+
+  it("drops the keys it does not know, such as the former honeypot", () => {
+    const result = parse({ website: "http://spam.test" });
+
+    assert.equal(result.success, true);
+    assert.equal("website" in (result.data ?? {}), false);
+  });
+
   it("keeps one message per field, the first one", () => {
     const result = contactFieldsSchema.safeParse({
       ...valid,
