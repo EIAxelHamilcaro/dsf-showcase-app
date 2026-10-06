@@ -2,7 +2,14 @@
 import { ChevronDown, Menu, Phone, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { type MouseEvent, useId, useState } from "react";
+import {
+  type FocusEvent,
+  type KeyboardEvent,
+  type MouseEvent,
+  useId,
+  useRef,
+  useState,
+} from "react";
 import { Button } from "@/components/ui/button";
 import { toTelHref } from "@/lib/seo/phone";
 import { cn } from "@/lib/utils";
@@ -40,6 +47,8 @@ export default function NavBarInteractive({
   const pathname = usePathname();
   const isHomePage = pathname === "/";
   const id = useId();
+  const servicesTrigger = useRef<HTMLButtonElement>(null);
+  const menuTrigger = useRef<HTMLButtonElement>(null);
   const phone = config.phone ?? "";
 
   const scrollToServices = (event: MouseEvent<HTMLElement>) => {
@@ -56,75 +65,114 @@ export default function NavBarInteractive({
     setMobileServicesOpen(false);
   };
 
+  const closeMobileMenuOnEscape = (event: KeyboardEvent<HTMLElement>) => {
+    if (event.key !== "Escape" || !mobileMenuOpen) {
+      return;
+    }
+
+    closeMobileMenu();
+    menuTrigger.current?.focus();
+  };
+
+  const toggleDesktopDropdown = (event: MouseEvent<HTMLButtonElement>) => {
+    const isMouseClick =
+      (event.nativeEvent as PointerEvent).pointerType === "mouse";
+
+    setDesktopDropdownOpen((isOpen) => isMouseClick || !isOpen);
+  };
+
+  const closeDesktopDropdownOnEscape = (event: KeyboardEvent<HTMLElement>) => {
+    if (event.key !== "Escape" || !desktopDropdownOpen) {
+      return;
+    }
+
+    setDesktopDropdownOpen(false);
+    servicesTrigger.current?.focus();
+  };
+
+  const closeDesktopDropdownOnFocusOut = (event: FocusEvent<HTMLElement>) => {
+    if (!event.currentTarget.contains(event.relatedTarget)) {
+      setDesktopDropdownOpen(false);
+    }
+  };
+
   return (
     <>
       <nav aria-label="Navigation principale" className="hidden xl:block">
         <ul className="flex items-center">
-          {items.map((item) => (
-            <li className="group relative" key={item.href}>
-              {item.children ? (
-                <>
-                  <Button
-                    aria-controls={`${id}-services`}
-                    aria-expanded={desktopDropdownOpen}
-                    className={desktopLinkClass}
-                    onClick={(event) => {
-                      scrollToServices(event);
-                      setDesktopDropdownOpen((isOpen) => !isOpen);
-                    }}
-                    onKeyDown={(event) => {
-                      if (event.key === "Escape") {
-                        setDesktopDropdownOpen(false);
-                      }
-                    }}
-                    type="button"
-                    variant="ghost"
-                  >
-                    {item.label}
-                    <ChevronDown aria-hidden="true" className="size-4" />
-                  </Button>
+          {items.map((item) =>
+            item.children ? (
+              <li
+                className="relative"
+                key={item.href}
+                onBlur={closeDesktopDropdownOnFocusOut}
+                onKeyDown={closeDesktopDropdownOnEscape}
+                onPointerEnter={(event) => {
+                  if (event.pointerType === "mouse") {
+                    setDesktopDropdownOpen(true);
+                  }
+                }}
+                onPointerLeave={(event) => {
+                  if (event.pointerType === "mouse") {
+                    setDesktopDropdownOpen(false);
+                  }
+                }}
+              >
+                <Button
+                  aria-controls={`${id}-services`}
+                  aria-expanded={desktopDropdownOpen}
+                  className={desktopLinkClass}
+                  onClick={toggleDesktopDropdown}
+                  ref={servicesTrigger}
+                  type="button"
+                  variant="ghost"
+                >
+                  {item.label}
+                  <ChevronDown aria-hidden="true" className="size-4" />
+                </Button>
 
-                  <ul
-                    className={cn(
-                      "absolute top-full left-0 z-50 w-md flex-col gap-1 rounded-lg border bg-background p-2 shadow-lg",
-                      desktopDropdownOpen ? "flex" : "hidden group-hover:flex",
-                    )}
-                    id={`${id}-services`}
-                  >
-                    {item.children.map((child) => (
-                      <li key={child.href}>
-                        <Link
-                          className="block rounded-md p-3 hover:bg-muted"
-                          href={child.href}
-                          onClick={() => setDesktopDropdownOpen(false)}
-                        >
-                          <span className="block font-bold text-primary">
-                            {child.label}
+                <ul
+                  className={cn(
+                    "absolute top-full left-0 z-50 w-md flex-col gap-1 rounded-lg border bg-background p-2 shadow-lg",
+                    desktopDropdownOpen ? "flex" : "hidden",
+                  )}
+                  id={`${id}-services`}
+                >
+                  {item.children.map((child) => (
+                    <li key={child.href}>
+                      <Link
+                        className="block rounded-md p-3 hover:bg-muted"
+                        href={child.href}
+                        onClick={() => setDesktopDropdownOpen(false)}
+                      >
+                        <span className="block font-bold text-primary">
+                          {child.label}
+                        </span>
+                        {child.description ? (
+                          <span className="block text-small text-muted-foreground">
+                            {child.description}
                           </span>
-                          {child.description ? (
-                            <span className="block text-small text-muted-foreground">
-                              {child.description}
-                            </span>
-                          ) : null}
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                </>
-              ) : (
+                        ) : null}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </li>
+            ) : (
+              <li key={item.href}>
                 <Link className={desktopLinkClass} href={item.href}>
                   {item.label}
                 </Link>
-              )}
-            </li>
-          ))}
+              </li>
+            ),
+          )}
         </ul>
       </nav>
 
       <div className="flex items-center gap-2 sm:gap-3 xl:gap-1">
         <Button
           asChild
-          className="px-0 text-base sm:px-3 sm:text-lg font-extrabold text-primary"
+          className="px-0 text-base font-extrabold text-primary has-[>svg]:px-0 max-[359px]:text-small sm:text-lg sm:has-[>svg]:px-3"
           variant="link"
         >
           <a href={toTelHref(phone)}>
@@ -136,13 +184,15 @@ export default function NavBarInteractive({
           Devis gratuit
         </ContactButton>
         <Button
-          aria-controls={`${id}-menu`}
+          aria-controls={mobileMenuOpen ? `${id}-menu` : undefined}
           aria-expanded={mobileMenuOpen}
           aria-label={mobileMenuOpen ? "Fermer le menu" : "Ouvrir le menu"}
-          className="xl:hidden border-control-border"
+          className="xl:hidden"
           onClick={() => setMobileMenuOpen((isOpen) => !isOpen)}
+          onKeyDown={closeMobileMenuOnEscape}
+          ref={menuTrigger}
           size="icon"
-          variant="outline"
+          variant="quiet"
         >
           {mobileMenuOpen ? (
             <X aria-hidden="true" className="size-6" />
@@ -157,6 +207,7 @@ export default function NavBarInteractive({
           aria-label="Navigation principale"
           className="xl:hidden basis-full border-t mt-2 pt-2 pb-3 max-h-[calc(100dvh-5rem)] overflow-y-auto"
           id={`${id}-menu`}
+          onKeyDown={closeMobileMenuOnEscape}
         >
           <ul className="flex flex-col gap-1">
             {items.map((item) => (
@@ -164,7 +215,9 @@ export default function NavBarInteractive({
                 {item.children ? (
                   <>
                     <Button
-                      aria-controls={`${id}-mobile-services`}
+                      aria-controls={
+                        mobileServicesOpen ? `${id}-mobile-services` : undefined
+                      }
                       aria-expanded={mobileServicesOpen}
                       className={mobileLinkClass}
                       onClick={() => setMobileServicesOpen((isOpen) => !isOpen)}

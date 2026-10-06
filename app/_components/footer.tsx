@@ -18,16 +18,16 @@ export function Footer({ config, legalLinks }: FooterProps) {
       <div className="mx-auto max-w-page px-gutter pt-12">
         <div className="grid gap-8 md:grid-cols-2">
           <div className="space-y-3">
-            <h3 className="text-xl font-extrabold">
+            <h2 className="text-xl font-extrabold">
               {config?.footer_section?.title}
-            </h3>
+            </h2>
             <p className="max-w-reading text-background/80">
               {config?.footer_section?.description}
             </p>
           </div>
 
           <div>
-            <h4 className="mb-2 text-lg font-bold">Contact</h4>
+            <h3 className="mb-2 text-lg font-bold">Contact</h3>
             {config?.phone ? (
               <a className={contactLinkClass} href={toTelHref(config.phone)}>
                 <Phone aria-hidden="true" className="size-5 shrink-0" />

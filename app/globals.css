@@ -172,10 +172,6 @@
     text-decoration-thickness: 2px;
     text-underline-offset: 3px;
   }
-  /* Focus visible plus marqué pour navigation clavier */
-  :focus-visible {
-    @apply outline-2 outline-offset-4 outline-primary;
-  }
   /* Boutons plus grands par défaut */
   button,
   [role="button"],
@@ -194,15 +190,11 @@
   outline-offset: 3px;
 }
 
-.bg-primary,
-.bg-foreground {
+:where(.bg-primary, .bg-foreground) * {
   --focus: var(--background);
 }
 
-.bg-background,
-.bg-card,
-.bg-muted,
-.bg-surface-tint {
+:where(.bg-background, .bg-card, .bg-muted, .bg-surface-tint) * {
   --focus: var(--primary);
   --tile-base: color-mix(in oklch, var(--primary) 7%, var(--surface-tint));
   --tile-soft: color-mix(in oklch, var(--primary) 18%, var(--surface-tint));

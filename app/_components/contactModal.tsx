@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -17,9 +17,11 @@ declare const window: WindowWithModal;
 
 export function ContactModal({ phone }: { phone?: string | null }) {
   const [open, setOpen] = useState(false);
+  const opener = useRef<Element | null>(null);
 
   useEffect(() => {
     window.openContactModal = () => {
+      opener.current = document.activeElement;
       setOpen(true);
     };
 
@@ -30,7 +32,15 @@ export function ContactModal({ phone }: { phone?: string | null }) {
 
   return (
     <Dialog modal onOpenChange={setOpen} open={open}>
-      <DialogContent className="max-w-2xl max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
+      <DialogContent
+        className="max-w-2xl max-h-[95vh] sm:max-h-[90vh] overflow-y-auto"
+        onCloseAutoFocus={(event) => {
+          if (opener.current instanceof HTMLElement) {
+            event.preventDefault();
+            opener.current.focus();
+          }
+        }}
+      >
         <DialogTitle className="text-2xl font-bold">
           Demandez votre devis gratuit
         </DialogTitle>

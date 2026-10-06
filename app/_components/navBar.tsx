@@ -69,7 +69,7 @@ export default function NavBar({ config }: { config: Config1 }) {
         <Link className="flex min-h-11 shrink-0 items-center" href="/">
           <Image
             alt="Logo de Douche Senior France"
-            className="h-8 w-auto min-[400px]:h-10 sm:h-12"
+            className="h-7 w-auto min-[360px]:h-8 min-[400px]:h-10 md:h-12"
             fetchPriority="low"
             loading="eager"
             sizes="160px"
