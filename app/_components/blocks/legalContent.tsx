@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { type ReactNode, useId } from "react";
 import {
   PageSection,
   subsectionTitleClass,
@@ -35,11 +35,14 @@ type LegalSection = LegalContentBlock["sections"][number];
 function LegalSectionContent({ section }: { section: LegalSection }) {
   const headers = section.headers ?? [];
   const rows = section.rows ?? [];
+  const headingId = useId();
 
   return (
     <>
       {section.heading ? (
-        <h2 className={cn(subsectionTitleClass, "pt-8")}>{section.heading}</h2>
+        <h2 className={cn(subsectionTitleClass, "pt-8")} id={headingId}>
+          {section.heading}
+        </h2>
       ) : null}
       {section.paragraphs?.map((paragraph, index) => (
         <p
@@ -58,7 +61,10 @@ function LegalSectionContent({ section }: { section: LegalSection }) {
       ) : null}
       {rows.length ? (
         <div className="overflow-x-auto">
-          <table className="w-full min-w-xl border-collapse text-left text-small">
+          <table
+            aria-labelledby={section.heading ? headingId : undefined}
+            className="w-full min-w-xl border-collapse text-left text-small"
+          >
             {headers.length ? (
               <thead>
                 <tr>
