@@ -1,4 +1,8 @@
 import type { CollectionConfig } from "payload";
+import {
+  revalidateSiteAfterChange,
+  revalidateSiteAfterDelete,
+} from "./hooks/revalidateSite";
 
 export const Media: CollectionConfig = {
   slug: "media",
@@ -8,6 +12,10 @@ export const Media: CollectionConfig = {
   },
   access: {
     read: () => true,
+  },
+  hooks: {
+    afterChange: [revalidateSiteAfterChange],
+    afterDelete: [revalidateSiteAfterDelete],
   },
   fields: [
     {
