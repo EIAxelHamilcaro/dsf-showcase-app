@@ -53,7 +53,7 @@ export default async function RootLayout({
   const [config, pages] = await Promise.all([getSiteConfig(), getAllPages()]);
 
   return (
-    <html lang="fr" suppressHydrationWarning>
+    <html data-scroll-behavior="smooth" lang="fr" suppressHydrationWarning>
       <head>
         <meta
           content="Douche Senior France"
