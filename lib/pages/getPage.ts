@@ -1,7 +1,7 @@
 import { getPayload } from "payload";
 import { cache } from "react";
 import { validateSlug } from "@/lib/cms/validators";
-import { composeCityPage, mergeSitePages } from "@/lib/pages/cityPage";
+import { buildCityPage, mergeSitePages } from "@/lib/pages/cityPage";
 import payloadConfig from "@/payload.config";
 import type { Page } from "@/payload-types";
 
@@ -29,7 +29,7 @@ export const getAllPages = cache(async (): Promise<Page[]> => {
       (page) => page.id === city.department && page.pageType === "department",
     );
 
-    return composeCityPage({ template, city, department }) ?? [];
+    return buildCityPage({ template, city, department }) ?? [];
   });
 
   return mergeSitePages(pages.docs, cityPages);

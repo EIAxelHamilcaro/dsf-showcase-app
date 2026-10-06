@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it, mock } from "node:test";
 import { validateSlugUnusedBy } from "../collections/validateSharedSlug";
-import { composeCityPage, mergeSitePages } from "../lib/pages/cityPage";
+import { buildCityPage, mergeSitePages } from "../lib/pages/cityPage";
 import { getBreadcrumb, getRelatedLinks } from "../lib/pages/pageLinks";
 import { buildPageGraph } from "../lib/seo/jsonLd";
 import { buildLlmsTxt } from "../lib/seo/llmsTxt";
@@ -13,7 +13,7 @@ const template: CityTemplate = {
   ...cityTemplateSeed,
   seo: {
     title: cityTemplateSeed.seo.title,
-    description: "Douche à {ville} et agglo ({communes}).",
+    description: "Douche à {ville} et agglo.",
   },
   serviceCards: {
     background: "muted",
@@ -74,7 +74,7 @@ const tours: City = {
 };
 
 const compose = (city: City) => {
-  const page = composeCityPage({ template, city, department });
+  const page = buildCityPage({ template, city, department });
 
   assert.ok(page);
 
@@ -84,7 +84,7 @@ const compose = (city: City) => {
 const blockTypes = (page: Page) =>
   page.layout.map((block) => block.blockType).join(" ");
 
-describe("composeCityPage", () => {
+describe("buildCityPage", () => {
   it("builds a standard city page from the template and the city record", () => {
     const page = compose(tours);
     const [hero, , zoneList, services, aids] = page.layout;
@@ -102,10 +102,7 @@ describe("composeCityPage", () => {
       aids?.blockType === "aidCards" && aids.heading,
       "Aides financières disponibles à Tours",
     );
-    assert.equal(
-      page.seo.description,
-      "Douche à Tours et agglo (Joué-lès-Tours, Saint-Cyr-sur-Loire).",
-    );
+    assert.equal(page.seo.description, "Douche à Tours et agglo.");
     assert.equal(page.slug, "douche-senior-tours");
     assert.equal(page.navLabel, "Douche Senior Tours");
     assert.equal(
@@ -151,8 +148,34 @@ describe("composeCityPage", () => {
     );
   });
 
+  it("never shows services or aids kept on a city record, the template owns them", () => {
+    const page = compose({
+      ...tours,
+      extraSections: [
+        {
+          blockType: "serviceCards",
+          background: "muted",
+          heading: "Prestations propres à la ville",
+          columns: "2",
+          cards: [{ title: "Carte propre" }],
+        },
+        {
+          blockType: "aidCards",
+          background: "default",
+          heading: "Aides propres à la ville",
+        },
+      ],
+    });
+
+    assert.equal(
+      blockTypes(page),
+      "hero featureCards zoneList serviceCards aidCards textSection faq cta",
+    );
+    assert.doesNotMatch(JSON.stringify(page), /propres? à la ville/);
+  });
+
   it("leaves out a shared section the template does not fill", () => {
-    const page = composeCityPage({
+    const page = buildCityPage({
       template: {
         ...template,
         serviceCards: { heading: "Sans carte" },
@@ -180,10 +203,7 @@ describe("composeCityPage", () => {
 
     assert.equal(page.areaName, "Tours Métropole");
     assert.equal(page.seo.title, "Titre propre");
-    assert.equal(
-      page.seo.description,
-      "Douche à Tours et agglo (Joué-lès-Tours, Saint-Cyr-sur-Loire).",
-    );
+    assert.equal(page.seo.description, "Douche à Tours et agglo.");
     assert.equal(
       hero?.blockType === "hero" && hero.location,
       "Tours et agglomération - Indre-et-Loire (37)",
@@ -206,11 +226,11 @@ describe("composeCityPage", () => {
     const empty = { hero: {}, cta: {} } as unknown as CityTemplate;
 
     assert.equal(
-      composeCityPage({ template, city: tours, department: undefined }),
+      buildCityPage({ template, city: tours, department: undefined }),
       undefined,
     );
     assert.equal(
-      composeCityPage({ template: empty, city: tours, department }),
+      buildCityPage({ template: empty, city: tours, department }),
       undefined,
     );
   });
@@ -268,7 +288,7 @@ describe("a composed city page in the site lists", () => {
   it("lists the city in llms.txt under its h1 and description", () => {
     assert.ok(
       buildLlmsTxt({ pages: all, config }).includes(
-        "## Villes\n\n- [Installation Douche Sécurisée pour Seniors à Tours](https://www.douche-senior-france.com/douche-senior-tours): Douche à Tours et agglo (Joué-lès-Tours, Saint-Cyr-sur-Loire).",
+        "## Villes\n\n- [Installation Douche Sécurisée pour Seniors à Tours](https://www.douche-senior-france.com/douche-senior-tours): Douche à Tours et agglo.",
       ),
     );
   });
