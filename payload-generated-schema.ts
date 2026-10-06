@@ -592,6 +592,11 @@ export const users = pgTable(
     }),
     salt: varchar("salt"),
     hash: varchar("hash"),
+    resetPasswordRequestedAt: timestamp("reset_password_requested_at", {
+      mode: "string",
+      withTimezone: true,
+      precision: 3,
+    }),
     loginAttempts: numeric("login_attempts", { mode: "number" }).default(0),
     lockUntil: timestamp("lock_until", {
       mode: "string",
@@ -611,6 +616,7 @@ export const media = pgTable(
   {
     id: serial("id").primaryKey(),
     alt: varchar("alt"),
+    _objectKey: varchar("_objectkey"),
     updatedAt: timestamp("updated_at", {
       mode: "string",
       withTimezone: true,
