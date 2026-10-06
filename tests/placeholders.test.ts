@@ -5,7 +5,9 @@ import {
   fillPlaceholders,
   findUnknownPlaceholders,
   listPlaceholderProblems,
+  retiredPlaceholderNames,
 } from "../lib/pages/placeholders";
+import { sharedDescription } from "../migrations/seed/cityDescriptionSeed";
 import { templateWording } from "../migrations/seed/cityModelSeed";
 import { cityTemplateSeed } from "../migrations/seed/cityTemplateSeed";
 
@@ -13,17 +15,16 @@ const tours = {
   ville: "Tours",
   departement: "Indre-et-Loire",
   code: "37",
-  communes: "Joué-lès-Tours, Saint-Cyr-sur-Loire",
 };
 
 describe("city template placeholders", () => {
   it("replaces every known placeholder, as often as it appears", () => {
     assert.equal(
       fillPlaceholders(
-        "{ville} et agglo ({communes}) - {departement} ({code}), {ville}",
+        "{ville} et agglo - {departement} ({code}), {ville}",
         tours,
       ),
-      "Tours et agglo (Joué-lès-Tours, Saint-Cyr-sur-Loire) - Indre-et-Loire (37), Tours",
+      "Tours et agglo - Indre-et-Loire (37), Tours",
     );
   });
 
@@ -72,6 +73,22 @@ describe("city template placeholders", () => {
 
   it("ships a template that only uses known placeholders", () => {
     assert.deepEqual(listPlaceholderProblems(cityTemplateSeed), []);
-    assert.deepEqual(listPlaceholderProblems(templateWording), []);
+    assert.deepEqual(
+      listPlaceholderProblems(
+        templateWording.filter(({ path }) => path !== "seo.description"),
+      ),
+      [],
+    );
+    assert.deepEqual(listPlaceholderProblems(sharedDescription.to), []);
+  });
+
+  it("refuses the retired commune placeholder, except from the earlier migration that wrote it", () => {
+    assert.deepEqual(listPlaceholderProblems({ seo: sharedDescription }), [
+      { path: "seo.from", names: ["communes"] },
+    ]);
+    assert.deepEqual(
+      listPlaceholderProblems(templateWording, retiredPlaceholderNames),
+      [],
+    );
   });
 });

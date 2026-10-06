@@ -1094,7 +1094,7 @@ export interface City {
   locationLine?: string | null;
   zonesHeading?: string | null;
   /**
-   * La ville en première ligne. Les 2e et 3e lignes remplacent {communes} dans le modèle
+   * La ville en première ligne, puis une ligne par commune ou quartier
    */
   zones: {
     name: string;
@@ -1135,6 +1135,9 @@ export interface City {
    * Laisser vide pour utiliser le titre et la description du modèle
    */
   seo?: {
+    /**
+     * Obligatoire quand le titre du modèle dépasse 60 caractères avec le nom de cette ville
+     */
     title?: string | null;
     description?: string | null;
   };
@@ -1942,7 +1945,7 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   createdAt?: T;
 }
 /**
- * Texte commun à toutes les pages ville. {ville}, {departement}, {code}, {communes} sont remplacés par le nom de la ville, le nom et le numéro de son département, et les 2e et 3e lignes de sa liste de communes
+ * Texte commun à toutes les pages ville. {ville}, {departement}, {code} sont remplacés par le nom de la ville, puis le nom et le numéro de son département
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "cityTemplate".

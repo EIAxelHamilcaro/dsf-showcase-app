@@ -5,6 +5,7 @@ import { ServiceCardsBlock } from "./blocks/ServiceCardsBlock";
 import { fieldsOf } from "./blocks/shared";
 import { TestimonialBlock } from "./blocks/TestimonialBlock";
 import { TextSectionBlock } from "./blocks/TextSectionBlock";
+import { validateCityTitle } from "./cityTitleRule";
 import {
   revalidateSiteAfterChange,
   revalidateSiteAfterDelete,
@@ -99,7 +100,7 @@ const Cities: CollectionConfig = {
       label: "Communes et quartiers desservis",
       admin: {
         description:
-          "La ville en première ligne. Les 2e et 3e lignes remplacent {communes} dans le modèle",
+          "La ville en première ligne, puis une ligne par commune ou quartier",
       },
       required: true,
       minRows: 1,
@@ -142,6 +143,11 @@ const Cities: CollectionConfig = {
           type: "text",
           label: "Titre (60 caractères maximum)",
           maxLength: 60,
+          validate: validateCityTitle,
+          admin: {
+            description:
+              "Obligatoire quand le titre du modèle dépasse 60 caractères avec le nom de cette ville",
+          },
         },
         {
           name: "description",

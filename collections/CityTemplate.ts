@@ -2,6 +2,7 @@ import { type GlobalConfig, ValidationError } from "payload";
 import {
   listPlaceholderProblems,
   placeholderNames,
+  retiredPlaceholderNames,
 } from "../lib/pages/placeholders";
 import { AidCardsBlock } from "./blocks/AidCardsBlock";
 import { CtaBlock } from "./blocks/CtaBlock";
@@ -10,6 +11,7 @@ import { HeroBlock } from "./blocks/HeroBlock";
 import { ServiceCardsBlock } from "./blocks/ServiceCardsBlock";
 import { fieldsOf, optionalFieldsOf } from "./blocks/shared";
 import { ZoneListBlock } from "./blocks/ZoneListBlock";
+import { validateTemplateTitle } from "./cityTitleRule";
 import { revalidateSiteAfterGlobalChange } from "./hooks/revalidateSite";
 
 const placeholderList = placeholderNames.map((name) => `{${name}}`).join(", ");
@@ -22,12 +24,15 @@ const CityTemplate: GlobalConfig = {
     update: ({ req }) => Boolean(req.user),
   },
   admin: {
-    description: `Texte commun à toutes les pages ville. ${placeholderList} sont remplacés par le nom de la ville, le nom et le numéro de son département, et les 2e et 3e lignes de sa liste de communes`,
+    description: `Texte commun à toutes les pages ville. ${placeholderList} sont remplacés par le nom de la ville, puis le nom et le numéro de son département`,
   },
   hooks: {
     beforeValidate: [
       ({ data, req }) => {
-        const problems = listPlaceholderProblems(data);
+        const problems = listPlaceholderProblems(
+          data,
+          req.user ? [] : retiredPlaceholderNames,
+        );
 
         if (problems.length === 0) {
           return data;
@@ -68,6 +73,7 @@ const CityTemplate: GlobalConfig = {
           type: "text",
           label: "Titre (60 caractères maximum une fois la ville insérée)",
           required: true,
+          validate: validateTemplateTitle,
         },
         {
           name: "description",

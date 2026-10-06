@@ -1,28 +1,31 @@
-export const placeholderNames = [
-  "ville",
-  "departement",
-  "code",
-  "communes",
-] as const;
+export const placeholderNames = ["ville", "departement", "code"] as const;
+
+export const retiredPlaceholderNames = ["communes"];
 
 export type PlaceholderName = (typeof placeholderNames)[number];
 
-export type PlaceholderValues = Record<
-  Exclude<PlaceholderName, "communes">,
-  string
-> & { communes?: string };
+export type PlaceholderValues = Record<PlaceholderName, string>;
 
 const placeholderPattern = /\{([^{}]*)\}/g;
 
 const isPlaceholderName = (name: string): name is PlaceholderName =>
   placeholderNames.some((known) => known === name);
 
-export function findUnknownPlaceholders(text: string): string[] {
+export function findUnknownPlaceholders(
+  text: string,
+  alsoAccepted: string[] = [],
+): string[] {
   const names = [...text.matchAll(placeholderPattern)].map(
     ([, name = ""]) => name,
   );
 
-  return [...new Set(names.filter((name) => !isPlaceholderName(name)))];
+  return [
+    ...new Set(
+      names.filter(
+        (name) => !(isPlaceholderName(name) || alsoAccepted.includes(name)),
+      ),
+    ),
+  ];
 }
 
 export function fillPlaceholders(
@@ -30,7 +33,7 @@ export function fillPlaceholders(
   values: PlaceholderValues,
 ): string {
   return text.replace(placeholderPattern, (match, name: string) =>
-    isPlaceholderName(name) ? (values[name] ?? "") : match,
+    isPlaceholderName(name) ? values[name] : match,
   );
 }
 
@@ -62,10 +65,11 @@ export interface PlaceholderProblem {
 
 export function listPlaceholderProblems(
   value: unknown,
+  alsoAccepted: string[] = [],
   path = "",
 ): PlaceholderProblem[] {
   if (typeof value === "string") {
-    const names = findUnknownPlaceholders(value);
+    const names = findUnknownPlaceholders(value, alsoAccepted);
 
     return names.length > 0 ? [{ path, names }] : [];
   }
@@ -75,6 +79,6 @@ export function listPlaceholderProblems(
   }
 
   return Object.entries(value).flatMap(([key, child]) =>
-    listPlaceholderProblems(child, path ? `${path}.${key}` : key),
+    listPlaceholderProblems(child, alsoAccepted, path ? `${path}.${key}` : key),
   );
 }

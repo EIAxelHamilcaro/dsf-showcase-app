@@ -1,4 +1,4 @@
-import type { CollectionConfig } from "payload";
+import { APIError, type CollectionConfig } from "payload";
 import { AidCardsBlock } from "./blocks/AidCardsBlock";
 import { CtaBlock } from "./blocks/CtaBlock";
 import { FaqBlock } from "./blocks/FaqBlock";
@@ -40,6 +40,29 @@ const Pages: CollectionConfig = {
     },
   },
   hooks: {
+    beforeDelete: [
+      async ({ id, req }) => {
+        const { docs } = await req.payload.find({
+          collection: "cities",
+          where: { department: { equals: id } },
+          limit: 0,
+          pagination: false,
+          depth: 0,
+          req,
+        });
+
+        if (docs.length === 0) {
+          return;
+        }
+
+        throw new APIError(
+          `Des villes sont encore rattachées à ce département : ${docs.map((city) => city.name).join(", ")}. Rattachez-les à un autre département ou supprimez-les, puis supprimez cette page`,
+          400,
+          undefined,
+          true,
+        );
+      },
+    ],
     afterChange: [revalidateSiteAfterChange],
     afterDelete: [revalidateSiteAfterDelete],
   },
