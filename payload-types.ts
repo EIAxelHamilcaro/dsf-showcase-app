@@ -751,7 +751,7 @@ export interface User {
 export interface Page {
   id: number;
   /**
-   * Partie finale de l'URL, par exemple douche-senior-blois
+   * Partie finale de l'URL, par exemple aides-financieres
    */
   slug: string;
   /**
