@@ -1,7 +1,9 @@
 import { Clock, MapPin, Users, Wrench } from "lucide-react";
 import Image from "next/image";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import type { Config1, Media } from "@/payload-types";
+import { PageSection, sectionLeadClass } from "./pageSection";
+
+const certificationLogoClass = "relative h-20 w-28 md:h-24 md:w-36";
 
 export function AboutSection({ config }: { config: Config1 }) {
   const features = [
@@ -27,98 +29,81 @@ export function AboutSection({ config }: { config: Config1 }) {
     },
   ];
 
+  const paragraphs = [
+    config.about_section.about_paragraphs?.para_1,
+    config.about_section.about_paragraphs?.para_2,
+    config.about_section.about_paragraphs?.para_3,
+  ];
+
   return (
-    <section
-      className="py-12 md:py-16 lg:py-24 text-lg mx-auto px-4 sm:px-10 md:px-16 lg:px-32 overflow-hidden"
-      id="a-propos"
-    >
-      {/* Intro */}
-      <div className="text-center mb-8 sm:mb-12 md:mb-16">
-        <div className="flex flex-col items-center gap-4 sm:gap-6">
-          <div className="flex items-center justify-center gap-3 sm:gap-6 flex-wrap">
-            <div className="relative w-20 sm:w-28 md:w-32 h-16 sm:h-20 md:h-24">
+    <PageSection id="a-propos">
+      <div className="space-y-12">
+        <div className="mx-auto max-w-4xl space-y-6 text-center">
+          <div className="grid grid-cols-2 items-center justify-items-center gap-x-6 gap-y-4 md:grid-cols-[auto_1fr_auto]">
+            <div className={certificationLogoClass}>
               <Image
                 alt="Certification Handibat pour l'accessibilité PMR et adaptation du logement aux personnes âgées"
-                className="object-contain opacity-90 hover:opacity-100 transition-opacity duration-200"
+                className="object-contain"
                 fill
-                sizes="(max-width: 640px) 80px, (max-width: 768px) 112px, 128px"
+                sizes="144px"
                 src="/logo-handibat.webp"
               />
             </div>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tight">
+            <h2 className="order-last col-span-2 text-3xl sm:text-4xl md:order-none md:col-span-1 lg:text-5xl font-extrabold tracking-tight">
               {config.about_title}
             </h2>
-            <div className="relative w-24 sm:w-32 md:w-40 h-16 sm:h-20 md:h-24">
+            <div className={certificationLogoClass}>
               <Image
                 alt="Label Silverbat spécialiste de l'adaptation des salles de bain pour seniors et personnes âgées"
-                className="object-contain opacity-90 hover:opacity-100 transition-opacity duration-200"
+                className="object-contain"
                 fill
-                sizes="(max-width: 640px) 96px, (max-width: 768px) 128px, 160px"
+                sizes="144px"
                 src="/logo-silverbat.webp"
               />
             </div>
           </div>
 
-          <p className="max-w-2xl mx-auto text-base sm:text-lg md:text-xl text-muted-foreground leading-relaxed">
+          <p className={`${sectionLeadClass} mx-auto max-w-reading`}>
             {config.about_text}
           </p>
         </div>
-      </div>
 
-      {/* Features */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 mb-8 sm:mb-12 md:mb-16">
-        {features.map(({ icon: Icon, title, description }, i) => (
-          <Card className="text-center" key={`feature_card_${i.toString()}`}>
-            <CardHeader className="pb-2 sm:pb-4">
-              <Icon className="text-primary mx-auto" size={32} />
-              <h3 className="font-semibold text-sm sm:text-base">{title}</h3>
-            </CardHeader>
-            <CardContent className="pt-0">
-              <p className="text-muted-foreground text-xs sm:text-sm md:text-base">
-                {description}
+        <div className="grid gap-x-8 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">
+          {features.map(({ icon: Icon, title, description }) => (
+            <div
+              className="space-y-3 border-t-2 border-primary pt-5"
+              key={title}
+            >
+              <Icon aria-hidden="true" className="size-9 text-primary" />
+              <h3 className="text-xl font-bold">{title}</h3>
+              <p className="text-muted-foreground">{description}</p>
+            </div>
+          ))}
+        </div>
+
+        <div className="grid items-center gap-8 rounded-xl bg-muted p-6 md:p-10 lg:grid-cols-2 lg:gap-12">
+          <div className="space-y-4">
+            <h3 className="text-2xl md:text-3xl font-extrabold tracking-tight">
+              {config.about_section.about_heading}
+            </h3>
+            {paragraphs.map((paragraph) => (
+              <p key={paragraph}>
+                <strong>{paragraph?.split(":")[0]} :</strong>
+                {paragraph?.split(":")[1]}
               </p>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      {/* Argumentaire */}
-      <div className="grid lg:grid-cols-2 gap-6 sm:gap-8 items-center bg-muted rounded-lg p-4 sm:p-6 md:p-8 lg:p-12">
-        <div className="space-y-3 sm:space-y-4">
-          <h3 className="text-xl sm:text-2xl font-bold">
-            {config.about_section.about_heading}
-          </h3>
-          <p className="text-sm sm:text-base md:text-lg">
-            <strong>
-              {config.about_section.about_paragraphs?.para_1?.split(":")[0]} :
-            </strong>
-            {config.about_section.about_paragraphs?.para_1?.split(":")[1]}
-          </p>
-          <p className="text-sm sm:text-base md:text-lg">
-            <strong>
-              {config.about_section.about_paragraphs?.para_2?.split(":")[0]} :
-            </strong>
-            {config.about_section.about_paragraphs?.para_2?.split(":")[1]}
-          </p>
-          <p className="text-sm sm:text-base md:text-lg">
-            <strong>
-              {config.about_section.about_paragraphs?.para_3?.split(":")[0]} :
-            </strong>
-            {config.about_section.about_paragraphs?.para_3?.split(":")[1]}
-          </p>
-        </div>
-        <div className="aspect-[4/3] rounded-lg overflow-hidden">
-          <Image
-            alt="Artisan français au travail dans une salle de bain"
-            className="object-cover w-full h-full"
-            height={800}
-            loading="lazy"
-            sizes="(max-width: 1024px) 100vw, 50vw"
-            src={(config.about_image as Media).url || ""}
-            width={600}
-          />
+            ))}
+          </div>
+          <div className="relative aspect-[4/3] overflow-hidden rounded-lg">
+            <Image
+              alt="Artisan français au travail dans une salle de bain"
+              className="object-cover"
+              fill
+              sizes="(min-width: 1024px) 540px, 100vw"
+              src={(config.about_image as Media).url || ""}
+            />
+          </div>
         </div>
       </div>
-    </section>
+    </PageSection>
   );
 }

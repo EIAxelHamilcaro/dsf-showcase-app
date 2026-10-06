@@ -10,9 +10,18 @@ import {
   formatReviewDate,
   toRatedReview,
 } from "@/lib/seo/reviews";
+import { cn } from "@/lib/utils";
 import type { Config1, Media } from "@/payload-types";
+import { PageSection, sectionLeadClass } from "./pageSection";
 
 const sourceLabels = { direct: "Avis direct", google: "Avis Google" };
+const slideImageSizes =
+  "(min-width: 1296px) 588px, (min-width: 768px) 50vw, 100vw";
+const slideFrameClass = "relative aspect-[4/5] overflow-hidden rounded-xl";
+const slideLabelClass =
+  "absolute top-3 left-3 rounded-full px-4 py-1 text-lg font-bold text-white";
+const arrowClass =
+  "size-12 rounded-full border-control-border bg-background shadow-md";
 
 export function GallerySection({ config }: { config: Config1 }) {
   const projects = config.caroussel_section || [];
@@ -58,55 +67,49 @@ export function GallerySection({ config }: { config: Config1 }) {
   }, []);
 
   return (
-    <section
-      className="py-12 md:py-16 lg:py-24 bg-muted w-full mx-auto px-4 sm:px-10 md:px-16 lg:px-32 overflow-hidden"
-      id="realisations"
-    >
-      <div className="text-center mb-16">
-        <h2 className="text-4xl md:text-5xl font-bold mb-4">
+    <PageSection className="overflow-hidden" id="realisations" tone="muted">
+      <div className="mb-10 space-y-4 text-center">
+        <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold">
           Nos réalisations avant / après
         </h2>
-        <p className="text-lg md:text-xl">
+        <p className={sectionLeadClass}>
           Découvrez comment nous transformons les salles de bain
         </p>
       </div>
 
-      <div className="relative overflow-hidden mb-16 max-w-full">
+      <div className="relative overflow-hidden">
         <div
-          className="flex transition-transform duration-1000 ease-in-out"
+          className="flex transition-transform duration-500 ease-in-out"
           style={{ transform: `translateX(-${currentProject * 100}%)` }}
         >
           {projects.map((project, index) => (
             <div
-              className="shrink-0 w-full grid grid-cols-1 md:grid-cols-2 gap-6"
+              aria-hidden={index !== currentProject}
+              className="grid w-full shrink-0 grid-cols-1 gap-4 md:grid-cols-2 md:gap-6"
               key={`project_${index.toString()}`}
             >
-              <div className="relative w-full h-80 sm:h-112 md:h-140 lg:h-180">
+              <div className={slideFrameClass}>
                 <Image
                   alt={`Baignoire ancienne avant remplacement par douche sécurisée senior - ${project.description || `Réalisation ${index + 1}`}`}
-                  className="object-cover rounded-xl shadow-lg"
+                  className="object-cover"
                   fill
-                  loading={index === 0 ? "eager" : "lazy"}
-                  sizes="(max-width: 768px) 100vw, 50vw"
+                  sizes={slideImageSizes}
                   src={(project.before as Media)?.url || "/placeholder.svg"}
                 />
-                <span className="absolute top-3 left-3 bg-destructive text-white px-2 py-1 sm:px-3 rounded-full text-sm sm:text-lg font-semibold">
+                <span className={cn(slideLabelClass, "bg-destructive")}>
                   Avant
                 </span>
               </div>
 
-              <div className="relative w-full h-80 sm:h-112 md:h-140 lg:h-180">
+              <div className={slideFrameClass}>
                 <Image
                   alt={`Douche sécurisée plain-pied pour senior après installation - ${project.description || `Réalisation ${index + 1}`}`}
-                  className="object-cover rounded-xl shadow-lg"
+                  className="object-cover"
                   fill
-                  loading={index === 0 ? "eager" : "lazy"}
-                  sizes="(max-width: 768px) 100vw, 50vw"
+                  sizes={slideImageSizes}
                   src={(project.after as Media)?.url || "/placeholder.svg"}
                 />
-                <span className="absolute top-3 left-3 bg-primary text-white px-2 py-1 sm:px-3 rounded-full text-sm sm:text-lg font-semibold">
-                  Après
-                </span>
+                <span className={cn(slideLabelClass, "bg-primary")}>Après</span>
               </div>
             </div>
           ))}
@@ -115,71 +118,63 @@ export function GallerySection({ config }: { config: Config1 }) {
         <div className="absolute inset-y-0 left-3 flex items-center">
           <Button
             aria-label="Projet précédent"
-            className="bg-background/80 backdrop-blur-sm rounded-full"
+            className={arrowClass}
             onClick={() => prevProject(true)}
             size="icon"
             variant="outline"
           >
-            <ChevronLeft className="h-5 w-5" />
+            <ChevronLeft aria-hidden="true" className="size-6" />
           </Button>
         </div>
         <div className="absolute inset-y-0 right-3 flex items-center">
           <Button
             aria-label="Projet suivant"
-            className="bg-background/80 backdrop-blur-sm rounded-full"
+            className={arrowClass}
             onClick={() => nextProject(true)}
             size="icon"
             variant="outline"
           >
-            <ChevronRight className="h-5 w-5" />
+            <ChevronRight aria-hidden="true" className="size-6" />
           </Button>
         </div>
       </div>
 
-      {/** biome-ignore assist/source/useSortedAttributes: ok */}
-      <div
-        className="flex justify-center mt-4 mb-16 gap-2 flex-wrap px-4"
-        role="tablist"
+      <fieldset
         aria-label="Navigation des projets"
+        className="mt-4 mb-section flex flex-wrap justify-center"
       >
         {projects.map((_, index) => (
-          <button
-            aria-current={index === currentProject ? "true" : "false"}
+          <Button
+            aria-current={index === currentProject ? "true" : undefined}
             aria-label={`Voir projet ${index + 1}`}
-            className={`relative w-11 h-11 min-w-11 min-h-11 p-0 rounded-full transition-colors cursor-pointer flex items-center justify-center ${
-              index === currentProject ? "" : "hover:bg-muted-foreground/10"
-            }`}
+            className="group size-11 rounded-full hover:bg-background"
             key={`dot_${index.toString()}`}
             onClick={() => {
               setCurrentProject(index);
               startAutoplay();
             }}
+            size="icon"
             type="button"
+            variant="ghost"
           >
-            <span
-              className={`w-3 h-3 rounded-full transition-colors ${
-                index === currentProject
-                  ? "bg-primary"
-                  : "bg-muted-foreground/30"
-              }`}
-            />
-          </button>
+            <span className="size-4 rounded-full border-2 border-muted-foreground group-aria-[current=true]:border-primary group-aria-[current=true]:bg-primary" />
+          </Button>
         ))}
-      </div>
+      </fieldset>
 
-      <div className="px-4 md:px-6 flex flex-col items-center justify-center">
-        <h3 className="text-3xl md:text-4xl font-bold text-center mb-8">
+      <div className="space-y-8">
+        <h3 className="text-3xl md:text-4xl font-bold text-center">
           Témoignages clients
         </h3>
         {aggregate ? (
-          <p className="text-base md:text-lg text-center mb-8">
+          <p className="text-lg text-center">
             {formatRating(aggregate.ratingValue)}/5 sur {aggregate.reviewCount}{" "}
             {aggregate.origin === "google" ? "avis Google" : "avis"}
             {aggregate.origin === "google" && config.google_profile_url ? (
               <>
                 {" "}
                 <a
-                  className="underline"
+                  className="inline-flex min-h-11 items-center font-bold text-primary underline"
                   href={config.google_profile_url}
                   rel="noopener noreferrer"
                   target="_blank"
@@ -190,35 +185,36 @@ export function GallerySection({ config }: { config: Config1 }) {
             ) : null}
           </p>
         ) : null}
-        <div className="relative w-full md:w-11/12 overflow-hidden">
-          <div className="flex gap-4 md:gap-6 animate-scroll-inf">
-            {[...Array(2)].map((_) => (
+        <div className="overflow-hidden motion-reduce:overflow-x-auto">
+          <div className="flex gap-6 animate-scroll-inf">
+            {[false, true].map((isClone) => (
               <div
-                className="flex gap-4 md:gap-6"
-                key={`clone_testimonial_${Math.random() * 1000}`}
+                aria-hidden={isClone}
+                className={cn("flex gap-6", isClone && "motion-reduce:hidden")}
+                key={isClone ? "clone" : "original"}
               >
                 {testimonials.map((testimonial, index) => {
                   const review = toRatedReview(testimonial);
 
                   return (
                     <Card
-                      className="p-4 md:p-6 w-72 sm:w-80 md:w-96 mb-1 border rounded-2xl shadow-sm hover:shadow-md transition-shadow shrink-0"
-                      key={`testmonial_$${Math.random() * 1000}-${index.toString}`}
+                      className="w-80 sm:w-96 shrink-0 bg-background shadow-none"
+                      key={testimonial.id ?? index.toString()}
                     >
-                      <CardHeader className="p-0 mb-0 gap-0">
+                      <CardHeader>
                         <div className="flex items-center gap-3">
-                          <div className="w-12 h-12 md:w-15 md:h-15 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold">
+                          <div className="flex size-12 shrink-0 items-center justify-center rounded-full bg-primary text-lg font-bold text-primary-foreground">
                             {testimonial?.title?.charAt(0)}
                           </div>
                           <div>
-                            <CardTitle className="text-lg md:text-xl">
+                            <CardTitle className="text-xl leading-snug">
                               {testimonial.title}
                             </CardTitle>
-                            <p className="text-sm md:text-base">
+                            <p className="text-muted-foreground">
                               {testimonial.age} • {testimonial.location}
                             </p>
                             {review ? (
-                              <p className="text-sm md:text-base text-muted-foreground">
+                              <p className="text-muted-foreground">
                                 {formatRating(review.rating)}/5 •{" "}
                                 {sourceLabels[review.source]}
                                 {review.date ? (
@@ -234,10 +230,8 @@ export function GallerySection({ config }: { config: Config1 }) {
                           </div>
                         </div>
                       </CardHeader>
-                      <CardContent className="p-0 mt-0">
-                        <p className="text-base md:text-lg italic">
-                          "{testimonial.text}"
-                        </p>
+                      <CardContent>
+                        <p className="text-lg italic">"{testimonial.text}"</p>
                       </CardContent>
                     </Card>
                   );
@@ -247,6 +241,6 @@ export function GallerySection({ config }: { config: Config1 }) {
           </div>
         </div>
       </div>
-    </section>
+    </PageSection>
   );
 }

@@ -3,63 +3,64 @@ import { Award, Heart, Shield } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { cn } from "@/lib/utils";
 import type { Config1, Media } from "@/payload-types";
+import { outlineActionClass, primaryActionClass } from "./blocks/phoneButton";
 import { ModalMultiStepForm } from "./multiStepForm";
+import { PageSection } from "./pageSection";
 import { RichTextBoldOnly } from "./richText";
+
+const downloadButtonClass = "h-12 px-3 text-base";
 
 export default function HeroSection({ config }: { config: Config1 }) {
   const heroImage = config.hero_image as Media;
+  const tags = [
+    { icon: Shield, label: config.main_tags?.main_tag_1 },
+    { icon: Heart, label: config.main_tags?.main_tag_2 },
+    { icon: Award, label: config.main_tags?.main_tag_3 },
+  ];
 
   return (
-    <section
-      className="py-12 md:py-16 lg:py-24 bg-gradient-to-b from-background to-muted mx-auto px-4 sm:px-10 md:px-16 lg:px-32 xl:px-52 overflow-hidden"
-      id="accueil"
-    >
-      <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-        <div className="space-y-8">
-          <div className="space-y-10 text-pretty">
-            <RichTextBoldOnly content={config.main_title} />
+    <PageSection id="accueil" tone="hero">
+      <div className="grid items-center gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:gap-14">
+        <div className="min-w-0 space-y-8">
+          <RichTextBoldOnly content={config.main_title} />
 
-            <p className="text-lg sm:text-xl md:text-2xl">
-              {config.sub_main_title}
-            </p>
+          <p className="max-w-reading text-xl md:text-2xl">
+            {config.sub_main_title}
+          </p>
+
+          <div className="flex flex-wrap gap-x-6 gap-y-3 text-lg font-bold">
+            {tags.map(({ icon: Icon, label }) => (
+              <div className="flex items-center gap-2" key={label}>
+                <Icon aria-hidden="true" className="size-6 text-primary" />
+                <span>{label}</span>
+              </div>
+            ))}
           </div>
 
-          <div className="flex flex-wrap gap-4 sm:gap-6 text-base sm:text-lg font-bold">
-            <div className="flex items-center gap-2">
-              <Shield className="h-5 w-5 text-primary" />
-              <span>{config.main_tags?.main_tag_1}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Heart className="h-5 w-5 text-primary" />
-              <span>{config.main_tags?.main_tag_2}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Award className="h-5 w-5 text-primary" />
-              <span>{config.main_tags?.main_tag_3}</span>
-            </div>
-          </div>
-
-          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 flex-wrap">
-            <Button asChild className="w-full sm:w-auto" size="lg">
+          <div className="grid max-w-xl gap-3 sm:grid-cols-2">
+            <Button
+              asChild
+              className={cn(primaryActionClass, "px-3")}
+              size="lg"
+            >
               <Link href="#contact">{config.main_button?.main_button_1}</Link>
             </Button>
             <Button
               asChild
-              className="w-full sm:w-auto"
+              className={cn(outlineActionClass, "px-3")}
               size="lg"
-              variant="outline"
             >
               <Link href="#realisations">
                 {config.main_button?.main_button_2}
               </Link>
             </Button>
             <Dialog>
-              <DialogTrigger asChild>
+              <DialogTrigger aria-controls={undefined} asChild>
                 <Button
-                  className="w-full sm:w-auto text-sm sm:text-base"
+                  className={`${downloadButtonClass} border-control-border`}
                   size="lg"
                   variant="outline"
                 >
@@ -71,7 +72,7 @@ export default function HeroSection({ config }: { config: Config1 }) {
                   <DialogTitle className="text-xl sm:text-2xl font-bold text-foreground">
                     Recevez votre guide gratuit
                   </DialogTitle>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-muted-foreground">
                     Répondez à quelques questions pour personnaliser votre guide
                   </p>
                 </div>
@@ -83,9 +84,9 @@ export default function HeroSection({ config }: { config: Config1 }) {
             </Dialog>
 
             <Dialog>
-              <DialogTrigger asChild>
+              <DialogTrigger aria-controls={undefined} asChild>
                 <Button
-                  className="w-full sm:w-auto text-sm sm:text-base"
+                  className={downloadButtonClass}
                   size="lg"
                   variant="destructive"
                 >
@@ -97,7 +98,7 @@ export default function HeroSection({ config }: { config: Config1 }) {
                   <DialogTitle className="text-xl sm:text-2xl font-bold text-foreground">
                     Recevez votre documentation
                   </DialogTitle>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-muted-foreground">
                     Répondez à quelques questions pour accéder à la
                     documentation complète
                   </p>
@@ -111,30 +112,29 @@ export default function HeroSection({ config }: { config: Config1 }) {
           </div>
         </div>
 
-        <div className="relative">
-          <Card className="overflow-hidden p-0">
-            <CardContent className="p-0 relative w-full h-[20rem] sm:h-[25rem] md:h-[30rem] lg:h-[35rem]">
-              <Image
-                alt="Douche senior sécurisée plain-pied avec barres d'appui et sol antidérapant - Installation en 1 jour"
-                fill
-                priority
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 600px"
-                src={heroImage.url || ""}
-                style={{ objectFit: "cover" }}
-              />
-            </CardContent>
-          </Card>
+        <div className="relative pb-6">
+          <div className="relative aspect-[4/5] sm:aspect-[3/2] lg:aspect-[4/5] overflow-hidden rounded-xl">
+            <Image
+              alt="Douche senior sécurisée plain-pied avec barres d'appui et sol antidérapant - Installation en 1 jour"
+              className="object-cover"
+              fetchPriority="high"
+              fill
+              preload
+              sizes="(min-width: 1024px) 540px, 100vw"
+              src={heroImage.url || ""}
+            />
+          </div>
 
-          <div className="absolute -bottom-4 left-2 sm:-bottom-6 sm:-left-6 bg-primary text-primary-foreground px-3 py-2 sm:px-4 sm:py-3 rounded-lg shadow-lg max-w-[calc(100%-1rem)] sm:max-w-none">
-            <p className="font-semibold text-sm sm:text-lg">
+          <div className="absolute bottom-0 left-3 right-3 sm:right-auto sm:max-w-md rounded-lg bg-primary px-4 py-3 text-primary-foreground shadow-lg">
+            <p className="text-base sm:text-lg font-bold">
               {config.hero_image_label?.hero_image_label_1}
             </p>
-            <p className="text-xs sm:text-base opacity-90">
+            <p className="text-small">
               {config.hero_image_label?.hero_image_label_2}
             </p>
           </div>
         </div>
       </div>
-    </section>
+    </PageSection>
   );
 }

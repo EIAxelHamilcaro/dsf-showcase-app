@@ -1,8 +1,10 @@
 import { MapPin } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import type { PageLink } from "@/lib/pages/pageLinks";
+import { cn } from "@/lib/utils";
+import { PageSection, sectionLeadClass } from "./pageSection";
+import { linkChipClass } from "./relatedLinks";
 
 const citiesByDepartment: Record<string, string> = {
   "/loir-et-cher": "Blois, Romorantin, Vendôme",
@@ -34,58 +36,64 @@ export function RegionalNavSection({
   );
 
   return (
-    <section className="py-12 md:py-16 lg:py-24 bg-muted">
-      <div className="container mx-auto px-4 sm:px-10 md:px-16 lg:px-32">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
-              Toute la région Centre-Val de Loire
-            </h2>
-            <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto">
-              Artisan certifié présent dans les 5 départements. Installation
-              rapide partout en région Centre.
-            </p>
-          </div>
-
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-            {orderedDepartments.map((dept) => (
-              <Link href={dept.href} key={dept.href}>
-                <Card className="h-full hover:border-primary transition-all duration-200 hover:shadow-lg cursor-pointer group">
-                  <CardContent className="pt-6 text-center">
-                    <MapPin className="h-10 w-10 md:h-12 md:w-12 text-primary mx-auto mb-3 group-hover:scale-110 transition-transform" />
-                    <h3 className="font-bold text-lg md:text-xl mb-2 group-hover:text-primary transition-colors">
-                      {dept.label}
-                    </h3>
-                    {citiesByDepartment[dept.href] ? (
-                      <p className="text-sm md:text-base text-muted-foreground">
-                        {citiesByDepartment[dept.href]}
-                      </p>
-                    ) : null}
-                  </CardContent>
-                </Card>
-              </Link>
-            ))}
-          </div>
-
-          <div className="mt-8 text-center">
-            <p className="text-muted-foreground">
-              + toutes les communes des 5 départements
-            </p>
-            {cities.length > 0 ? (
-              <nav
-                aria-label="Villes desservies"
-                className="mt-6 flex flex-wrap justify-center gap-2"
-              >
-                {cities.map((city) => (
-                  <Button asChild key={city.href} variant="outline">
-                    <Link href={city.href}>{city.label}</Link>
-                  </Button>
-                ))}
-              </nav>
-            ) : null}
-          </div>
-        </div>
+    <PageSection tone="muted">
+      <div className="mb-10 space-y-4 text-center">
+        <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold">
+          Toute la région Centre-Val de Loire
+        </h2>
+        <p className={cn(sectionLeadClass, "mx-auto max-w-3xl")}>
+          Artisan certifié présent dans les 5 départements. Installation rapide
+          partout en région Centre.
+        </p>
       </div>
-    </section>
+
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 md:gap-6">
+        {orderedDepartments.map((dept) => (
+          <Link
+            className="group flex items-start gap-4 rounded-xl border bg-background p-6 hover:border-primary"
+            href={dept.href}
+            key={dept.href}
+          >
+            <MapPin
+              aria-hidden="true"
+              className="mt-1 size-8 shrink-0 text-primary"
+            />
+            <div>
+              <h3 className="text-xl font-bold text-primary underline group-hover:no-underline">
+                {dept.label}
+              </h3>
+              {citiesByDepartment[dept.href] ? (
+                <p className="text-muted-foreground">
+                  {citiesByDepartment[dept.href]}
+                </p>
+              ) : null}
+            </div>
+          </Link>
+        ))}
+      </div>
+
+      <div className="mt-8 text-center">
+        <p className="text-muted-foreground">
+          + toutes les communes des 5 départements
+        </p>
+        {cities.length > 0 ? (
+          <nav
+            aria-label="Villes desservies"
+            className="mt-6 flex flex-wrap justify-center gap-3"
+          >
+            {cities.map((city) => (
+              <Button
+                asChild
+                className={linkChipClass}
+                key={city.href}
+                variant="outline"
+              >
+                <Link href={city.href}>{city.label}</Link>
+              </Button>
+            ))}
+          </nav>
+        ) : null}
+      </div>
+    </PageSection>
   );
 }
