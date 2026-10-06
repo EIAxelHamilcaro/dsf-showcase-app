@@ -34,6 +34,10 @@ export function getBreadcrumb(page: Page, all: Page[]): PageLink[] {
   return [{ label: "Accueil", href: "/" }, ...toLinks(trail)];
 }
 
+export function getServiceLinks(all: Page[]): PageLink[] {
+  return toLinks(all.filter((page) => page.pageType === "service"));
+}
+
 export function getDepartmentLinks(all: Page[]): PageLink[] {
   return toLinks(all.filter((page) => page.pageType === "department"));
 }
@@ -48,40 +52,30 @@ export function getLegalLinks(all: Page[]): PageLink[] {
 
 export function getRelatedLinks(page: Page, all: Page[]): PageLink[] {
   const others = all.filter((candidate) => candidate.slug !== page.slug);
-  const parent = parentOf(page, all);
+  const ofType = (pageType: Page["pageType"]) =>
+    others.filter((candidate) => candidate.pageType === pageType);
+  const services = ofType("service");
+  const departments = ofType("department");
+  const cities = ofType("city");
 
   if (page.pageType === "city") {
-    const siblings = others.filter(
-      (candidate) =>
-        candidate.pageType === "city" &&
-        parentOf(candidate, all)?.id === parent?.id,
-    );
-    const services = others.filter(
-      (candidate) => candidate.pageType === "service",
-    );
+    const parent = parentOf(page, all);
+    const isSibling = (city: Page) =>
+      parent !== undefined && parentOf(city, all)?.id === parent.id;
 
-    return toLinks([...(parent ? [parent] : []), ...siblings, ...services]);
+    return toLinks([
+      ...(parent ? [parent] : []),
+      ...cities.filter(isSibling),
+      ...services,
+      ...cities.filter((city) => !isSibling(city)),
+    ]);
   }
 
   if (page.pageType === "department") {
-    const cities = others.filter(
-      (candidate) =>
-        candidate.pageType === "city" &&
-        parentOf(candidate, all)?.id === page.id,
-    );
-    const services = others.filter(
-      (candidate) => candidate.pageType === "service",
-    );
+    const isOwnCity = (city: Page) => parentOf(city, all)?.id === page.id;
 
-    return toLinks([...cities, ...services]);
+    return toLinks([...cities.filter(isOwnCity), ...services, ...departments]);
   }
 
-  const services = others.filter(
-    (candidate) => candidate.pageType === "service",
-  );
-  const departments = others.filter(
-    (candidate) => candidate.pageType === "department",
-  );
-
-  return toLinks([...services, ...departments]);
+  return toLinks([...services, ...departments, ...cities]);
 }

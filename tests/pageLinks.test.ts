@@ -26,29 +26,34 @@ const all = [loirEtCher, cher, blois, romorantin, bourges, pmr, aids];
 const hrefs = (links: { href: string }[]) => links.map((link) => link.href);
 
 describe("getRelatedLinks", () => {
-  it("links a city to its department, its sibling cities and the services", () => {
+  it("links a city to its department, its sibling cities, the services, then the other cities", () => {
     assert.deepEqual(hrefs(getRelatedLinks(blois, all)), [
       "/loir-et-cher",
       "/douche-senior-romorantin",
       "/installation-douche-pmr",
       "/aides-financieres",
+      "/douche-senior-bourges",
     ]);
   });
 
-  it("links a department to its own cities only, then the services", () => {
+  it("links a department to its own cities only, the services, then the other departments", () => {
     assert.deepEqual(hrefs(getRelatedLinks(loirEtCher, all)), [
       "/douche-senior-blois",
       "/douche-senior-romorantin",
       "/installation-douche-pmr",
       "/aides-financieres",
+      "/cher",
     ]);
   });
 
-  it("links a service to the other services and every department", () => {
+  it("links a service to the other services, every department and every city", () => {
     assert.deepEqual(hrefs(getRelatedLinks(pmr, all)), [
       "/aides-financieres",
       "/loir-et-cher",
       "/cher",
+      "/douche-senior-blois",
+      "/douche-senior-romorantin",
+      "/douche-senior-bourges",
     ]);
   });
 });
@@ -75,6 +80,9 @@ describe("a parent that makes no sense", () => {
     assert.deepEqual(hrefs(getRelatedLinks(lonely, pages)), [
       "/installation-douche-pmr",
       "/aides-financieres",
+      "/douche-senior-blois",
+      "/douche-senior-romorantin",
+      "/douche-senior-bourges",
     ]);
   });
 
