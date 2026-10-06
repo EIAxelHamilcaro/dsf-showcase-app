@@ -840,6 +840,10 @@ export interface TestimonialBlock {
   background: 'default' | 'muted';
   quote: string;
   author: string;
+  /**
+   * Note donnée par le client, entier de 1 à 5. Laisser vide pour ne pas afficher d'étoiles.
+   */
+  rating?: number | null;
   id?: string | null;
   blockName?: string | null;
   blockType: 'testimonial';
@@ -1439,6 +1443,7 @@ export interface TestimonialBlockSelect<T extends boolean = true> {
   background?: T;
   quote?: T;
   author?: T;
+  rating?: T;
   id?: T;
   blockName?: T;
 }

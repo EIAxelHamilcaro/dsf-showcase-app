@@ -130,6 +130,7 @@ const bloisPage = cityPage(
       quote:
         "Installation rapide et soignée. L'équipe est arrivée à 8h, tout était terminé à 17h. Ma mère peut maintenant se doucher sans risque dans son appartement des Grouets. Merci !",
       author: "Marie L. - Blois (Les Grouets)",
+      rating: 5,
     }),
     serviceCards({
       background: "muted",

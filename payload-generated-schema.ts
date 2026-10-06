@@ -702,6 +702,7 @@ export const pages_blocks_testimonial = pgTable(
       .default("default"),
     quote: varchar("quote").notNull(),
     author: varchar("author").notNull(),
+    rating: numeric("rating", { mode: "number" }),
     blockName: varchar("block_name"),
   },
   (columns) => [
