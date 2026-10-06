@@ -1,16 +1,17 @@
 # Runbook de mise en production : pages CMS, SEO, formulaires
 
-État au 06/10/2026 : rédigé, jamais exécuté. Rien dans le dépôt ne lance cette procédure. Elle revient à la personne qui détient la base de production (Neon) et le projet Vercel.
+État au 06/10/2026 : rédigé, jamais exécuté. L'amorçage de la base (section 3) et la fusion dans `main` reviennent à la personne qui détient la base de production (Neon) et le projet Vercel. Une fois la base amorcée, chaque déploiement de production migre seul.
 
 Ce qui a été vérifié l'a été en local (base `127.0.0.1:5544`, répétition `scripts/rehearseMigration.sh` sur une sauvegarde de la production). Ce qui dépend de Vercel, Neon ou Cloudflare est marqué « à vérifier ».
 
 ## Règles
 
 - Jamais `migrate:down`, `migrate:fresh`, `migrate:reset` ni `migrate:refresh` sur la production. Le `down` des 10 migrations lève une erreur exprès, les trois autres commandes suppriment des tables.
-- Migrer d'abord, déployer ensuite : le build lit la base (`generateStaticParams`, `sitemap.xml`, `llms.txt`).
+- La migration fait partie du build de production : `scripts/vercelBuild.sh` lance `payload migrate` puis `next build`, qui lit la base (`generateStaticParams`, `sitemap.xml`, `llms.txt`). Plus aucun `payload migrate` à la main sur la production.
+- Seul `VERCEL_ENV=production` migre. Les previews et les déploiements de développement ne migrent jamais, même s'ils partagent la base de production.
 - `pnpm dev`, `pnpm build`, `pnpm start`, `pnpm test` et `pnpm payload` passent par `scripts/local.sh`, qui force la base locale et refuse tout hôte autre que `127.0.0.1` ou `localhost`. Ce garde-fou ne se contourne pas et ne se modifie pas.
-- Le `.env` du poste pointe vers la production. Toute commande `pnpm exec payload ...` ou `next ...` lancée sans le wrapper touche donc la production.
-- Après la migration, ne plus jamais lancer en mode dev un code antérieur au commit `e167873` avec le `.env` de production : avant ce commit le schéma est poussé automatiquement (`push`), ce qui proposerait de supprimer les nouvelles tables.
+- Le `.env` du poste pointe vers la production. Toute commande `pnpm exec payload ...` ou `next ...` lancée sans le wrapper touche donc la production. `pnpm build:production` ne se lance pas sur un poste : son `next build` lirait la production. Sa partie migration, elle, refuse hors Vercel toute base autre que `127.0.0.1` ou `localhost`.
+- Après l'amorçage, ne plus jamais lancer en mode dev un code antérieur au commit `e167873` avec le `.env` de production : avant ce commit le schéma est poussé automatiquement (`push`), ce qui proposerait de supprimer les nouvelles tables.
 
 ## 1. Correctif de sécurité, à livrer tout de suite et seul
 
@@ -56,7 +57,7 @@ pg_restore --list ~/.local/share/dsf-backups/dsf-prod-$(date +%F).dump | head -2
 
 - La chaîne vient des réglages du projet Vercel ou de la console Neon. Elle ne s'écrit dans aucun fichier du dépôt.
 - À vérifier : `pg_dump` local de version égale ou supérieure au serveur (la ligne `version()` la donne), et chaîne de connexion directe plutôt que le pooler Neon.
-- À vérifier dans la console Neon : durée de l'historique de restauration, puis créer une branche Neon depuis la production juste avant la migration et noter l'heure.
+- À vérifier dans la console Neon : durée de l'historique de restauration, puis créer une branche Neon depuis la production juste avant l'amorçage et noter l'heure.
 
 ### Répétition sur la sauvegarde fraîche (locale, sans risque)
 
@@ -64,14 +65,28 @@ pg_restore --list ~/.local/share/dsf-backups/dsf-prod-$(date +%F).dump | head -2
 DSF_BACKUP=~/.local/share/dsf-backups/dsf-prod-$(date +%F).dump ./scripts/rehearseMigration.sh
 ```
 
-Le script restaure la sauvegarde dans la base locale `dsf_rehearsal` (conteneur Docker `dsf-local-pg`, PostgreSQL 17.11), marque la baseline, migre, compare, puis rejoue les deux migrations de contenu sur une copie modifiée comme le ferait un éditeur. Il doit finir par :
+Le script restaure la sauvegarde dans la base locale `dsf_rehearsal` (conteneur Docker `dsf-local-pg`, PostgreSQL 17.11) puis joue le vrai chemin de déploiement, `scripts/vercelBuild.sh --migrate-only` (sans `next build`), dans quatre situations :
+
+```
+(a) OK: schema and data untouched
+(b) OK: refused with the dev mode row, refused with an unrecorded baseline, nothing written
+(c) OK: 10 of 10 migrations recorded
+(d) OK: schema and data untouched
+```
+
+- (a) build de preview : aucune migration.
+- (b) build de production sur une base non amorcée : refus, rien d'écrit.
+- (c) amorçage (`scripts/sql/markBaselineApplied.sql`) puis build de production : les 9 migrations passent.
+- (d) second build de production : rien ne change.
+
+Il compare ensuite la base avant et après, puis rejoue les deux migrations de contenu sur une copie modifiée comme le ferait un éditeur. Il doit finir par :
 
 ```
 replay: second run changed nothing, editor changes kept
 OK: no existing row lost or altered beyond scripts/sql/expectedCellChanges.txt
 ```
 
-Toute ligne `FAIL` arrête la release. C'est ici, et pas en production, que se lisent les lignes de journal décrites en section 3.
+Toute ligne `FAIL` arrête la release. C'est ici, et pas en production, que se lisent les lignes de journal décrites en section 4.
 
 ### Variables d'environnement Vercel
 
@@ -88,19 +103,29 @@ Toute ligne `FAIL` arrête la release. C'est ici, et pas en production, que se l
 
 Déjà utilisées par `main`, présence à vérifier : `DATABASE_URI`, `PAYLOAD_SECRET`, `BLOB_READ_WRITE_TOKEN`, `GMAIL_CONTACT`, `GMAIL_PASS`, `GMAIL_USER`, `NEXT_PUBLIC_SERVER_URL` (URL de l'aperçu en direct dans l'admin, désormais aussi pour les pages : sans elle l'aperçu vise `http://localhost:3000`).
 
-### Commande de build
+### Commande de build et portées
 
-`vercel.json` impose `pnpm build:production` (`next build --webpack`). Le script `build` passe par `scripts/local.sh` et échoue exprès sur Vercel. À vérifier : aucun réglage du tableau de bord ne remplace cette commande, et la branche de production est bien `main`.
+`vercel.json` impose `pnpm build:production`, soit `scripts/vercelBuild.sh`. Le script `build` passe par `scripts/local.sh` et échoue exprès sur Vercel.
 
-À savoir : le build d'une preview de cette branche lit la base de la portée Preview. Si c'est la production et qu'elle n'est pas migrée, la table `pages` manque et le build doit échouer. Sans effet sur la production.
+À vérifier par le propriétaire dans le tableau de bord Vercel :
 
-## 3. Migration de la production
+- Aucune commande de build n'y remplace celle de `vercel.json`, et la branche de production est bien `main`.
+- Portées de `DATABASE_URI` : laquelle sert Production, laquelle sert Preview. Si Preview vise la base de production, c'est toléré (une preview ne migre jamais), mais le build d'une preview lit alors la production : tant qu'elle n'est pas migrée, la table `pages` manque et ce build échoue, sans effet sur la production.
+- Les variables système sont exposées au build (`VERCEL=1`, `VERCEL_ENV`). Sans `VERCEL_ENV=production` le build ne migre pas, sans `VERCEL=1` il refuse de migrer une base distante.
+- `DATABASE_URI` et `PAYLOAD_SECRET` sont disponibles pendant le build de production.
 
-La production a été créée en mode dev : `payload_migrations` contient une ligne `dev` de lot `-1`. La baseline (`20261006_105338_baseline`) décrit le schéma existant : elle se marque comme appliquée, elle ne s'exécute pas. Suivent 9 migrations.
+Non vérifiable depuis le dépôt : `payload migrate` n'a jamais tourné dans un build Vercel de ce projet, ni à travers le pooler Neon. Le premier build de production en est le premier essai réel. S'il échoue, l'ancien déploiement reste en ligne.
 
-Le wrapper refuse la production. Les commandes Payload ci-dessous sont donc appelées directement, avec `DATABASE_URI` exporté pour cette seule commande. Une variable déjà définie l'emporte sur `.env` et `.env.local`. Le `.env` du dépôt fournit `PAYLOAD_SECRET`, sans lequel Payload refuse de démarrer.
+## 3. Amorçage de la base de production, une seule fois
 
-Avant chaque commande, relire l'hôte :
+La production a été créée en mode dev : `payload_migrations` contient une ligne `dev` de lot `-1`. La baseline (`20261006_105338_baseline`) décrit le schéma existant : elle se marque comme appliquée, elle ne s'exécute pas.
+
+Tant que ce n'est pas fait, tout build de production est refusé (section 4). Mesuré en local sur une copie de la sauvegarde, sans le garde-fou :
+
+- avec la ligne `dev`, `payload migrate` affiche une question (`Would you like to proceed?`) et attend sans fin, même sans terminal : le build resterait bloqué jusqu'au délai maximal de Vercel ;
+- sans la ligne `dev` et sans baseline marquée, il rejoue la baseline, échoue sur `CREATE TABLE "leads"` (code 1) et n'écrit rien.
+
+L'amorçage se fait avec `psql`, après la sauvegarde (section 2), avant de fusionner la release. Il ne change rien pour le site en ligne. Avant chaque commande, relire l'hôte :
 
 ```bash
 node -e 'console.log(new URL(process.env.PROD_URI).host)'
@@ -119,7 +144,9 @@ psql "$PROD_URI" -Atc "select name, batch from payload_migrations order by id;"
 
 Attendu pour la dernière commande : une seule ligne `dev|-1`. Autre chose : arrêt.
 
-### 3.2 Marquer la baseline
+### 3.2 Marquer la baseline et retirer la ligne dev
+
+Le même fichier que la répétition fait les deux écritures dans une transaction :
 
 ```bash
 psql "$PROD_URI" -v ON_ERROR_STOP=1 -v baseline=20261006_105338_baseline -f scripts/sql/markBaselineApplied.sql
@@ -135,18 +162,38 @@ COMMIT
  20261006_105338_baseline |     1
 ```
 
-Sans cette étape, `payload migrate` pose une question interactive sur la perte de données puis tente de recréer les tables existantes.
-
-### 3.3 Migrer
+### 3.3 Vérifier
 
 ```bash
-DATABASE_URI="$PROD_URI" pnpm exec payload migrate:status
-DATABASE_URI="$PROD_URI" pnpm exec payload migrate 2>&1 | tee ~/.local/share/dsf-backups/migrate-prod.log
+psql "$PROD_URI" -Atc "select name, batch from payload_migrations order by id;"
 ```
 
-`migrate:status` avant : baseline `Yes`, les 9 autres `No`.
+Attendu, une seule ligne :
 
-`migrate` affiche 9 couples `Migrating:` / `Migrated:` dans cet ordre, puis `Done.` :
+```
+20261006_105338_baseline|1
+```
+
+Après cela, ne plus jamais lancer en mode dev un code antérieur au commit `e167873` sur cette base (voir Règles).
+
+## 4. Déploiement : le build migre
+
+Ordre :
+
+1. Sauvegarde et répétition (section 2).
+2. Variables Turnstile et vérifications Vercel (section 2).
+3. Amorçage (section 3).
+4. Fusionner la PR de la release dans `main`. Ne lancer qu'un seul déploiement de production à la fois : rien ne verrouille deux migrations simultanées.
+5. Lire le journal du build (ci-dessous), puis contrôler la base et le site (section 5).
+
+### Ce que fait le build
+
+| `VERCEL_ENV` | Effet |
+| --- | --- |
+| `production` | contrôle de l'amorçage, `payload migrate`, puis `next build --webpack` |
+| autre valeur ou absent | `next build --webpack` seul, avec la ligne `migrations skipped: VERCEL_ENV is 'preview', only production deployments migrate` |
+
+Journal attendu d'un build de production : `bootstrap check passed: database <hôte>/<base>, 1 migration(s) recorded`, puis 9 couples `Migrating:` / `Migrated:` dans cet ordre, puis `Done.`, puis le build Next :
 
 1. `pages_and_site_settings`
 2. `block_display_options`
@@ -158,6 +205,8 @@ DATABASE_URI="$PROD_URI" pnpm exec payload migrate 2>&1 | tee ~/.local/share/dsf
 8. `turnkey_content`
 9. `content_review_fixes`
 
+Les builds suivants affichent `10 migration(s) recorded` puis `Done.` sans rien migrer, jusqu'à la prochaine migration ajoutée au dépôt.
+
 Lignes de journal attendues (comptées sur la répétition du 06/10/2026) :
 
 | Migration | Lignes | Détail |
@@ -167,50 +216,67 @@ Lignes de journal attendues (comptées sur la répétition du 06/10/2026) :
 
 Soit 29 `corrected`, 1 `removed`, 1 `swapped`, 1 `set`.
 
-Conditions d'arrêt (ne pas déployer, enquêter) :
+### Fenêtre pendant le build
 
-- Une ligne contient `left as is`, `not found`, `found more than once`, `found 0 times`, `skipped`, `already corrected`, `already exists` ou `already has` : le contenu de production diffère de celui de la répétition, une correction n'a pas été posée.
-- Un compte diffère du tableau.
-- `Error running migration` : chaque migration tourne dans sa propre transaction, celle qui échoue n'écrit rien, les précédentes restent appliquées et la commande sort en code 1. Cas prévus par le code : une ligne `config` absente ou multiple, une page attendue absente, un média de `migrations/seed/mediaAltSeed.ts` introuvable (identifiant et nom de fichier). Corriger la cause puis relancer `payload migrate`, qui reprend à la migration manquante.
-
-### 3.4 État après
-
-```bash
-psql "$PROD_URI" -v ON_ERROR_STOP=1 -At -f scripts/sql/rowCounts.sql > $B/rows-after.txt
-psql "$PROD_URI" -v ON_ERROR_STOP=1 -At -f scripts/sql/dataChecksums.sql > $B/checksums-after.txt
-psql "$PROD_URI" -v ON_ERROR_STOP=1 -At -f scripts/sql/cellDump.sql > $B/cells-after.txt
-diff $B/rows-before.txt $B/rows-after.txt
-diff $B/checksums-before.txt $B/checksums-after.txt
-diff $B/cells-before.txt $B/cells-after.txt | grep '^<'
-DATABASE_URI="$PROD_URI" pnpm exec payload migrate:status
-```
-
-Attendu :
-
-- Comptes : une seule ligne `<`, `payload_migrations|1` (devenue `10`). Les lignes `>` sont les nouvelles tables, dont `pages|17`, `config_menu_services|4`, `pages_blocks_faq|15`, `pages_blocks_legal_content|2`. Toute autre ligne `<` : une table existante a perdu ou gagné des lignes, arrêt (un lead arrivé pendant l'opération change `leads` : le vérifier dans l'admin).
-- Sommes de contrôle : aucune différence sur `leads`, `users`, `users_sessions`, `config_faq_section_faq`, `config_testimonials_section` (hors colonnes ajoutées `rating`, `date`, `source`). Une différence sur `leads`, `users` ou `users_sessions` peut venir d'un lead ou d'une connexion à l'admin pendant l'opération : le confirmer avant de continuer.
-- Cellules : exactement 6 lignes `<`, toutes prévues par `scripts/sql/expectedCellChanges.txt` :
-  - `config|1|financial_section_financial_help_1_title`, `..._icon_text`, `..._description` (crédit d'impôt supprimé) ;
-  - `config|1|updated_at` ;
-  - `config_caroussel_section|2|before_id` et `after_id` (photos avant et après inversées).
-- `migrate:status` : 10 lignes `Yes`, baseline en lot 1, les 9 autres en lot 2.
-
-Cette release modifie donc 3 textes de l'accueil et une paire de photos existants, et remplit des colonnes neuves (identité légale, lien de la fiche Google, description des 34 médias). Aucune ligne existante n'est supprimée.
-
-## 4. Ordre de déploiement
-
-1. Migrer (section 3).
-2. Créer les variables Turnstile (section 2).
-3. Fusionner la PR de la release dans `main`, laisser Vercel construire.
-4. Contrôler (section 5) avant de considérer l'ancien déploiement comme inutile.
+Les migrations écrivent dans la base dès qu'elles passent, donc pendant le build, avant que le nouveau code soit en ligne. Pendant le reste du build (durée de `next build` sur Vercel non mesurée, quelques minutes), l'ancien site affiche déjà les données modifiées : les 3 textes du crédit d'impôt de l'accueil et la paire de photos de la réalisation 2. Si `next build` échoue après une migration réussie, cet état dure jusqu'au build suivant, qui ne remigre pas.
 
 L'ancien code reste compatible avec le schéma migré. Vérifié par lecture des 5 migrations de schéma : elles ne font que créer des types et des tables, ajouter des colonnes sans `NOT NULL` aux tables existantes (`config`, `config_testimonials_section`, `media`, `payload_locked_documents_rels`), des index et des clés étrangères. Aucun `DROP`, aucun renommage, aucun changement de type.
 
 Ce qui n'est pas couvert :
 
 - L'ancien code n'a pas été exécuté sur une base migrée : la compatibilité repose sur la lecture des migrations.
-- Les migrations de données changent ce que l'ancien site affiche dès la migration : les 3 textes du crédit d'impôt sur l'accueil et la paire de photos de la réalisation 2.
-- Entre la migration et le déploiement, puis après un éventuel retour arrière, ne pas enregistrer la configuration depuis l'admin de l'ancien code : il ignore les nouvelles colonnes et son comportement à l'enregistrement n'a pas été testé.
+- Pendant cette fenêtre, puis après un éventuel retour arrière, ne pas enregistrer la configuration depuis l'admin de l'ancien code : il ignore les nouvelles colonnes et son comportement à l'enregistrement n'a pas été testé.
+
+### Build refusé
+
+Le journal contient une ligne `refused:` suivie de `No migration ran. Bootstrap procedure: docs/deploy-runbook.md, section 3.`, le build échoue, l'ancien déploiement reste en ligne, rien n'est écrit.
+
+| Message | Quoi faire |
+| --- | --- |
+| `still carries a dev mode row (batch -1)` | faire l'amorçage (section 3) |
+| `does not record the baseline migration` | faire l'amorçage (section 3) |
+| `has no payload_migrations table` | `DATABASE_URI` de la portée Production vise une base vide ou une autre base : corriger la variable |
+| `DATABASE_URI is not set` ou `is not a valid URL` | corriger la variable de la portée Production |
+| `outside a Vercel build only a loopback database` | `VERCEL=1` absent : exposer les variables système au build |
+| `cannot read payload_migrations` | base injoignable, lire le message qui suit |
+
+Puis relancer le déploiement.
+
+### Migration en échec
+
+`Error running migration <nom>` : la commande sort en code 1, le build échoue, l'ancien déploiement reste en ligne. Chaque migration tourne dans sa propre transaction : celle qui échoue n'écrit rien, les précédentes restent appliquées. Cas prévus par le code : une ligne `config` absente ou multiple, une page attendue absente, un média de `migrations/seed/mediaAltSeed.ts` introuvable (identifiant et nom de fichier). Corriger la cause puis redéployer : la migration reprend à la première manquante.
+
+### Lignes à surveiller dans un build réussi
+
+Ces lignes ne font pas échouer le build. Les chercher dans le journal juste après le déploiement, et d'abord dans la répétition, qui les montre avant la production :
+
+- `left as is`, `not found`, `found more than once`, `found 0 times`, `skipped`, `already corrected`, `already exists` ou `already has` : le contenu de production diffère de celui de la répétition, une correction n'a pas été posée.
+- Un compte qui diffère du tableau.
+
+### État de la base après le build
+
+```bash
+B=~/.local/share/dsf-backups
+psql "$PROD_URI" -v ON_ERROR_STOP=1 -At -f scripts/sql/rowCounts.sql > $B/rows-after.txt
+psql "$PROD_URI" -v ON_ERROR_STOP=1 -At -f scripts/sql/dataChecksums.sql > $B/checksums-after.txt
+psql "$PROD_URI" -v ON_ERROR_STOP=1 -At -f scripts/sql/cellDump.sql > $B/cells-after.txt
+diff $B/rows-before.txt $B/rows-after.txt
+diff $B/checksums-before.txt $B/checksums-after.txt
+diff $B/cells-before.txt $B/cells-after.txt | grep '^<'
+psql "$PROD_URI" -Atc "select name, batch from payload_migrations order by id;"
+```
+
+Attendu :
+
+- Comptes : une seule ligne `<`, `payload_migrations|1` (devenue `10`). Les lignes `>` sont les nouvelles tables, dont `pages|17`, `config_menu_services|4`, `pages_blocks_faq|15`, `pages_blocks_legal_content|2`. Toute autre ligne `<` : une table existante a perdu ou gagné des lignes, enquêter (un lead arrivé entre-temps change `leads` : le vérifier dans l'admin).
+- Sommes de contrôle : aucune différence sur `leads`, `users`, `users_sessions`, `config_faq_section_faq`, `config_testimonials_section` (hors colonnes ajoutées `rating`, `date`, `source`). Une différence sur `leads`, `users` ou `users_sessions` peut venir d'un lead ou d'une connexion à l'admin entre-temps : le confirmer.
+- Cellules : exactement 6 lignes `<`, toutes prévues par `scripts/sql/expectedCellChanges.txt` :
+  - `config|1|financial_section_financial_help_1_title`, `..._icon_text`, `..._description` (crédit d'impôt supprimé) ;
+  - `config|1|updated_at` ;
+  - `config_caroussel_section|2|before_id` et `after_id` (photos avant et après inversées).
+- `payload_migrations` : 10 lignes, la baseline en lot 1, les 9 autres en lot 2.
+
+Cette release modifie donc 3 textes de l'accueil et une paire de photos existants, et remplit des colonnes neuves (identité légale, lien de la fiche Google, description des 34 médias). Aucune ligne existante n'est supprimée.
 
 ## 5. Contrôles après déploiement
 
@@ -250,9 +316,9 @@ Attendu :
 
 ## 6. Retour arrière
 
-- Code : redéployer le build précédent depuis Vercel (promotion de l'ancien déploiement). Le schéma migré lui convient, avec les limites de la section 4.
+- Code : redéployer le build précédent depuis Vercel (promotion de l'ancien déploiement). Une promotion ne reconstruit rien, donc ne migre pas. Le schéma migré lui convient, avec les limites de la section 4.
 - Schéma et données : aucun `down`. Les 10 migrations lèvent une erreur à l'annulation, parce que leurs écritures ne se distinguent plus de celles d'un éditeur.
-- Dernier recours : restaurer. De préférence la branche Neon ou le point de restauration notés avant la migration, sinon `pg_restore` de la sauvegarde dans une base neuve, puis changer `DATABASE_URI` dans Vercel et redéployer. Perdu dans ce cas : les leads reçus et les modifications faites dans l'admin depuis la sauvegarde. Exporter d'abord les leads récents depuis l'admin. Les fichiers médias sont dans Vercel Blob et ne font pas partie de la sauvegarde.
+- Dernier recours : restaurer. De préférence la branche Neon ou le point de restauration notés avant l'amorçage, sinon `pg_restore` de la sauvegarde dans une base neuve, puis changer `DATABASE_URI` dans Vercel et redéployer. Perdu dans ce cas : les leads reçus et les modifications faites dans l'admin depuis la sauvegarde. Exporter d'abord les leads récents depuis l'admin. Les fichiers médias sont dans Vercel Blob et ne font pas partie de la sauvegarde.
 - Un essai laissé en base (lead de test, page créée par erreur) se supprime par l'admin, jamais en SQL.
 
 ## 7. Points ouverts pour le propriétaire
