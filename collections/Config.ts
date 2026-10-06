@@ -7,7 +7,7 @@ const Config: CollectionConfig = {
     create: () => false,
     delete: () => false,
     read: () => true,
-    update: () => true,
+    update: ({ req }) => Boolean(req.user),
   },
   admin: {
     livePreview: {

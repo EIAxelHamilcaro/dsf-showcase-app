@@ -4,8 +4,8 @@ const Leads: CollectionConfig = {
   slug: "leads",
   access: {
     create: () => false,
-    delete: () => true,
-    read: () => true,
+    delete: ({ req }) => Boolean(req.user),
+    read: ({ req }) => Boolean(req.user),
     update: () => false,
   },
   admin: {
