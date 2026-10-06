@@ -1,16 +1,15 @@
 /** biome-ignore-all lint/security/noDangerouslySetInnerHtml: SEO */
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Nunito } from "next/font/google";
 import "../globals.css";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
-import { getLocale } from "next-intl/server";
 import { getPayload } from "payload";
 import type { ReactNode } from "react";
 import { ContactModal } from "@/app/_components/contactModal";
 import { Footer } from "@/app/_components/footer";
 import NavBar from "@/app/_components/navBar";
-import Providers from "@/common/providers";
+import { homeSeo, siteName, siteUrl } from "@/lib/site";
 import { cn } from "@/lib/utils";
 import payloadConfig from "@/payload.config";
 
@@ -22,14 +21,10 @@ const nunito = Nunito({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://www.douche-senior-france.com/"),
-  title: {
-    default:
-      "⭐ Douche Senior Centre-Val Loire | 1 Jour | Aide 100% ☎",
-    template: "%s | Douche Senior France",
-  },
-  description:
-    "✓ Douche sécurisée 1 jour Centre-Val de Loire. Artisan certifié Handibat. Aide MaPrimeAdapt jusqu'à 100% 💰 Devis gratuit ☎ 02 54 97 53 23",
+  metadataBase: new URL(siteUrl),
+  title: { default: homeSeo.title, template: "%s" },
+  description: homeSeo.description,
+  applicationName: siteName,
   robots: {
     index: true,
     follow: true,
@@ -41,42 +36,10 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
-  openGraph: {
-    type: "website",
-    locale: "fr_FR",
-    url: "https://www.douche-senior-france.com",
-    title:
-      "⭐ Douche Senior Centre-Val Loire | 1 Jour | Aide 100% ☎",
-    description:
-      "✓ Douche sécurisée 1 jour Centre-Val de Loire. Artisan certifié Handibat. Aide MaPrimeAdapt jusqu'à 100% 💰 Devis gratuit ☎ 02 54 97 53 23",
-    images: [
-      {
-        url: "/hero.png",
-        width: 1536,
-        height: 1024,
-        alt: "Transformation baignoire en douche sécurisée pour senior - Avant/Après",
-      },
-    ],
-    siteName: "Douche Senior France",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title:
-      "⭐ Douche Senior Centre-Val Loire | 1 Jour | Aide 100% ☎",
-    description:
-      "✓ Douche sécurisée 1 jour Centre-Val de Loire. Artisan certifié Handibat. Aide MaPrimeAdapt jusqu'à 100% 💰 Devis gratuit ☎ 02 54 97 53 23",
-    images: ["/hero.png"],
-  },
-  alternates: {
-    canonical: "https://www.douche-senior-france.com",
-  },
-  other: {
-    "theme-color": "#2563eb",
-    "msapplication-TileColor": "#2563eb",
-    "format-detection": "telephone=yes",
-    keywords:
-      "douche senior Centre-Val de Loire, artisan douche senior région Centre, douche PMR Centre-Val Loire, installation douche sécurisée Loiret, douche senior Loir-et-Cher, remplacement baignoire Indre-et-Loire, douche senior Cher, douche PMR Indre, artisan Handibat Centre, douche italienne senior Tours Orléans Blois, aide MaPrimeAdapt Centre-Val Loire, douche sans marche région Centre, artisan certifié Silverbat 41 37 45 36 18",
-  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#2563eb",
 };
 
 const orgJsonLd = {
@@ -114,37 +77,52 @@ const serviceJsonLd = {
     {
       "@type": "AdministrativeArea",
       name: "Centre-Val de Loire",
-      identifier: "R24"
+      identifier: "R24",
     },
     {
       "@type": "AdministrativeArea",
       name: "Loir-et-Cher",
       identifier: "41",
-      containedInPlace: { "@type": "AdministrativeArea", name: "Centre-Val de Loire" }
+      containedInPlace: {
+        "@type": "AdministrativeArea",
+        name: "Centre-Val de Loire",
+      },
     },
     {
       "@type": "AdministrativeArea",
       name: "Indre-et-Loire",
       identifier: "37",
-      containedInPlace: { "@type": "AdministrativeArea", name: "Centre-Val de Loire" }
+      containedInPlace: {
+        "@type": "AdministrativeArea",
+        name: "Centre-Val de Loire",
+      },
     },
     {
       "@type": "AdministrativeArea",
       name: "Loiret",
       identifier: "45",
-      containedInPlace: { "@type": "AdministrativeArea", name: "Centre-Val de Loire" }
+      containedInPlace: {
+        "@type": "AdministrativeArea",
+        name: "Centre-Val de Loire",
+      },
     },
     {
       "@type": "AdministrativeArea",
       name: "Indre",
       identifier: "36",
-      containedInPlace: { "@type": "AdministrativeArea", name: "Centre-Val de Loire" }
+      containedInPlace: {
+        "@type": "AdministrativeArea",
+        name: "Centre-Val de Loire",
+      },
     },
     {
       "@type": "AdministrativeArea",
       name: "Cher",
       identifier: "18",
-      containedInPlace: { "@type": "AdministrativeArea", name: "Centre-Val de Loire" }
+      containedInPlace: {
+        "@type": "AdministrativeArea",
+        name: "Centre-Val de Loire",
+      },
     },
   ],
   hasOfferCatalog: {
@@ -209,7 +187,7 @@ const localBusinessJsonLd = {
     {
       "@type": "AdministrativeArea",
       name: "Centre-Val de Loire",
-      identifier: "R24"
+      identifier: "R24",
     },
     {
       "@type": "GeoCircle",
@@ -273,7 +251,6 @@ export default async function RootLayout({
 }: Readonly<{
   children: ReactNode;
 }>) {
-  const locale = await getLocale();
   const payload = await getPayload({ config: payloadConfig });
   const config = await payload.findByID({
     collection: "config",
@@ -282,7 +259,7 @@ export default async function RootLayout({
   });
 
   return (
-    <html className="scroll-smooth" lang={locale} suppressHydrationWarning>
+    <html className="scroll-smooth" lang="fr" suppressHydrationWarning>
       <head>
         <meta
           content="Douche Senior France"
@@ -314,20 +291,16 @@ export default async function RootLayout({
       <body className={cn(nunito.variable, "antialiased size-full font-sans")}>
         <SpeedInsights />
         <Analytics />
-        <Providers>
-          <a
-            className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-md focus:font-semibold"
-            href="#main-content"
-          >
-            Aller au contenu principal
-          </a>
-          <NavBar config={config} />
-          <main id="main-content">
-            {children}
-          </main>
-          <Footer config={config} />
-          <ContactModal />
-        </Providers>
+        <a
+          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-md focus:font-semibold"
+          href="#main-content"
+        >
+          Aller au contenu principal
+        </a>
+        <NavBar config={config} />
+        <main id="main-content">{children}</main>
+        <Footer config={config} />
+        <ContactModal />
       </body>
     </html>
   );

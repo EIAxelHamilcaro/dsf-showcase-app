@@ -4,6 +4,7 @@ import { BlockRenderer } from "@/app/_components/blocks/blockRenderer";
 import { RefreshRouteOnSave } from "@/app/_components/refreshRouteOnSave";
 import { getAllPages, getPageBySlug } from "@/lib/pages/getPage";
 import { getSiteConfig } from "@/lib/pages/getSiteConfig";
+import { buildMetadata, seoImageUrl } from "@/lib/seo/buildMetadata";
 
 interface CmsPageProps {
   params: Promise<{ slug: string }>;
@@ -28,11 +29,12 @@ export async function generateMetadata({
     return {};
   }
 
-  return {
+  return buildMetadata({
     title: page.seo.title,
     description: page.seo.description,
-    alternates: { canonical: `/${page.slug}` },
-  };
+    path: `/${page.slug}`,
+    imageUrl: seoImageUrl(page),
+  });
 }
 
 export default async function CmsPage({ params }: CmsPageProps) {
