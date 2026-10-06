@@ -71,16 +71,18 @@ export function RegionalNavSection({
             <p className="text-muted-foreground">
               + toutes les communes des 5 départements
             </p>
-            <nav
-              aria-label="Villes desservies"
-              className="mt-6 flex flex-wrap justify-center gap-2"
-            >
-              {cities.map((city) => (
-                <Button asChild key={city.href} variant="outline">
-                  <Link href={city.href}>{city.label}</Link>
-                </Button>
-              ))}
-            </nav>
+            {cities.length > 0 ? (
+              <nav
+                aria-label="Villes desservies"
+                className="mt-6 flex flex-wrap justify-center gap-2"
+              >
+                {cities.map((city) => (
+                  <Button asChild key={city.href} variant="outline">
+                    <Link href={city.href}>{city.label}</Link>
+                  </Button>
+                ))}
+              </nav>
+            ) : null}
           </div>
         </div>
       </div>

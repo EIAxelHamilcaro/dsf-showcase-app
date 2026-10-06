@@ -63,6 +63,65 @@ describe("getBreadcrumb", () => {
   });
 });
 
+describe("a parent that makes no sense", () => {
+  const trail = (candidate: Page, pages: Page[]) =>
+    hrefs(getBreadcrumb(candidate, pages));
+
+  it("gives a city without parent the short trail and no department link", () => {
+    const lonely = page(8, "douche-senior-vendome", "city");
+    const pages = [...all, lonely];
+
+    assert.deepEqual(trail(lonely, pages), ["/", "/douche-senior-vendome"]);
+    assert.deepEqual(hrefs(getRelatedLinks(lonely, pages)), [
+      "/installation-douche-pmr",
+      "/aides-financieres",
+    ]);
+  });
+
+  it("ignores a parent that is not a department", () => {
+    const underService = page(8, "douche-senior-vendome", "city", 6);
+    const underCity = page(9, "douche-senior-vierzon", "city", 3);
+    const pages = [...all, underService, underCity];
+
+    assert.deepEqual(trail(underService, pages), [
+      "/",
+      "/douche-senior-vendome",
+    ]);
+    assert.deepEqual(trail(underCity, pages), ["/", "/douche-senior-vierzon"]);
+  });
+
+  it("ignores a parent set on a page that is not a city", () => {
+    const nested = page(8, "sologne", "department", 1);
+    const service = page(9, "pose-receveur", "service", 1);
+    const pages = [...all, nested, service];
+
+    assert.deepEqual(trail(nested, pages), ["/", "/sologne"]);
+    assert.deepEqual(trail(service, pages), ["/", "/pose-receveur"]);
+  });
+
+  it("ignores a page that is its own parent", () => {
+    const loop = page(8, "douche-senior-vendome", "city", 8);
+    const pages = [...all, loop];
+
+    assert.deepEqual(trail(loop, pages), ["/", "/douche-senior-vendome"]);
+    assert.doesNotThrow(() => getRelatedLinks(loop, pages));
+  });
+
+  it("drops a link whose label is empty or only spaces", () => {
+    const blank = {
+      ...page(8, "douche-senior-vendome", "city", 1),
+      navLabel: "   ",
+    } as Page;
+    const pages = [...all, blank];
+
+    assert.deepEqual(trail(blank, pages), ["/", "/loir-et-cher"]);
+    assert.ok(!hrefs(getCityLinks(pages)).includes("/douche-senior-vendome"));
+    assert.ok(
+      !hrefs(getRelatedLinks(blois, pages)).includes("/douche-senior-vendome"),
+    );
+  });
+});
+
 describe("getCityLinks", () => {
   it("lists every city page for the home page", () => {
     assert.deepEqual(hrefs(getCityLinks(all)), [

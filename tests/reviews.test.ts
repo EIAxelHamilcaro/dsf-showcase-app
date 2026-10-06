@@ -5,6 +5,7 @@ import {
   formatRating,
   formatReviewDate,
   getRatedReviews,
+  toReviewDay,
 } from "../lib/seo/reviews";
 import type { Config1 } from "../payload-types";
 
@@ -140,5 +141,42 @@ describe("formatRating", () => {
 describe("formatReviewDate", () => {
   it("shows the day the JSON-LD publishes, in the French order", () => {
     assert.equal(formatReviewDate("2026-03-02"), "02/03/2026");
+  });
+});
+
+describe("toReviewDay", () => {
+  it("keeps the day the editor picked in the admin, stored as noon UTC", () => {
+    assert.equal(toReviewDay("2026-03-02T12:00:00.000Z"), "2026-03-02");
+    assert.equal(toReviewDay("2026-07-14T12:00:00.000Z"), "2026-07-14");
+  });
+
+  it("reads a date stored at midnight in France as that French day", () => {
+    assert.equal(toReviewDay("2026-03-01T23:00:00.000Z"), "2026-03-02");
+    assert.equal(toReviewDay("2026-07-13T22:00:00.000Z"), "2026-07-14");
+  });
+
+  it("gives nothing for an empty or unreadable date", () => {
+    assert.equal(toReviewDay(null), undefined);
+    assert.equal(toReviewDay(""), undefined);
+    assert.equal(toReviewDay("pas une date"), undefined);
+  });
+});
+
+describe("a rated testimonial without a name", () => {
+  it("is not a review: it is neither listed nor counted", () => {
+    const config = configWith({
+      testimonials_section: [
+        { ...testimonial(5), title: "  " },
+        { ...testimonial(3), title: null },
+        testimonial(4),
+      ],
+    });
+
+    assert.equal(getRatedReviews(config).length, 1);
+    assert.deepEqual(computeAggregateRating(config), {
+      ratingValue: 4,
+      reviewCount: 1,
+      origin: "testimonials",
+    });
   });
 });

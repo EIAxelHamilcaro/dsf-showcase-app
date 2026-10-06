@@ -35,17 +35,8 @@ export const crawlablePaths: readonly string[] = ["/", "/api/media/file/"];
 export const businessFacts = {
   facebookUrl: "https://www.facebook.com/douche.senior.france/",
   logoPath: "/logo.png",
-  priceRange: "€€",
   latitude: 47.28256927999651,
   longitude: 1.5726510253114867,
-  openingHours: [
-    {
-      days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-      opens: "08:00",
-      closes: "18:00",
-    },
-    { days: ["Saturday"], opens: "09:00", closes: "12:00" },
-  ],
   serviceTypeName: "Installation de douches sécurisées pour seniors et PMR",
   description:
     "Artisan spécialisé dans le remplacement de baignoire par douche sécurisée pour seniors et PMR",

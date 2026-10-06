@@ -5,36 +5,43 @@ export interface PageLink {
   href: string;
 }
 
-const toLink = (page: Page): PageLink => ({
-  label: page.navLabel,
-  href: `/${page.slug}`,
-});
+const toLinks = (pages: Page[]): PageLink[] =>
+  pages.flatMap((page) => {
+    const label = page.navLabel.replace(/\s+/g, " ").trim();
+
+    return label ? [{ label, href: `/${page.slug}` }] : [];
+  });
 
 const parentOf = (page: Page, all: Page[]): Page | undefined => {
   const parent = page.parent;
 
-  if (parent === null || parent === undefined) {
+  if (page.pageType !== "city" || parent === null || parent === undefined) {
     return undefined;
   }
 
   const parentId = typeof parent === "object" ? parent.id : parent;
 
-  return all.find((candidate) => candidate.id === parentId);
+  return all.find(
+    (candidate) =>
+      candidate.id === parentId &&
+      candidate.id !== page.id &&
+      candidate.pageType === "department",
+  );
 };
 
 export function getBreadcrumb(page: Page, all: Page[]): PageLink[] {
   const parent = parentOf(page, all);
-  const trail = parent ? [toLink(parent)] : [];
+  const trail = parent ? [parent, page] : [page];
 
-  return [{ label: "Accueil", href: "/" }, ...trail, toLink(page)];
+  return [{ label: "Accueil", href: "/" }, ...toLinks(trail)];
 }
 
 export function getDepartmentLinks(all: Page[]): PageLink[] {
-  return all.filter((page) => page.pageType === "department").map(toLink);
+  return toLinks(all.filter((page) => page.pageType === "department"));
 }
 
 export function getCityLinks(all: Page[]): PageLink[] {
-  return all.filter((page) => page.pageType === "city").map(toLink);
+  return toLinks(all.filter((page) => page.pageType === "city"));
 }
 
 export function getRelatedLinks(page: Page, all: Page[]): PageLink[] {
@@ -51,7 +58,7 @@ export function getRelatedLinks(page: Page, all: Page[]): PageLink[] {
       (candidate) => candidate.pageType === "service",
     );
 
-    return [...(parent ? [parent] : []), ...siblings, ...services].map(toLink);
+    return toLinks([...(parent ? [parent] : []), ...siblings, ...services]);
   }
 
   if (page.pageType === "department") {
@@ -64,7 +71,7 @@ export function getRelatedLinks(page: Page, all: Page[]): PageLink[] {
       (candidate) => candidate.pageType === "service",
     );
 
-    return [...cities, ...services].map(toLink);
+    return toLinks([...cities, ...services]);
   }
 
   const services = others.filter(
@@ -74,5 +81,5 @@ export function getRelatedLinks(page: Page, all: Page[]): PageLink[] {
     (candidate) => candidate.pageType === "department",
   );
 
-  return [...services, ...departments].map(toLink);
+  return toLinks([...services, ...departments]);
 }

@@ -47,7 +47,16 @@ const city = {
   parent: 1,
   areaName: "Blois",
   seo: { title: "Titre Blois", description: "Description Blois" },
-  layout: [],
+  layout: [
+    {
+      blockType: "hero",
+      titleBefore: "Installation ",
+      titleHighlight: "Douche  Sécurisée",
+      titleAfter: "pour Seniors à Blois",
+      intro: "Intro",
+      ctaLabel: "Devis",
+    },
+  ],
   updatedAt: "2026-03-01T10:00:00.000Z",
 } as unknown as Page;
 
@@ -129,6 +138,158 @@ describe("buildPageGraph", () => {
       "@id": "https://www.douche-senior-france.com/#business",
     });
     assert.deepEqual(service?.areaServed, { "@type": "City", name: "Blois" });
+  });
+
+  it("names the service after the visible h1 and the web page after the SEO title", () => {
+    const graph = buildPageGraph({ page: city, all, config: fullConfig });
+
+    assert.equal(
+      nodesOf(graph, "Service")[0]?.name,
+      "Installation Douche Sécurisée pour Seniors à Blois",
+    );
+    assert.equal(nodesOf(graph, "WebPage")[0]?.name, "Titre Blois");
+  });
+
+  it("glues an elided article to the highlighted word like the h1 does", () => {
+    const indre = {
+      ...department,
+      layout: [
+        {
+          blockType: "hero",
+          titleBefore: "Installation Douche Senior dans l'",
+          titleHighlight: "Indre (36)",
+          intro: "Intro",
+          ctaLabel: "Devis",
+        },
+      ],
+    } as unknown as Page;
+    const graph = buildPageGraph({ page: indre, all, config: fullConfig });
+
+    assert.equal(
+      nodesOf(graph, "Service")[0]?.name,
+      "Installation Douche Senior dans l'Indre (36)",
+    );
+  });
+
+  it("falls back to the navigation label when the page has no hero", () => {
+    const graph = buildPageGraph({ page: service, all, config: fullConfig });
+
+    assert.equal(nodesOf(graph, "Service")[0]?.name, "Installation Douche PMR");
+  });
+
+  it("emits a service without area for a city that has no area name", () => {
+    const unnamed = { ...city, areaName: " " } as unknown as Page;
+    const graph = buildPageGraph({ page: unnamed, all, config: fullConfig });
+    const node = nodesOf(graph, "Service")[0];
+
+    assert.ok(node);
+    assert.equal("areaServed" in node, false);
+    assert.ok(!JSON.stringify(graph).includes('""'));
+  });
+
+  it("describes a department without code by its name only, and skips one without name", () => {
+    const noCode = { ...department, departmentCode: null } as unknown as Page;
+    const noName = { ...department, areaName: null } as unknown as Page;
+    const withoutCode = buildPageGraph({
+      page: noCode,
+      all: [noCode, city, service],
+      config: fullConfig,
+    });
+    const withoutName = buildPageGraph({
+      page: noName,
+      all: [noName, city, service],
+      config: fullConfig,
+    });
+    const business = findById(
+      withoutName,
+      "https://www.douche-senior-france.com/#business",
+    );
+    const unnamedService = nodesOf(withoutName, "Service")[0];
+
+    assert.deepEqual(nodesOf(withoutCode, "Service")[0]?.areaServed, {
+      "@type": "AdministrativeArea",
+      name: "Loir-et-Cher",
+    });
+    assert.ok(unnamedService);
+    assert.equal("areaServed" in unnamedService, false);
+    assert.deepEqual(business?.areaServed, [
+      { "@type": "AdministrativeArea", name: "Centre-Val de Loire" },
+    ]);
+  });
+
+  it("survives a parent of the wrong type, a self parent and a missing parent", () => {
+    const cases = [
+      { ...city, parent: 3 },
+      { ...city, parent: 2 },
+      { ...city, parent: null },
+    ] as unknown as Page[];
+
+    for (const candidate of cases) {
+      const pages = [department, candidate, service];
+      const graph = buildPageGraph({
+        page: candidate,
+        all: pages,
+        config: fullConfig,
+      });
+      const items = nodesOf(graph, "BreadcrumbList")[0]?.itemListElement as {
+        position: number;
+        name: string;
+      }[];
+
+      assert.deepEqual(
+        items.map((item) => [item.position, item.name]),
+        [
+          [1, "Accueil"],
+          [2, "Douche Senior Blois"],
+        ],
+      );
+      assert.deepEqual(danglingReferences(graph), []);
+    }
+  });
+
+  it("drops a breadcrumb item whose label is blank and renumbers the rest", () => {
+    const blankParent = { ...department, navLabel: "  " } as unknown as Page;
+    const graph = buildPageGraph({
+      page: city,
+      all: [blankParent, city, service],
+      config: fullConfig,
+    });
+    const items = nodesOf(graph, "BreadcrumbList")[0]?.itemListElement as {
+      position: number;
+      name: string;
+    }[];
+
+    assert.deepEqual(
+      items.map((item) => [item.position, item.name]),
+      [
+        [1, "Accueil"],
+        [2, "Douche Senior Blois"],
+      ],
+    );
+  });
+
+  it("publishes no opening hours and no price range, which the site shows nowhere", () => {
+    const serialized = JSON.stringify(
+      buildPageGraph({ page: city, all, config: fullConfig }),
+    );
+
+    assert.ok(!serialized.includes("openingHoursSpecification"));
+    assert.ok(!serialized.includes("priceRange"));
+  });
+
+  it("publishes the coordinates only with a complete address", () => {
+    const withAddress = findById(
+      buildPageGraph({ page: city, all, config: fullConfig }),
+      "https://www.douche-senior-france.com/#business",
+    );
+    const withoutAddress = findById(
+      buildPageGraph({ page: city, all, config: emptyIdentityConfig }),
+      "https://www.douche-senior-france.com/#business",
+    );
+
+    assert.ok(withAddress && withoutAddress);
+    assert.equal("geo" in withAddress, true);
+    assert.equal("geo" in withoutAddress, false);
   });
 
   it("lists the trail Accueil, department, city in the breadcrumb", () => {
@@ -403,6 +564,33 @@ describe("buildHomeGraph", () => {
         ["Paul", 4],
       ],
     );
+  });
+
+  it("leaves out a rated testimonial that has no author name", () => {
+    const rated = {
+      ...fullConfig,
+      testimonials_section: [
+        { title: " ", text: "Avis anonyme", rating: 5 },
+        { title: "Paul", text: "Avis deux", rating: 4 },
+      ],
+    } as unknown as Config1;
+    const business = findById(
+      buildHomeGraph({ all, config: rated }),
+      "https://www.douche-senior-france.com/#business",
+    );
+    const reviews = business?.review as { author: { name: string } }[];
+
+    assert.deepEqual(
+      reviews.map((review) => review.author.name),
+      ["Paul"],
+    );
+    assert.deepEqual(business?.aggregateRating, {
+      "@type": "AggregateRating",
+      ratingValue: 4,
+      reviewCount: 1,
+      bestRating: 5,
+      worstRating: 1,
+    });
   });
 
   it("uses the Google figures for the aggregate when both are entered", () => {

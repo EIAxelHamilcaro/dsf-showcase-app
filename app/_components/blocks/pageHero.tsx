@@ -1,10 +1,9 @@
 import { MapPin } from "lucide-react";
 import { ContactButton } from "@/app/_components/contactButton";
 import { PageSection } from "@/app/_components/pageSection";
+import { followsElision } from "@/lib/pages/pageHeading";
 import type { HeroBlock } from "@/payload-types";
 import { PhoneButton } from "./phoneButton";
-
-const elisionPattern = /['’]$/;
 
 interface PageHeroProps {
   block: HeroBlock;
@@ -12,7 +11,7 @@ interface PageHeroProps {
 }
 
 export function PageHero({ block, phone }: PageHeroProps) {
-  const gapAfterBefore = elisionPattern.test(block.titleBefore) ? "" : " ";
+  const gapAfterBefore = followsElision(block.titleBefore) ? "" : " ";
 
   return (
     <PageSection tone="hero">

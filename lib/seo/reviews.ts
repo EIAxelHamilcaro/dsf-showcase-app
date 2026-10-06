@@ -21,18 +21,39 @@ const isValidRating = (value: number | null | undefined): value is number =>
 
 const roundTwo = (value: number) => Math.round(value * 100) / 100;
 
+const reviewDayFormat = new Intl.DateTimeFormat("en-CA", {
+  timeZone: "Europe/Paris",
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+});
+
+export function toReviewDay(
+  date: string | null | undefined,
+): string | undefined {
+  const instant = new Date(date ?? "");
+
+  if (Number.isNaN(instant.getTime())) {
+    return undefined;
+  }
+
+  return reviewDayFormat.format(instant);
+}
+
 export function toRatedReview(
   testimonial: Testimonial,
 ): RatedReview | undefined {
-  if (!isValidRating(testimonial.rating)) {
+  const author = testimonial.title?.trim();
+
+  if (!isValidRating(testimonial.rating) || !author) {
     return undefined;
   }
 
   return {
-    author: testimonial.title ?? "",
+    author,
     text: testimonial.text ?? "",
     rating: testimonial.rating,
-    date: testimonial.date?.slice(0, 10),
+    date: toReviewDay(testimonial.date),
     source: testimonial.source ?? "direct",
   };
 }

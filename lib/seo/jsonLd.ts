@@ -1,4 +1,5 @@
 import type { Config1, Page } from "../../payload-types";
+import { getPageHeading } from "../pages/pageHeading";
 import { getBreadcrumb } from "../pages/pageLinks";
 import { businessFacts, homeSeo, siteName, siteRegion, siteUrl } from "../site";
 import { toE164 } from "./phone";
@@ -96,12 +97,10 @@ function buildRatingNodes(config: Config1): Node {
       : undefined,
     review:
       reviews.length > 0
-        ? reviews.map((review) => {
-            const author = clean(review.author);
-
-            return compact({
+        ? reviews.map((review) =>
+            compact({
               "@type": "Review",
-              author: author ? { "@type": "Person", name: author } : undefined,
+              author: { "@type": "Person", name: clean(review.author) },
               reviewBody: clean(review.text),
               datePublished: review.date,
               reviewRating: {
@@ -110,8 +109,8 @@ function buildRatingNodes(config: Config1): Node {
                 bestRating: 5,
                 worstRating: 1,
               },
-            });
-          })
+            }),
+          )
         : undefined,
   };
 }
@@ -123,6 +122,7 @@ function buildBusiness(
 ): Node {
   const legal = config.legal_section;
   const siren = clean(legal?.siren);
+  const address = buildAddress(config);
   const sameAs = [
     businessFacts.facebookUrl,
     clean(config.google_profile_url),
@@ -147,19 +147,14 @@ function buildBusiness(
     image: absolute(businessFacts.logoPath),
     telephone: toE164(config.phone),
     email: clean(config.email),
-    priceRange: businessFacts.priceRange,
-    address: buildAddress(config),
-    geo: {
-      "@type": "GeoCoordinates",
-      latitude: businessFacts.latitude,
-      longitude: businessFacts.longitude,
-    },
-    openingHoursSpecification: businessFacts.openingHours.map((slot) => ({
-      "@type": "OpeningHoursSpecification",
-      dayOfWeek: slot.days,
-      opens: slot.opens,
-      closes: slot.closes,
-    })),
+    address,
+    geo: address
+      ? {
+          "@type": "GeoCoordinates",
+          latitude: businessFacts.latitude,
+          longitude: businessFacts.longitude,
+        }
+      : undefined,
     areaServed: [regionArea(), ...departments],
     sameAs,
     ...(withRatings ? buildRatingNodes(config) : {}),
@@ -270,7 +265,7 @@ export function buildPageGraph({
     itemListElement: trail.map((link, index) => ({
       "@type": "ListItem",
       position: index + 1,
-      name: clean(link.label),
+      name: link.label,
       item: absolute(link.href),
     })),
   };
@@ -294,7 +289,7 @@ export function buildPageGraph({
       : compact({
           "@type": "Service",
           "@id": `${url}#service`,
-          name: clean(page.seo.title),
+          name: clean(getPageHeading(page)),
           serviceType: businessFacts.serviceTypeName,
           description: clean(page.seo.description),
           provider: { "@id": businessId },
