@@ -13,7 +13,7 @@ export function ZoneList({ block }: ZoneListProps) {
         <ul className="grid gap-3 min-[360px]:grid-cols-2 sm:flex sm:flex-wrap">
           {block.items.map((item, index) => (
             <li
-              className="flex items-center gap-2 rounded-lg border bg-background px-4 py-3 font-semibold"
+              className="flex items-center gap-2 rounded-lg border bg-background px-3 py-3 font-semibold sm:px-4"
               key={item.id ?? index.toString()}
             >
               {block.showMapIcon ? (

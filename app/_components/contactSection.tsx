@@ -80,10 +80,10 @@ export function ContactSection({ config }: { config: Config1 }) {
 
       <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
         <Card className="min-w-0 bg-background shadow-none">
-          <CardHeader className="px-3 sm:px-6">
+          <CardHeader className="px-2 sm:px-6">
             <CardTitle className="text-2xl">Formulaire de contact</CardTitle>
           </CardHeader>
-          <CardContent className="px-3 sm:px-6">
+          <CardContent className="px-2 sm:px-6">
             <form
               className="space-y-4"
               noValidate

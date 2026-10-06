@@ -112,7 +112,7 @@ export function ServicesSection({ config }: { config: Config1 }) {
 
         <div className="flex flex-wrap justify-center gap-8">
           {aids.map(({ href, badgeClass, help }) => (
-            <div className="max-w-xs min-w-56 flex-1 text-center" key={href}>
+            <div className="max-w-xs grow basis-56 text-center" key={href}>
               <Link
                 className="group block rounded-lg"
                 href={href}

@@ -103,7 +103,7 @@ interface LegalContentProps {
 export function LegalContent({ block, updatedAt }: LegalContentProps) {
   return (
     <PageSection>
-      <div className="mx-auto max-w-reading space-y-5 text-lg leading-relaxed">
+      <div className="mx-auto max-w-reading space-y-5 text-lg leading-relaxed break-words">
         <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight">
           {block.title}
         </h1>
