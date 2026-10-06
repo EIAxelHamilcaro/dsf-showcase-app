@@ -1,9 +1,16 @@
 "use client";
 import { Turnstile, type TurnstileInstance } from "@marsidev/react-turnstile";
-import { type ReactNode, useCallback, useRef, useState } from "react";
+import {
+  type ReactNode,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { isTestKey, testSiteKey } from "@/lib/contact/turnstileKeys";
 
 const tokenWaitInMs = 10_000;
+const flexibleWidgetQuery = "(min-width: 22.5rem)";
 const isDeployed = Boolean(process.env.NEXT_PUBLIC_VERCEL_ENV);
 const configuredSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 const fallbackSiteKey =
@@ -28,6 +35,11 @@ export function useTurnstile(): TurnstileState {
   const token = useRef<string>(undefined);
   const listeners = useRef<TokenListener[]>([]);
   const [hasFailed, setHasFailed] = useState(false);
+  const [isCompact, setIsCompact] = useState(false);
+
+  useEffect(() => {
+    setIsCompact(!window.matchMedia(flexibleWidgetQuery).matches);
+  }, []);
 
   const publish = useCallback((received: string | undefined) => {
     token.current = received;
@@ -79,7 +91,7 @@ export function useTurnstile(): TurnstileState {
       onExpire={expire}
       onSuccess={succeed}
       onUnsupported={fail}
-      options={{ language: "fr", size: "flexible" }}
+      options={{ language: "fr", size: isCompact ? "compact" : "flexible" }}
       ref={instance}
       scriptOptions={{ onError: fail }}
       siteKey={siteKey}
